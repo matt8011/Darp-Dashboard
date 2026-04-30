@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "darp-dashboard",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "7823", "--directory", "C:\\Users\\mkyle\\OneDrive\\Desktop\\darp dashboard"],
+      "port": 7823
+    }
+  ]
+}
