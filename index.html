@@ -47,8 +47,9 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 .section-heading { font-family:'Barlow Condensed',sans-serif; font-size:clamp(24px,3vw,36px); font-weight:800; letter-spacing:0.02em; text-transform:uppercase; margin-bottom:4px; }
 .section-sub { font-size:13px; color:var(--muted); margin-bottom:32px; }
 
-.hero-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:40px; }
-.hero-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; position:relative; overflow:hidden; transition:transform 0.2s,border-color 0.2s; }
+.hero-grid { display:flex; flex-direction:row; gap:16px; margin-bottom:40px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:4px; }
+.hero-grid::-webkit-scrollbar { display:none; }
+.hero-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; position:relative; overflow:hidden; transition:transform 0.2s,border-color 0.2s; flex:0 0 200px; min-width:200px; }
 .hero-card:hover { transform:translateY(-3px); border-color:var(--light); }
 .hero-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--blue),var(--light)); }
 .hero-card .hc-icon { font-size:28px; margin-bottom:12px; }
@@ -76,13 +77,11 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 .bar-name { font-size:13px; font-weight:600; width:160px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .bar-track { flex:1; height:32px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden; }
 .bar-fill { height:100%; border-radius:4px; display:flex; align-items:center; padding-right:10px; justify-content:flex-end; transition:width 1.2s cubic-bezier(0.22,1,0.36,1); width:0; }
-.bar-fill.c1 { background:linear-gradient(90deg,var(--blue),var(--light)); }
-.bar-fill.c2 { background:linear-gradient(90deg,#1a3f70,#4a8fcb); }
-.bar-fill.c3 { background:linear-gradient(90deg,#1a3f70,#3d7ab5); }
-.bar-fill.c4 { background:linear-gradient(90deg,#152f55,#2f65a0); }
-.bar-fill.c5 { background:linear-gradient(90deg,#101e35,#234e88); }
 .bar-val { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:var(--white); opacity:0.9; white-space:nowrap; }
 .bar-extra { font-size:11px; color:var(--muted); width:90px; text-align:right; flex-shrink:0; }
+.bar-key { margin-top:10px; padding-top:8px; border-top:1px solid var(--border); }
+.bar-key-line { font-size:11px; color:var(--muted); line-height:1.6; }
+.bar-key-line strong { color:var(--light); font-weight:700; margin-right:4px; }
 .dual-split { display:grid; grid-template-columns:1fr 1fr; gap:36px; }
 @media(max-width:700px){.dual-split{grid-template-columns:1fr}}
 .dual-title { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--light); margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border); }
@@ -191,8 +190,6 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 .grouped-bars { flex:1; display:flex; flex-direction:column; gap:4px; }
 .gbar { height:14px; border-radius:2px; display:flex; align-items:center; padding-right:6px; justify-content:flex-end; transition:width 1.2s cubic-bezier(0.22,1,0.36,1); min-width:2px; }
 .gbar span { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; color:rgba(255,255,255,0.9); white-space:nowrap; }
-.gbar-mf { background:linear-gradient(90deg,var(--blue),var(--light)); }
-.gbar-bf { background:linear-gradient(90deg,#1a3f70,#4a8fcb); }
 /* Team growth */
 .team-row { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
 .team-sem { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; width:44px; flex-shrink:0; }
@@ -236,7 +233,7 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 .sc-ld { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
 
 /* === Tooltip === */
-#tip { display:none; position:fixed; z-index:9999; background:rgba(8,20,48,0.97); border:1px solid rgba(109,174,230,0.35); border-radius:8px; padding:10px 14px; pointer-events:none; font-family:'Barlow',sans-serif; font-size:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5); min-width:180px; max-width:260px; }
+#tip { display:none; position:fixed; z-index:9999; background:rgba(8,20,48,0.97); border:1px solid rgba(109,174,230,0.35); border-radius:8px; padding:10px 14px; pointer-events:none; font-family:'Barlow',sans-serif; font-size:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5); min-width:160px; max-width:min(260px,calc(100vw - 20px)); }
 .tip-title { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:var(--white); letter-spacing:.05em; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.1); }
 .tip-row { display:flex; justify-content:space-between; gap:12px; margin-top:4px; color:var(--muted); }
 .tip-row span:last-child { color:var(--white); font-weight:600; text-align:right; }
@@ -665,22 +662,35 @@ function _tip(title, rows) {
       `<div class="tip-row"><span>${r[0]}</span><span>${r[1]}</span></div>`).join('');
 }
 
+const _BAR_A = '#1d4e8f';
+const _BAR_B = '#6aaee6';
+function _lerpColor(a, b, t) {
+  const ah = (n,s)=>parseInt(a.slice(s,s+2),16),
+        bh = (n,s)=>parseInt(b.slice(s,s+2),16);
+  const r = Math.round(ah(0,1)+(bh(0,1)-ah(0,1))*t).toString(16).padStart(2,'0');
+  const g = Math.round(ah(0,3)+(bh(0,3)-ah(0,3))*t).toString(16).padStart(2,'0');
+  const bl= Math.round(ah(0,5)+(bh(0,5)-ah(0,5))*t).toString(16).padStart(2,'0');
+  return '#'+r+g+bl;
+}
+
 function _lbBarHTML(data, fmt) {
   const ranks = ['r1','r2','r3','',''];
   const maxVal = data[0] ? data[0].val : 1;
   return data.map((d,i) => {
+    const t = d.val / maxVal;
+    const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
     let tipAttrs = '';
     if(d.tip) {
       const k = ++_tipIdx;
       _tipStore[k] = d.tip;
-      tipAttrs = ` data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()"`;
+      tipAttrs = ` data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()" ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])"`;
     }
     return `<div class="bar-row"${tipAttrs}>
       <div class="bar-rank ${ranks[i]||''}">${i+1}</div>
       <div class="bar-name">${d.name}</div>
       <div class="bar-track">
-        <div class="bar-fill c${i+1}" data-pct="${(d.val/maxVal*100).toFixed(1)}">
-          <span class="bar-val">${fmt(d.val)}</span>
+        <div class="bar-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
+          <span class="bar-val" data-orig="${fmt(d.val)}">${fmt(d.val)}</span>
         </div>
       </div>
       <div class="bar-extra">${d.extra||''}</div>
@@ -939,15 +949,18 @@ function renderGrowth() {
 
 function renderMFBF() {
   const max = Math.max(...mfbfData.flatMap(s=>[s.mf, s.bf]));
-  document.getElementById('mfbf-bars').innerHTML = mfbfData.map(s =>
-    `<div class="grouped-row">
+  document.getElementById('mfbf-bars').innerHTML = mfbfData.map(s => {
+    const mfT = s.mf / max, bfT = s.bf / max;
+    const mfGrad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,mfT)})`;
+    const bfGrad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,bfT)})`;
+    return `<div class="grouped-row">
       <div class="grouped-label ${s.current?'current':''}">${s.sem}</div>
       <div class="grouped-bars">
-        <div class="gbar gbar-mf" style="width:0" data-w="${(s.mf/max*100).toFixed(1)}%"><span>${s.mf.toLocaleString()} lbs</span></div>
-        <div class="gbar gbar-bf" style="width:0" data-w="${(s.bf/max*100).toFixed(1)}%"><span>${s.bf.toLocaleString()} lbs</span></div>
+        <div class="gbar" style="width:0;background:${mfGrad}" data-w="${(mfT*100).toFixed(1)}%"><span>${s.mf.toLocaleString()} lbs</span></div>
+        <div class="gbar" style="width:0;background:${bfGrad}" data-w="${(bfT*100).toFixed(1)}%"><span>${s.bf.toLocaleString()} lbs</span></div>
       </div>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
   setTimeout(()=>{
     document.querySelectorAll('#mfbf-bars .gbar').forEach(el => el.style.width = el.dataset.w);
   }, 80);
@@ -1018,7 +1031,51 @@ function animateBars() {
     const pct = parseFloat(el.dataset.pct);
     requestAnimationFrame(() => { el.style.width = Math.min(pct, 100) + '%'; });
   });
+  setTimeout(checkAllBarOverflow, 1350);
 }
+
+function checkBarOverflow(chart) {
+  // Reset first
+  chart.querySelectorAll('.bar-val').forEach(v => { v.textContent = v.dataset.orig; });
+  const existing = chart.querySelector('.bar-key');
+  if(existing) existing.remove();
+
+  const overflows = [];
+  chart.querySelectorAll('.bar-fill').forEach(fill => {
+    const val = fill.querySelector('.bar-val');
+    if(!val) return;
+    // padding-right 10px accounted for
+    if(fill.offsetWidth < val.scrollWidth + 14) overflows.push(val);
+  });
+
+  if(overflows.length === 0) return;
+
+  const keyLines = [];
+  if(overflows.length === 1) {
+    keyLines.push(`<div class="bar-key-line"><strong>*</strong>${overflows[0].dataset.orig}</div>`);
+    overflows[0].textContent = '*';
+  } else {
+    overflows.forEach((v, i) => {
+      keyLines.push(`<div class="bar-key-line"><strong>*${i+1}</strong>${v.dataset.orig}</div>`);
+      v.textContent = `*${i+1}`;
+    });
+  }
+
+  const keyDiv = document.createElement('div');
+  keyDiv.className = 'bar-key';
+  keyDiv.innerHTML = keyLines.join('');
+  chart.appendChild(keyDiv);
+}
+
+function checkAllBarOverflow() {
+  document.querySelectorAll('.bar-chart').forEach(checkBarOverflow);
+}
+
+let _resizeTO;
+window.addEventListener('resize', () => {
+  clearTimeout(_resizeTO);
+  _resizeTO = setTimeout(checkAllBarOverflow, 200);
+});
 
 // ============================================================
 // TAB 1 – INTERACTIVE CARD DATA
@@ -1295,21 +1352,39 @@ let filteredAmb = null;
 let selectedWeek = null;
 
 // ── Tooltip utilities ─────────────────────────────────────────────────────
+function _tipCoords(e) {
+  if(e.touches && e.touches.length) return {x:e.touches[0].clientX, y:e.touches[0].clientY};
+  if(e.changedTouches && e.changedTouches.length) return {x:e.changedTouches[0].clientX, y:e.changedTouches[0].clientY};
+  return {x:e.clientX, y:e.clientY};
+}
+function _placeTip(cx, cy) {
+  const t = document.getElementById('tip');
+  const tw = 270, margin = 8;
+  let tx = cx + 14;
+  if(tx + tw > window.innerWidth) tx = Math.max(margin, cx - tw - 4);
+  t.style.left = tx + 'px';
+  t.style.top = Math.max(margin, cy - 36) + 'px';
+}
 function tipShow(e, html) {
   const t = document.getElementById('tip');
   t.innerHTML = html;
   t.style.display = 'block';
-  moveTip(e);
+  const {x,y} = _tipCoords(e);
+  _placeTip(x, y);
 }
 function moveTip(e) {
-  const t = document.getElementById('tip');
-  const x = e.clientX + 14, y = e.clientY - 36;
-  t.style.left = (x + 270 > window.innerWidth ? e.clientX - 274 : x) + 'px';
-  t.style.top = Math.max(8, y) + 'px';
+  if(e.touches) return; // touch: tip stays put where tapped
+  const {x,y} = _tipCoords(e);
+  _placeTip(x, y);
 }
 function hideTip() {
   document.getElementById('tip').style.display = 'none';
 }
+// Dismiss tip when tapping anywhere not on a tip-trigger element
+document.addEventListener('touchstart', function(e) {
+  if(!e.target.closest('[data-wi],[data-day],[data-pt],[data-sem],[data-week-xi],[data-seg-wi],[data-eff-wi],[data-crown],[data-tipk]'))
+    hideTip();
+}, {passive:true});
 
 // ── Weekly bar tooltip ────────────────────────────────────────────────────
 function showBarTip(e, wi) {
@@ -1369,7 +1444,7 @@ function renderVizLbs() {
   const pw=W-ML-MR, ph=H-MT-MB, maxY=3600;
   const n=s26WeekTotals.length, sw=pw/n, bw=Math.floor(sw*0.72);
   const maxVal=Math.max(...s26WeekTotals);
-  let g='', xl='';
+  let defs='', g='', xl='';
   [1000,2000,3000].forEach(v => {
     const y=(MT+ph-(v/maxY)*ph).toFixed(1);
     g+=`<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
@@ -1384,23 +1459,18 @@ function renderVizLbs() {
       g+=`<rect x="${bx}" y="${MT}" width="${bw}" height="${ph}" fill="rgba(255,255,255,0.02)" rx="2"/>`;
       g+=`<text x="${cx}" y="${(MT+ph/2+4).toFixed(1)}" fill="rgba(255,255,255,0.18)" font-size="8" text-anchor="middle" font-family="Barlow Condensed,sans-serif" transform="rotate(-90,${cx},${(MT+ph/2).toFixed(1)})">SPRING BREAK</text>`;
     } else {
+      const t = lbs / maxVal;
+      const topColor = _lerpColor(_BAR_A, _BAR_B, t);
+      defs += `<linearGradient id="wbg${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${topColor}"/><stop offset="100%" stop-color="${_BAR_A}"/></linearGradient>`;
       const bh=((lbs/maxY)*ph).toFixed(1);
       const by=(MT+ph-lbs/maxY*ph).toFixed(1);
-      const isTop=(lbs===maxVal);
-      g+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="${isTop?'url(#wbgT)':'url(#wbg)'}" rx="2.5" data-wi="${i}" style="cursor:pointer"/>`;
-      if (lbs>=1200) g+=`<text x="${cx}" y="${(+by-5).toFixed(1)}" fill="${isTop?'#fff':'#b0d0ee'}" font-size="9" font-weight="700" text-anchor="middle" font-family="Barlow Condensed,sans-serif" pointer-events="none">${(lbs/1000).toFixed(1)}k</text>`;
+      g+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="url(#wbg${i})" rx="2.5" data-wi="${i}" style="cursor:pointer"/>`;
+      if (lbs>=1200) g+=`<text x="${cx}" y="${(+by-5).toFixed(1)}" fill="#fff" font-size="9" font-weight="700" text-anchor="middle" font-family="Barlow Condensed,sans-serif" pointer-events="none">${(lbs/1000).toFixed(1)}k</text>`;
     }
   });
   document.getElementById('viz-lbs-inner').innerHTML=
     `<svg viewBox="0 0 ${W} ${H}" style="width:100%;overflow:visible">
-      <defs>
-        <linearGradient id="wbg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#5ba3d6"/><stop offset="100%" stop-color="#1d4e8f"/>
-        </linearGradient>
-        <linearGradient id="wbgT" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#a8dbf5"/><stop offset="100%" stop-color="#2a7bc0"/>
-        </linearGradient>
-      </defs>
+      <defs>${defs}</defs>
       ${g}
       <line x1="${ML}" y1="${MT+ph}" x2="${W-MR}" y2="${MT+ph}" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
       ${xl}
@@ -1408,6 +1478,7 @@ function renderVizLbs() {
   document.querySelectorAll('#viz-lbs-inner [data-wi]').forEach(el => {
     const wi = +el.dataset.wi;
     el.addEventListener('mousemove', e => showBarTip(e, wi));
+    el.addEventListener('touchstart', e => showBarTip(e, wi), {passive:true});
     el.addEventListener('mouseleave', hideTip);
     el.addEventListener('click', e => showBarTip(e, wi));
   });
@@ -1445,7 +1516,7 @@ function renderVizHrs() {
   const full = Math.floor(totalFilms);
   const partial = totalFilms - full;
   const TW=28, TH=42, GAP=2;
-  const imgPath = 'data%20files/kung%20fu%20panda.jpg';
+  const imgPath = 'data%20files/kun%20fu%20panda%202.jpg';
   let html = `<div style="display:flex;flex-wrap:wrap;gap:${GAP}px;">`;
   for (let i = 0; i <= full; i++) {
     const op = (i === full) ? partial.toFixed(2) : 1;
@@ -1524,20 +1595,18 @@ function renderVizLbhr() {
   // Weekday bar tooltips
   document.querySelectorAll('#viz-lbhr-inner [data-day]').forEach(el => {
     const i = +el.dataset.day;
-    el.addEventListener('mousemove', e => {
-      const wks = wkdayMeta.activeWeeks[i];
-      const totalLbs = wkdayMeta.totalLbs[i];
-      const totalHrs = wkdayMeta.totalHrs[i];
-      const avgLbs = Math.round(totalLbs / wks);
-      const avgHrs = (totalHrs / wks).toFixed(1);
+    function _wkdayTip(e) {
+      const wks = wkdayMeta.activeWeeks[i], totalLbs = wkdayMeta.totalLbs[i], totalHrs = wkdayMeta.totalHrs[i];
       tipShow(e,
         `<div class="tip-title">${wkdayLbhr.labels[i]}s — Spring 2026</div>` +
         `<div class="tip-row"><span>Total lbs collected</span><span>${totalLbs.toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Avg lbs per ${wkdayLbhr.labels[i]}</span><span>${avgLbs.toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Avg hours worked</span><span>${avgHrs} hrs</span></div>` +
+        `<div class="tip-row"><span>Avg lbs per ${wkdayLbhr.labels[i]}</span><span>${Math.round(totalLbs/wks).toLocaleString()}</span></div>` +
+        `<div class="tip-row"><span>Avg hours worked</span><span>${(totalHrs/wks).toFixed(1)} hrs</span></div>` +
         `<div class="tip-row"><span>Total hours worked</span><span>${totalHrs.toFixed(1)} hrs</span></div>`
       );
-    });
+    }
+    el.addEventListener('mousemove', _wkdayTip);
+    el.addEventListener('touchstart', _wkdayTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
     el.addEventListener('click', e => {
       const wks = wkdayMeta.activeWeeks[i];
@@ -1545,13 +1614,7 @@ function renderVizLbhr() {
       const totalHrs = wkdayMeta.totalHrs[i];
       const avgLbs = Math.round(totalLbs / wks);
       const avgHrs = (totalHrs / wks).toFixed(1);
-      tipShow(e,
-        `<div class="tip-title">${wkdayLbhr.labels[i]}s — Spring 2026</div>` +
-        `<div class="tip-row"><span>Total lbs collected</span><span>${totalLbs.toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Avg lbs per ${wkdayLbhr.labels[i]}</span><span>${avgLbs.toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Avg hours worked</span><span>${avgHrs} hrs</span></div>` +
-        `<div class="tip-row"><span>Total hours worked</span><span>${totalHrs.toFixed(1)} hrs</span></div>`
-      );
+      _wkdayTip(e);
     });
   });
 }
@@ -1605,14 +1668,12 @@ function renderVizScatter() {
   document.querySelectorAll('#viz-scatter-inner [data-pt]').forEach(el => {
     const idx = +el.dataset.pt;
     const p = allTimeData[idx];
-    el.addEventListener('mousemove', e => {
+    function _dotTip(e) {
       const dateStr = new Date(p.d + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
       let lbhrStr = '—';
       if (p.s === 'S26') {
         const mi = S26_META_IDX[p.d];
-        if (mi !== undefined && s26WeekMeta[mi] && s26WeekMeta[mi].lbhr != null) {
-          lbhrStr = s26WeekMeta[mi].lbhr.toFixed(1);
-        }
+        if (mi !== undefined && s26WeekMeta[mi] && s26WeekMeta[mi].lbhr != null) lbhrStr = s26WeekMeta[mi].lbhr.toFixed(1);
       } else if (p.s === 'F25' && F25_LBHR[idx] != null) {
         lbhrStr = F25_LBHR[idx].toFixed(1);
       } else if (semStats[p.s] && semStats[p.s].lbhr != null) {
@@ -1623,7 +1684,9 @@ function renderVizScatter() {
         `<div class="tip-row"><span>Lbs diverted</span><span>${p.y.toLocaleString()}</span></div>` +
         `<div class="tip-row"><span>Avg lb/hr</span><span>${lbhrStr}</span></div>`
       );
-    });
+    }
+    el.addEventListener('mousemove', _dotTip);
+    el.addEventListener('touchstart', _dotTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
   });
 
@@ -1652,10 +1715,12 @@ function renderVizScatter() {
         `<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--white);line-height:1">${lbhrStr}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Avg lb / hr</div></div>` +
         `</div>`;
     });
-    el.addEventListener('mousemove', e => {
+    function _semTip(e) {
       const st = semStats[el.dataset.sem];
-      tipShow(e, `<div class="tip-title">${st ? st.name : el.dataset.sem}</div><div class="tip-row"><span>Click for semester stats</span></div>`);
-    });
+      tipShow(e, `<div class="tip-title">${st ? st.name : el.dataset.sem}</div><div class="tip-row"><span>Tap for semester stats</span></div>`);
+    }
+    el.addEventListener('mousemove', _semTip);
+    el.addEventListener('touchstart', _semTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
   });
 }
@@ -1784,11 +1849,12 @@ function renderVizAmb() {
   // Week label click → filter by week
   document.querySelectorAll('#viz-amb-inner [data-week-xi]').forEach(el => {
     el.addEventListener('click', () => selectWeekIdx(+el.dataset.weekXi));
-    el.addEventListener('mousemove', e => {
-      const xi = +el.dataset.weekXi;
-      const wi = wkIdxs[xi];
-      tipShow(e, `<div class="tip-title">${s26WeekMeta[wi].range}</div><div class="tip-row"><span>Click to isolate week</span></div>`);
-    });
+    function _weekTip(e) {
+      const wi = wkIdxs[+el.dataset.weekXi];
+      tipShow(e, `<div class="tip-title">${s26WeekMeta[wi].range}</div><div class="tip-row"><span>Tap to isolate week</span></div>`);
+    }
+    el.addEventListener('mousemove', _weekTip);
+    el.addEventListener('touchstart', _weekTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
   });
 
@@ -1796,21 +1862,20 @@ function renderVizAmb() {
   document.querySelectorAll('#viz-amb-inner [data-seg-ai]').forEach(el => {
     const ai = +el.dataset.segAi;
     const wi = +el.dataset.segWi;
-    const xi = +el.dataset.segXi;
-    el.addEventListener('mousemove', e => {
-      const lbs = ambWeeklyLbs[ai][wi];
-      const weekTotal = s26WeekTotals[wi];
+    function _segTip(e) {
+      const lbs = ambWeeklyLbs[ai][wi], weekTotal = s26WeekTotals[wi];
       const pct = weekTotal > 0 ? Math.round(lbs / weekTotal * 100) : 0;
-      const shifts = ambWeeklyShifts[ai][wi];
       tipShow(e,
         `<div class="tip-title">${ambNames[ai]}</div>` +
         `<div class="tip-row"><span>Week of</span><span>${s26WeekMeta[wi].range.split(' – ')[0]}</span></div>` +
         `<div class="tip-row"><span>Lbs this week</span><span>${lbs.toLocaleString()}</span></div>` +
         `<div class="tip-row"><span>Week total</span><span>${weekTotal.toLocaleString()}</span></div>` +
         `<div class="tip-row"><span>Share</span><span>${pct}%</span></div>` +
-        `<div class="tip-row"><span>Shifts worked</span><span>${shifts}</span></div>`
+        `<div class="tip-row"><span>Shifts worked</span><span>${ambWeeklyShifts[ai][wi]}</span></div>`
       );
-    });
+    }
+    el.addEventListener('mousemove', _segTip);
+    el.addEventListener('touchstart', _segTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
     el.addEventListener('click', () => { selectAmbFilter(ambNames[ai]); });
   });
@@ -1818,9 +1883,11 @@ function renderVizAmb() {
   // Crown name click = same as legend filter
   document.querySelectorAll('#viz-amb-inner [data-crown]').forEach(el => {
     el.addEventListener('click', () => selectAmbFilter(el.dataset.crown));
-    el.addEventListener('mousemove', e => {
-      tipShow(e, `<div class="tip-title">${el.dataset.crown}</div><div class="tip-row"><span>Click to highlight</span></div>`);
-    });
+    function _crownTip(e) {
+      tipShow(e, `<div class="tip-title">${el.dataset.crown}</div><div class="tip-row"><span>Tap to highlight</span></div>`);
+    }
+    el.addEventListener('mousemove', _crownTip);
+    el.addEventListener('touchstart', _crownTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
   });
 
@@ -1828,11 +1895,9 @@ function renderVizAmb() {
   document.querySelectorAll('#viz-amb-inner [data-eff-ai]').forEach(el => {
     const ai = +el.dataset.effAi;
     const wi = +el.dataset.effWi;
-    el.addEventListener('mousemove', e => {
-      const eff = ambWeeklyEff[ai][wi];
-      const lbs = ambWeeklyLbs[ai][wi];
-      const hrs = ambWeeklyHrs[ai][wi];
-      const shiftCount = ambWeeklyShifts[ai][wi];
+    function _effTip(e) {
+      const eff = ambWeeklyEff[ai][wi], lbs = ambWeeklyLbs[ai][wi];
+      const hrs = ambWeeklyHrs[ai][wi], shiftCount = ambWeeklyShifts[ai][wi];
       tipShow(e,
         `<div class="tip-title">${ambNames[ai]}</div>` +
         `<div class="tip-row"><span>Week of</span><span>${s26WeekMeta[wi].range.split(' – ')[0]}</span></div>` +
@@ -1842,7 +1907,9 @@ function renderVizAmb() {
         `<div class="tip-row"><span>Shifts worked</span><span>${shiftCount}</span></div>` +
         `<div style="font-size:10px;color:var(--muted);margin-top:6px;border-top:1px solid rgba(255,255,255,0.08);padding-top:6px">100 = hall avg for shift time · higher is better</div>`
       );
-    });
+    }
+    el.addEventListener('mousemove', _effTip);
+    el.addEventListener('touchstart', _effTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
     el.addEventListener('click', () => selectAmbFilter(ambNames[ai]));
   });
