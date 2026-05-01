@@ -241,6 +241,32 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 .amb-li { cursor:pointer; transition:opacity 0.2s; border-radius:4px; padding:2px 5px; }
 .amb-li.dimmed { opacity:0.2; }
 .amb-li.selected { background:rgba(109,174,230,0.12); color:var(--white); }
+/* Selector card grid — full-width, no scroll; children share equal width */
+.sel-grid { display:flex; gap:16px; margin-bottom:32px; }
+.sel-grid .hero-card { flex:1 1 0; min-width:0; cursor:pointer; }
+/* Inactive: gradient bar dimmed; hover: lift */
+.sel-grid .hero-card::before { opacity:0.25; }
+.sel-grid .hero-card:hover { transform:translateY(-3px); border-color:var(--light); }
+.sel-grid .hero-card:hover::before { opacity:0.6; }
+/* Active: accent look, full gradient bar */
+.sel-grid .hero-card.active { background:linear-gradient(135deg,rgba(29,78,143,0.4),rgba(10,31,68,0.6)); border-color:rgba(109,174,230,0.35); }
+.sel-grid .hero-card.active::before { opacity:1; }
+.sel-grid .hero-card.active .hc-val { color:var(--light); }
+@media(max-width:640px) { .sel-grid { flex-direction:column; } }
+/* Eco viz panels */
+.eco-viz { animation:fadeUp 0.3s ease forwards; }
+/* Eco equiv rows */
+.eco-equiv-row { display:flex; align-items:center; gap:16px; padding:12px 0; border-bottom:1px solid var(--border); }
+.eco-equiv-row:last-child { border-bottom:none; }
+.eco-equiv-icon { font-size:22px; width:32px; flex-shrink:0; text-align:center; }
+.eco-equiv-val { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; color:var(--white); line-height:1; min-width:90px; }
+.eco-equiv-label { font-size:12px; color:var(--muted); line-height:1.4; }
+.eco-equiv-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 20px; }
+@media(max-width:600px) { .eco-equiv-grid { grid-template-columns:1fr; } }
+/* Compost breakdown facts */
+.eco-remix-fact { background:rgba(58,191,126,0.07); border:1px solid rgba(58,191,126,0.2); border-radius:8px; padding:12px 16px; margin-bottom:10px; font-size:13px; line-height:1.6; }
+.eco-remix-fact strong { color:var(--green); font-weight:600; }
+.eco-source { font-size:10px; color:var(--muted); margin-top:14px; line-height:1.7; opacity:0.7; }
 </style>
 </head>
 <body>
@@ -257,9 +283,9 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 </header>
 
 <nav>
-  <button class="tab active" onclick="showPanel('impact',this)">🌱 Impact</button>
+  <button class="tab active" onclick="showPanel('impact',this)">🌱 Overview</button>
   <button class="tab" onclick="showPanel('leaderboard',this)">🏆 Leaderboard</button>
-  <button class="tab" onclick="showPanel('attendance',this)">📋 Attendance</button>
+  <button class="tab" onclick="showPanel('attendance',this)">🌍 Impact</button>
   <button class="tab" onclick="showPanel('growth',this)">📈 Program Growth</button>
   <button class="tab" onclick="showPanel('returners',this)">🔄 Returner Progress</button>
 </nav>
@@ -429,12 +455,37 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
   <div class="section-title">Spring 2026 · Top Performers</div>
   <h2 class="section-heading">Ambassador Leaderboard</h2>
   <p class="section-sub">Top 5 in each category — every ambassador contributes; this highlights standout performances</p>
-  <div class="toggle-group">
-    <button class="tog active" id="ltog-lbs"     onclick="showLeaderboard('lbs',this)">Total Lbs</button>
-    <button class="tog"        id="ltog-eff"     onclick="showLeaderboard('eff',this)">Efficiency</button>
-    <button class="tog"        id="ltog-lbhr"    onclick="showLeaderboard('lbhr',this)">Highest lb/hr</button>
-    <button class="tog"        id="ltog-busybee" onclick="showLeaderboard('busybee',this)">🐝 Busy Bee</button>
-    <button class="tog"        id="ltog-lbshift" onclick="showLeaderboard('lbshift',this)">Lbs per Shift</button>
+  <div class="sel-grid">
+    <div class="hero-card lb-sel-card active" id="ltog-lbs"     onclick="showLeaderboard('lbs',this)">
+      <div class="hc-icon">🏋️</div>
+      <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">Total Lbs</div>
+      <div class="hc-label">Semester output</div>
+      <div class="hc-sub">34,009 lbs · S26</div>
+    </div>
+    <div class="hero-card lb-sel-card"        id="ltog-eff"     onclick="showLeaderboard('eff',this)">
+      <div class="hc-icon">⚡</div>
+      <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">Efficiency</div>
+      <div class="hc-label">Effectiveness score</div>
+      <div class="hc-sub">vs. dining hall baseline</div>
+    </div>
+    <div class="hero-card lb-sel-card"        id="ltog-lbhr"    onclick="showLeaderboard('lbhr',this)">
+      <div class="hc-icon">🚀</div>
+      <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">lb / hr</div>
+      <div class="hc-label">Pounds per hour</div>
+      <div class="hc-sub">Most intense shifts</div>
+    </div>
+    <div class="hero-card lb-sel-card"        id="ltog-busybee" onclick="showLeaderboard('busybee',this)">
+      <div class="hc-icon">🐝</div>
+      <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">Busy Bee</div>
+      <div class="hc-label">Dedication ranking</div>
+      <div class="hc-sub">Hours &amp; shifts worked</div>
+    </div>
+    <div class="hero-card lb-sel-card"        id="ltog-lbshift" onclick="showLeaderboard('lbshift',this)">
+      <div class="hc-icon">📦</div>
+      <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">lb / shift</div>
+      <div class="hc-label">Per-shift output</div>
+      <div class="hc-sub">Avg yield per shift</div>
+    </div>
   </div>
   <div class="chart-section">
     <div class="chart-header">
@@ -448,27 +499,169 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
   </div>
 </div>
 
-<!-- ATTENDANCE -->
+<!-- ECO IMPACT -->
 <div id="panel-attendance" class="panel">
-  <div class="section-title">Spring 2026 · Reliability</div>
-  <h2 class="section-heading">Shift Attendance</h2>
-  <p class="section-sub">Top 5 ambassadors by attendance rate — each dot represents one shift</p>
-  <div class="chart-section">
-    <div class="chart-header">
-      <div>
-        <div class="chart-title">Shift Attendance · Top 5</div>
-        <div class="chart-note">Showing up is the foundation of everything else</div>
+  <div class="section-title">Spring 2026 · Environmental</div>
+  <h2 class="section-heading">Eco Impact</h2>
+  <p class="section-sub">Every pound diverted keeps methane out of landfills — processed by Remix Organics into compost and renewable energy · tap a card to explore</p>
+
+  <!-- 3 selector cards — same style as Overview hero cards -->
+  <div class="sel-grid">
+    <div class="hero-card eco-sel-card active" id="ecard-co2" onclick="showEco('co2',this)">
+      <div class="hc-icon">🌡️</div>
+      <div class="hc-val"><span>21,614</span> lbs</div>
+      <div class="hc-label">CO₂e Avoided · S26</div>
+      <div class="hc-sub">↑ 85,906 lbs all-time</div>
+    </div>
+    <div class="hero-card eco-sel-card" id="ecard-lbs" onclick="showEco('lbs',this)">
+      <div class="hc-icon">♻️</div>
+      <div class="hc-val"><span>34,009</span> lbs</div>
+      <div class="hc-label">Food Waste Diverted · S26</div>
+      <div class="hc-sub">↑ 135,173 lbs all-time</div>
+    </div>
+    <div class="hero-card eco-sel-card" id="ecard-compost" onclick="showEco('compost',this)">
+      <div class="hc-icon">🌱</div>
+      <div class="hc-val">~<span>13,600</span> lbs</div>
+      <div class="hc-label">Compost Produced · S26</div>
+      <div class="hc-sub">Est. via Remix Organics</div>
+    </div>
+  </div>
+
+  <!-- ── CO₂e viz ─────────────────────────────────────── -->
+  <div class="eco-viz" id="eco-viz-co2">
+    <div class="lb-pair">
+      <div class="chart-section">
+        <div class="chart-header">
+          <div><div class="chart-title">What 21,614 lbs CO₂e Looks Like</div>
+          <div class="chart-note">Spring 2026 emissions avoided — in everyday terms</div></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🚗</div>
+          <div class="eco-equiv-val">24,258</div>
+          <div class="eco-equiv-label">miles not driven<br><span style="opacity:0.6">≈ 97% of Earth's circumference · EPA avg car 0.891 lbs CO₂/mile</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">📱</div>
+          <div class="eco-equiv-val">151</div>
+          <div class="eco-equiv-label">iPhones worth of production emissions<br><span style="opacity:0.6">Apple reports ~143 lbs CO₂e per iPhone 15 full lifecycle</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🌳</div>
+          <div class="eco-equiv-val">450</div>
+          <div class="eco-equiv-label">trees absorbing CO₂ for a full year<br><span style="opacity:0.6">1 urban tree sequesters ~48 lbs CO₂/year · EPA Urban Forestry</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🏠</div>
+          <div class="eco-equiv-val">527</div>
+          <div class="eco-equiv-label">days of avg household electricity emissions<br><span style="opacity:0.6">US avg home ~41 lbs CO₂e/day · EPA</span></div>
+        </div>
+        <div class="eco-source">Sources: EPA (epa.gov) · Apple Environmental Progress Report 2023 · EPA Urban Forestry Program · UW-Madison CO₂ Calculator</div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div><div class="chart-title">CO₂e Avoided · By Semester</div>
+          <div class="chart-note">Pounds of CO₂ equivalent kept out of atmosphere</div></div>
+          <span class="chart-badge badge-all">All Semesters</span>
+        </div>
+        <div class="bar-chart" id="eco-co2-chart"></div>
       </div>
     </div>
-    <div class="att-chart" id="att-chart"></div>
-    <div class="legend" style="margin-top:20px">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--light)"></div>Shift Worked</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div>Extra Shift (above expected)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2)"></div>Shift Missed</div>
+  </div>
+
+  <!-- ── Food waste lbs viz ─────────────────────────── -->
+  <div class="eco-viz" id="eco-viz-lbs" style="display:none">
+    <div class="chart-section">
+      <div class="chart-header">
+        <div><div class="chart-title">34,009 lbs — How Heavy Is That?</div>
+        <div class="chart-note">Spring 2026 food waste diverted — in relatable terms</div></div>
+      </div>
+      <div class="eco-equiv-grid">
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🍔</div>
+          <div class="eco-equiv-val">68,018</div>
+          <div class="eco-equiv-label">quarter-pound cheeseburgers<br><span style="opacity:0.6">avg full burger ~0.5 lbs with bun, cheese &amp; toppings</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🐘</div>
+          <div class="eco-equiv-val">2.6</div>
+          <div class="eco-equiv-label">African elephants<br><span style="opacity:0.6">avg African elephant ≈ 13,000 lbs</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🚌</div>
+          <div class="eco-equiv-val">2.3</div>
+          <div class="eco-equiv-label">fully loaded school buses<br><span style="opacity:0.6">avg loaded school bus ≈ 14,500 lbs</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🛁</div>
+          <div class="eco-equiv-val">94</div>
+          <div class="eco-equiv-label">bathtubs of soup<br><span style="opacity:0.6">standard tub ≈ 42 gal · soup ~8.6 lbs/gal = 361 lbs/tub</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🍟</div>
+          <div class="eco-equiv-val">130,800</div>
+          <div class="eco-equiv-label">medium orders of french fries<br><span style="opacity:0.6">avg medium fries ≈ 4.1 oz = 0.26 lbs</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🏈</div>
+          <div class="eco-equiv-val">1.4</div>
+          <div class="eco-equiv-label">football fields covered ankle-deep in food<br><span style="opacity:0.6">field = 57,600 sq ft · 1" deep at ~6 lbs/cu ft = 28,800 lbs</span></div>
+        </div>
+      </div>
     </div>
-    <div style="margin-top:24px;padding:16px;background:rgba(58,191,126,0.08);border:1px solid rgba(58,191,126,0.2);border-radius:8px;">
-      <p style="font-size:13px;color:var(--green);font-weight:600;margin-bottom:4px;">💪 Team Opportunity</p>
-      <p style="font-size:12px;color:var(--muted);line-height:1.7;">Consistent attendance is the single biggest lever for program output. Every shift is ~100+ lbs that either gets diverted or doesn't. Ambassadors who push their attendance rate toward 95%+ will have an outsized impact on the team's final semester total.</p>
+  </div>
+
+  <!-- ── Compost viz ────────────────────────────────── -->
+  <div class="eco-viz" id="eco-viz-compost" style="display:none">
+    <div class="lb-pair">
+      <div class="chart-section">
+        <div class="chart-header">
+          <div><div class="chart-title">Where the Food Waste Goes</div>
+          <div class="chart-note">34,009 lbs collected → what Remix Organics does with it</div></div>
+        </div>
+        <div class="eco-remix-fact">
+          <strong>Remix Organics</strong> — RI-based organics recycler, 40,000+ tons diverted from landfills since 2013. Collected food scraps are routed to one of two processing pathways:
+        </div>
+        <div class="eco-remix-fact">
+          <strong>🌱 Composting Path</strong> → ~40% of input weight becomes finished compost (~13,600 lbs this semester). The remaining ~60% is lost as water vapor and CO₂ during natural microbial decomposition — no methane, no landfill.
+        </div>
+        <div class="eco-remix-fact">
+          <strong>⚡ Anaerobic Digestion Path</strong> → Some loads go to sealed digesters. Microbes break down food anaerobically, producing methane that is <em>captured</em> and used as renewable natural gas or electricity — instead of escaping into the atmosphere.
+        </div>
+        <div class="eco-remix-fact">
+          <strong>🚫 What doesn't happen:</strong> None of it goes to landfill, where food waste decomposes anaerobically with no methane capture — generating greenhouse gases for decades.
+        </div>
+        <div class="eco-source">Source: Remix Organics (remixorganics.com) · Industry compost yield: 35–45% of wet input weight</div>
+      </div>
+      <div class="chart-section">
+        <div class="chart-header">
+          <div><div class="chart-title">What ~13,600 lbs of Compost Can Do</div>
+          <div class="chart-note">S26 estimated yield — applied to local farmland</div></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🌱</div>
+          <div class="eco-equiv-val">2,345</div>
+          <div class="eco-equiv-label">sq ft of garden soil amended<br><span style="opacity:0.6">standard 2-inch application layer · ~5.8 lbs/sq ft</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🥕</div>
+          <div class="eco-equiv-val">~112</div>
+          <div class="eco-equiv-label">raised garden beds supplied for a season<br><span style="opacity:0.6">standard 4×8 ft beds at 2-inch compost depth</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🍎</div>
+          <div class="eco-equiv-val">~15</div>
+          <div class="eco-equiv-label">apple trees' annual compost needs met<br><span style="opacity:0.6">mature tree needs ~870 lbs/yr around drip line → ~6,000 lbs apples</span></div>
+        </div>
+        <div class="eco-equiv-row">
+          <div class="eco-equiv-icon">🌾</div>
+          <div class="eco-equiv-val">~54,000</div>
+          <div class="eco-equiv-label">lbs of compost returned all-time<br><span style="opacity:0.6">est. from 135,173 lbs diverted since S24 launch</span></div>
+        </div>
+        <div style="margin-top:16px">
+          <div class="lb-section-title">Compost Produced · By Semester</div>
+          <div class="bar-chart" id="eco-compost-chart"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -647,10 +840,18 @@ function showPanel(id, btn) {
 let currentLb = 'lbs';
 function showLeaderboard(type, btn) {
   currentLb = type;
-  document.querySelectorAll('.tog').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.lb-sel-card').forEach(t => t.classList.remove('active'));
   if(btn) btn.classList.add('active');
   renderLeaderboard(type);
   setTimeout(animateBars, 60);
+}
+
+function showEco(type, btn) {
+  document.querySelectorAll('.eco-sel-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.eco-viz').forEach(v => { v.style.display = 'none'; });
+  if(btn) btn.classList.add('active');
+  const el = document.getElementById('eco-viz-'+type);
+  if(el) { el.style.display = ''; setTimeout(animateBars, 60); }
 }
 
 // Tooltip store for leaderboard bars
@@ -675,7 +876,7 @@ function _lerpColor(a, b, t) {
 
 function _lbBarHTML(data, fmt) {
   const ranks = ['r1','r2','r3','',''];
-  const maxVal = data[0] ? data[0].val : 1;
+  const maxVal = data.length ? Math.max(...data.map(d => d.val)) : 1;
   return data.map((d,i) => {
     const t = d.val / maxVal;
     const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
@@ -873,23 +1074,17 @@ function renderLeaderboard(type) {
   el.innerHTML = html;
 }
 
-function renderAttendance() {
-  document.getElementById('att-chart').innerHTML = top5Att.map(a => {
-    const pct = Math.round(a.worked / a.expected * 100);
-    const cls = pct >= 100 ? 'perfect' : pct >= 90 ? 'high' : 'mid';
-    const total = Math.max(a.worked, a.expected);
-    let dots = '';
-    for(let i=0; i<total; i++) {
-      if(i < a.expected && i < a.worked) dots += `<div class="dot worked" title="Shift worked"></div>`;
-      else if(i >= a.expected) dots += `<div class="dot extra" title="Extra shift"></div>`;
-      else dots += `<div class="dot missed" title="Shift missed"></div>`;
-    }
-    return `<div class="att-row">
-      <div class="att-name">${a.name}</div>
-      <div class="att-dots">${dots}</div>
-      <div class="att-pct ${cls}">${pct}%</div>
-    </div>`;
-  }).join('');
+function renderEcoImpact() {
+  // CO2e by semester — uses yoySems global array
+  const co2Data = yoySems.map(s => ({name: s.sem, val: s.co2}));
+  document.getElementById('eco-co2-chart').innerHTML = _lbBarHTML(co2Data, v => v.toLocaleString() + ' lbs');
+
+  // Compost by semester (40% yield est.)
+  const compostData = yoySems.map(s => ({name: s.sem, val: Math.round(s.lbs * 0.4)}));
+  document.getElementById('eco-compost-chart').innerHTML = _lbBarHTML(compostData, v => v.toLocaleString() + ' lbs');
+
+  // Animate new bars
+  setTimeout(animateBars, 60);
 }
 
 function renderGrowth() {
@@ -1917,7 +2112,7 @@ function renderVizAmb() {
 
 // Init
 renderLeaderboard('lbs');
-renderAttendance();
+renderEcoImpact();
 renderGrowth();
 renderReturners();
 setTimeout(animateBars, 120);
