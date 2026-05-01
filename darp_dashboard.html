@@ -110,11 +110,24 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 .sem-label.current { color:var(--light); }
 .sem-track { flex:1; height:36px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden; }
 .sem-fill { height:100%; display:flex; align-items:center; padding:0 10px; justify-content:flex-end; border-radius:4px; transition:width 1.4s cubic-bezier(0.22,1,0.36,1); width:0; }
-.sem-fill.past { background:linear-gradient(90deg,#1a3f70,#2d5f99); }
-.sem-fill.current { background:linear-gradient(90deg,var(--blue),var(--light)); }
 .sem-fill-val { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; }
 .cum-chart { position:relative; height:200px; }
 .cum-chart svg { width:100%; height:100%; }
+.cum-toggle { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; align-items:center; }
+.cum-tog { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:5px 12px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; border-radius:5px; transition:all 0.2s; }
+.cum-tog:hover { color:var(--light); border-color:var(--light); }
+.cum-tog.active { background:rgba(109,174,230,0.15); color:var(--white); border-color:var(--light); }
+.cum-unit-tog { position:relative; display:inline-flex; align-items:center; gap:4px; user-select:none; }
+.cum-unit-arrow { font-size:8px; opacity:0.6; transition:opacity 0.15s,transform 0.15s; pointer-events:none; }
+.cum-unit-tog.open .cum-unit-arrow { opacity:1; transform:rotate(180deg); }
+.cum-unit-opts { display:none; position:absolute; top:calc(100% + 5px); left:0; background:#0c1e3d; border:1px solid rgba(109,174,230,0.35); border-radius:6px; overflow:hidden; z-index:400; min-width:68px; box-shadow:0 6px 20px rgba(0,0,0,0.5); }
+.cum-unit-tog.open .cum-unit-opts { display:block; }
+.cum-unit-opt { padding:6px 14px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:background 0.12s,color 0.12s; }
+.cum-unit-opt:hover { background:rgba(109,174,230,0.12); color:var(--white); }
+.cum-unit-opt.selected { color:var(--light); background:rgba(109,174,230,0.08); }
+.stacked-key { margin-top:8px; padding-top:6px; border-top:1px solid var(--border); }
+.stacked-key-line { font-size:11px; color:var(--muted); line-height:1.7; }
+.stacked-key-line strong { font-weight:700; margin-right:4px; }
 
 .att-chart { width:100%; }
 .att-row { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
@@ -134,6 +147,7 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 .gc-card { background:rgba(29,78,143,0.2); border:1px solid rgba(109,174,230,0.2); border-radius:10px; padding:20px; text-align:center; }
 .gc-card .gc-val { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:900; color:var(--light); }
 .gc-card .gc-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:4px; }
+.gc-card .gc-sub { font-size:10px; color:var(--light); margin-top:3px; opacity:0.7; }
 
 .returner-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
 .ret-card { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px; padding:20px; transition:border-color 0.2s,transform 0.2s; }
@@ -178,7 +192,7 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 .stacked-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
 .stacked-label { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; width:44px; flex-shrink:0; }
 .stacked-label.current { color:var(--light); }
-.stacked-track { flex:1; height:30px; display:flex; border-radius:4px; overflow:hidden; gap:2px; }
+.stacked-track { height:30px; display:flex; border-radius:4px; overflow:hidden; gap:2px; max-width:calc(100% - 58px); }
 .stacked-seg { height:100%; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; color:rgba(255,255,255,0.9); transition:width 1.2s cubic-bezier(0.22,1,0.36,1); white-space:nowrap; overflow:hidden; }
 .seg-b { background:linear-gradient(90deg,#2a5a2a,#3abf7e); }
 .seg-l { background:linear-gradient(90deg,var(--blue),var(--light)); }
@@ -283,56 +297,49 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 </header>
 
 <nav>
-  <button class="tab active" onclick="showPanel('impact',this)">🌱 Overview</button>
-  <button class="tab" onclick="showPanel('leaderboard',this)">🏆 Leaderboard</button>
-  <button class="tab" onclick="showPanel('attendance',this)">🌍 Impact</button>
-  <button class="tab" onclick="showPanel('growth',this)">📈 Program Growth</button>
-  <button class="tab" onclick="showPanel('returners',this)">🔄 Returner Progress</button>
+  <button class="tab active" onclick="showPanel('impact',this)">🌱 Season Summary</button>
+  <button class="tab" onclick="showPanel('leaderboard',this)">🏆 Ambassadors</button>
+  <button class="tab" onclick="showPanel('attendance',this)">🌍 Eco Impact</button>
+  <button class="tab" onclick="showPanel('growth',this)">📊 All-Time</button>
 </nav>
 
 <main>
 
 <!-- IMPACT -->
 <div id="panel-impact" class="panel active">
-  <div class="section-title">Spring 2026 · Full Semester</div>
-  <h2 class="section-heading">What We Accomplished</h2>
+  <div class="section-title">Spring 2026 · Highlights</div>
+  <h2 class="section-heading">Season Highlights</h2>
   <p class="section-sub">Complete Spring 2026 data — tap any card to explore the story behind the numbers</p>
   <div class="hero-grid">
     <div class="hero-card" id="hcard-lbs" onclick="selectCard('lbs')">
       <div class="hc-icon">🌿</div>
-      <div class="hc-val"><span>34,009</span></div>
+      <div class="hc-val"><span>31,345</span></div>
       <div class="hc-label">Pounds Diverted</div>
       <div class="hc-sub">Spring 2026 full semester</div>
     </div>
     <div class="hero-card" id="hcard-co2" onclick="selectCard('co2')">
       <div class="hc-icon">💨</div>
-      <div class="hc-val">21,614</div>
+      <div class="hc-val">19,921</div>
       <div class="hc-label">Pounds of CO₂e Avoided</div>
-      <div class="hc-sub">≈ 24,258 miles not driven</div>
+      <div class="hc-sub">≈ 22,358 miles not driven</div>
     </div>
     <div class="hero-card" id="hcard-hrs" onclick="selectCard('hrs')">
       <div class="hc-icon">⏱️</div>
-      <div class="hc-val">673</div>
+      <div class="hc-val">633</div>
       <div class="hc-label">Total Hours Worked</div>
-      <div class="hc-sub">Across 273 shifts</div>
+      <div class="hc-sub">Across 280 shifts</div>
     </div>
     <div class="hero-card" id="hcard-lbhr" onclick="selectCard('lbhr')">
       <div class="hc-icon">⚡</div>
-      <div class="hc-val">49.65</div>
+      <div class="hc-val">49.55</div>
       <div class="hc-label">Avg lb/hr This Semester</div>
-      <div class="hc-sub">↑ +6.4% vs. F25 (46.7 lb/hr)</div>
+      <div class="hc-sub">↑ +6.1% vs. F25 (46.7 lb/hr)</div>
     </div>
     <div class="hero-card" id="hcard-alltime" onclick="selectCard('alltime')">
       <div class="hc-icon">🏛️</div>
-      <div class="hc-val"><span>135,173</span></div>
+      <div class="hc-val"><span>129,352</span></div>
       <div class="hc-label">All-Time Cumulative Pounds</div>
       <div class="hc-sub">Since program launch S24</div>
-    </div>
-    <div class="hero-card" id="hcard-amb" onclick="selectCard('amb')">
-      <div class="hc-icon">👥</div>
-      <div class="hc-val">14</div>
-      <div class="hc-label">Active Ambassadors</div>
-      <div class="hc-sub">Largest team in program history</div>
     </div>
   </div>
 
@@ -398,17 +405,6 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
       <div id="sem-stats-panel" style="display:none;background:rgba(29,78,143,0.2);border:1px solid rgba(109,174,230,0.25);border-radius:8px;padding:14px 20px;margin-top:14px"></div>
     </div>
 
-    <div class="viz-panel chart-section" id="viz-amb">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">Ambassador Weekly Output · Spring 2026</div>
-          <div class="chart-note">Stacked by ambassador — 👑 marks each week's top contributor</div>
-        </div>
-      </div>
-      <button class="eff-toggle" id="eff-btn" onclick="toggleEff()">⚡ Show Efficiency View</button>
-      <div id="viz-amb-inner"></div>
-      <div class="amb-legend" id="amb-legend"></div>
-    </div>
 
   </div>
 
@@ -452,8 +448,22 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 
 <!-- LEADERBOARD -->
 <div id="panel-leaderboard" class="panel">
-  <div class="section-title">Spring 2026 · Top Performers</div>
-  <h2 class="section-heading">Ambassador Leaderboard</h2>
+  <div class="section-title">Spring 2026 · Team</div>
+  <h2 class="section-heading">S26 Weekly Team Output</h2>
+  <p class="section-sub">Filter by ambassador · toggle output vs. efficiency mode</p>
+  <div class="chart-section" style="margin-bottom:32px">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Ambassador Weekly Output · Spring 2026</div>
+        <div class="chart-note">Stacked by ambassador — 👑 marks each week's top contributor</div>
+      </div>
+    </div>
+    <button class="eff-toggle" id="eff-btn" onclick="toggleEff()">⚡ Show Efficiency View</button>
+    <div id="viz-amb-inner"></div>
+    <div class="amb-legend" id="amb-legend"></div>
+  </div>
+  <div class="section-title">Spring 2026 · Ambassadors</div>
+  <h2 class="section-heading">Top Performers</h2>
   <p class="section-sub">Top 5 in each category — every ambassador contributes; this highlights standout performances</p>
   <div class="sel-grid">
     <div class="hero-card lb-sel-card active" id="ltog-lbs"     onclick="showLeaderboard('lbs',this)">
@@ -509,19 +519,19 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
   <div class="sel-grid">
     <div class="hero-card eco-sel-card active" id="ecard-co2" onclick="showEco('co2',this)">
       <div class="hc-icon">🌡️</div>
-      <div class="hc-val"><span>21,614</span> lbs</div>
+      <div class="hc-val"><span>19,921</span> lbs</div>
       <div class="hc-label">CO₂e Avoided · S26</div>
-      <div class="hc-sub">↑ 85,906 lbs all-time</div>
+      <div class="hc-sub">↑ 82,207 lbs all-time</div>
     </div>
     <div class="hero-card eco-sel-card" id="ecard-lbs" onclick="showEco('lbs',this)">
       <div class="hc-icon">♻️</div>
-      <div class="hc-val"><span>34,009</span> lbs</div>
+      <div class="hc-val"><span>31,345</span> lbs</div>
       <div class="hc-label">Food Waste Diverted · S26</div>
-      <div class="hc-sub">↑ 135,173 lbs all-time</div>
+      <div class="hc-sub">↑ 129,352 lbs all-time</div>
     </div>
     <div class="hero-card eco-sel-card" id="ecard-compost" onclick="showEco('compost',this)">
       <div class="hc-icon">🌱</div>
-      <div class="hc-val">~<span>13,600</span> lbs</div>
+      <div class="hc-val">~<span>12,500</span> lbs</div>
       <div class="hc-label">Compost Produced · S26</div>
       <div class="hc-sub">Est. via Remix Organics</div>
     </div>
@@ -532,27 +542,27 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
     <div class="lb-pair">
       <div class="chart-section">
         <div class="chart-header">
-          <div><div class="chart-title">What 21,614 lbs CO₂e Looks Like</div>
+          <div><div class="chart-title">What 19,921 lbs CO₂e Looks Like</div>
           <div class="chart-note">Spring 2026 emissions avoided — in everyday terms</div></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🚗</div>
-          <div class="eco-equiv-val">24,258</div>
-          <div class="eco-equiv-label">miles not driven<br><span style="opacity:0.6">≈ 97% of Earth's circumference · EPA avg car 0.891 lbs CO₂/mile</span></div>
+          <div class="eco-equiv-val">22,358</div>
+          <div class="eco-equiv-label">miles not driven<br><span style="opacity:0.6">≈ 90% of Earth's circumference · EPA avg car 0.891 lbs CO₂/mile</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">📱</div>
-          <div class="eco-equiv-val">151</div>
+          <div class="eco-equiv-val">139</div>
           <div class="eco-equiv-label">iPhones worth of production emissions<br><span style="opacity:0.6">Apple reports ~143 lbs CO₂e per iPhone 15 full lifecycle</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🌳</div>
-          <div class="eco-equiv-val">450</div>
+          <div class="eco-equiv-val">415</div>
           <div class="eco-equiv-label">trees absorbing CO₂ for a full year<br><span style="opacity:0.6">1 urban tree sequesters ~48 lbs CO₂/year · EPA Urban Forestry</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🏠</div>
-          <div class="eco-equiv-val">527</div>
+          <div class="eco-equiv-val">486</div>
           <div class="eco-equiv-label">days of avg household electricity emissions<br><span style="opacity:0.6">US avg home ~41 lbs CO₂e/day · EPA</span></div>
         </div>
         <div class="eco-source">Sources: EPA (epa.gov) · Apple Environmental Progress Report 2023 · EPA Urban Forestry Program · UW-Madison CO₂ Calculator</div>
@@ -572,38 +582,38 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
   <div class="eco-viz" id="eco-viz-lbs" style="display:none">
     <div class="chart-section">
       <div class="chart-header">
-        <div><div class="chart-title">34,009 lbs — How Heavy Is That?</div>
+        <div><div class="chart-title">31,345 lbs — How Heavy Is That?</div>
         <div class="chart-note">Spring 2026 food waste diverted — in relatable terms</div></div>
       </div>
       <div class="eco-equiv-grid">
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🍔</div>
-          <div class="eco-equiv-val">68,018</div>
+          <div class="eco-equiv-val">62,690</div>
           <div class="eco-equiv-label">quarter-pound cheeseburgers<br><span style="opacity:0.6">avg full burger ~0.5 lbs with bun, cheese &amp; toppings</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🐘</div>
-          <div class="eco-equiv-val">2.6</div>
+          <div class="eco-equiv-val">2.4</div>
           <div class="eco-equiv-label">African elephants<br><span style="opacity:0.6">avg African elephant ≈ 13,000 lbs</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🚌</div>
-          <div class="eco-equiv-val">2.3</div>
+          <div class="eco-equiv-val">2.2</div>
           <div class="eco-equiv-label">fully loaded school buses<br><span style="opacity:0.6">avg loaded school bus ≈ 14,500 lbs</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🛁</div>
-          <div class="eco-equiv-val">94</div>
+          <div class="eco-equiv-val">87</div>
           <div class="eco-equiv-label">bathtubs of soup<br><span style="opacity:0.6">standard tub ≈ 42 gal · soup ~8.6 lbs/gal = 361 lbs/tub</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🍟</div>
-          <div class="eco-equiv-val">130,800</div>
+          <div class="eco-equiv-val">120,600</div>
           <div class="eco-equiv-label">medium orders of french fries<br><span style="opacity:0.6">avg medium fries ≈ 4.1 oz = 0.26 lbs</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🏈</div>
-          <div class="eco-equiv-val">1.4</div>
+          <div class="eco-equiv-val">1.1</div>
           <div class="eco-equiv-label">football fields covered ankle-deep in food<br><span style="opacity:0.6">field = 57,600 sq ft · 1" deep at ~6 lbs/cu ft = 28,800 lbs</span></div>
         </div>
       </div>
@@ -616,13 +626,13 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
       <div class="chart-section">
         <div class="chart-header">
           <div><div class="chart-title">Where the Food Waste Goes</div>
-          <div class="chart-note">34,009 lbs collected → what Remix Organics does with it</div></div>
+          <div class="chart-note">31,345 lbs collected → what Remix Organics does with it</div></div>
         </div>
         <div class="eco-remix-fact">
           <strong>Remix Organics</strong> — RI-based organics recycler, 40,000+ tons diverted from landfills since 2013. Collected food scraps are routed to one of two processing pathways:
         </div>
         <div class="eco-remix-fact">
-          <strong>🌱 Composting Path</strong> → ~40% of input weight becomes finished compost (~13,600 lbs this semester). The remaining ~60% is lost as water vapor and CO₂ during natural microbial decomposition — no methane, no landfill.
+          <strong>🌱 Composting Path</strong> → ~40% of input weight becomes finished compost (~12,500 lbs this semester). The remaining ~60% is lost as water vapor and CO₂ during natural microbial decomposition — no methane, no landfill.
         </div>
         <div class="eco-remix-fact">
           <strong>⚡ Anaerobic Digestion Path</strong> → Some loads go to sealed digesters. Microbes break down food anaerobically, producing methane that is <em>captured</em> and used as renewable natural gas or electricity — instead of escaping into the atmosphere.
@@ -634,28 +644,28 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
       </div>
       <div class="chart-section">
         <div class="chart-header">
-          <div><div class="chart-title">What ~13,600 lbs of Compost Can Do</div>
+          <div><div class="chart-title">What ~12,500 lbs of Compost Can Do</div>
           <div class="chart-note">S26 estimated yield — applied to local farmland</div></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🌱</div>
-          <div class="eco-equiv-val">2,345</div>
+          <div class="eco-equiv-val">2,160</div>
           <div class="eco-equiv-label">sq ft of garden soil amended<br><span style="opacity:0.6">standard 2-inch application layer · ~5.8 lbs/sq ft</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🥕</div>
-          <div class="eco-equiv-val">~112</div>
+          <div class="eco-equiv-val">~103</div>
           <div class="eco-equiv-label">raised garden beds supplied for a season<br><span style="opacity:0.6">standard 4×8 ft beds at 2-inch compost depth</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🍎</div>
-          <div class="eco-equiv-val">~15</div>
+          <div class="eco-equiv-val">~14</div>
           <div class="eco-equiv-label">apple trees' annual compost needs met<br><span style="opacity:0.6">mature tree needs ~870 lbs/yr around drip line → ~6,000 lbs apples</span></div>
         </div>
         <div class="eco-equiv-row">
           <div class="eco-equiv-icon">🌾</div>
-          <div class="eco-equiv-val">~54,000</div>
-          <div class="eco-equiv-label">lbs of compost returned all-time<br><span style="opacity:0.6">est. from 135,173 lbs diverted since S24 launch</span></div>
+          <div class="eco-equiv-val">~51,700</div>
+          <div class="eco-equiv-label">lbs of compost returned all-time<br><span style="opacity:0.6">est. from 129,352 lbs diverted since S24 launch</span></div>
         </div>
         <div style="margin-top:16px">
           <div class="lb-section-title">Compost Produced · By Semester</div>
@@ -669,12 +679,12 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 <!-- PROGRAM GROWTH -->
 <div id="panel-growth" class="panel">
   <div class="section-title">Spring 2024 → Spring 2026</div>
-  <h2 class="section-heading">Program Growth Over Time</h2>
+  <h2 class="section-heading">All-Time Program History</h2>
   <p class="section-sub">Every semester, this team has built on what came before</p>
   <div class="growth-callout">
-    <div class="gc-card"><div class="gc-val">×4.8</div><div class="gc-label">Growth since launch (S24 → S26)</div></div>
-    <div class="gc-card"><div class="gc-val">135,173</div><div class="gc-label">All-time lbs diverted</div></div>
-    <div class="gc-card"><div class="gc-val">85,906</div><div class="gc-label">All-time lbs CO₂e avoided</div></div>
+    <div class="gc-card"><div class="gc-val">×4.4</div><div class="gc-label">Output growth per semester</div><div class="gc-sub">S24: 7,111 lbs → S26: 31,345 lbs</div></div>
+    <div class="gc-card"><div class="gc-val">129,352</div><div class="gc-label">All-time lbs diverted</div></div>
+    <div class="gc-card"><div class="gc-val">82,207</div><div class="gc-label">All-time lbs CO₂e avoided</div></div>
   </div>
   <div class="yoy-grid">
     <div class="chart-section">
@@ -686,10 +696,32 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
     </div>
     <div class="chart-section">
       <div class="chart-header">
-        <div><div class="chart-title">Cumulative All-Time Pounds</div><div class="chart-note">The mountain keeps growing</div></div>
+        <div><div class="chart-title" id="cum-chart-title">Cumulative All-Time Pounds</div><div class="chart-note" id="cum-chart-note">The mountain keeps growing</div></div>
         <span class="chart-badge badge-all">All-Time</span>
       </div>
-      <div class="cum-chart"><svg id="cum-svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="cum-toggle">
+        <button class="cum-tog active" onclick="showCumMetric('lbs',this)">Lbs Collected</button>
+        <div class="cum-tog cum-unit-tog" id="cum-tog-hrs" onclick="onCumHrsTogClick(event,this)">
+          <span id="cum-hrs-label">Hours</span>&thinsp;Worked
+          <span class="cum-unit-arrow">▾</span>
+          <div class="cum-unit-opts" onclick="event.stopPropagation()">
+            <div class="cum-unit-opt selected" data-metric="hrs" onclick="selectCumHrs('hrs','Hours',this)">Hours</div>
+            <div class="cum-unit-opt" data-metric="shifts" onclick="selectCumHrs('shifts','Shifts',this)">Shifts</div>
+            <div class="cum-unit-opt" data-metric="days" onclick="selectCumHrs('days','Days',this)">Days</div>
+          </div>
+        </div>
+        <div class="cum-tog cum-unit-tog" id="cum-tog-lbunit" onclick="onCumUnitTogClick(event,this)">
+          lb&thinsp;/&thinsp;<span id="cum-unit-label">hr</span>
+          <span class="cum-unit-arrow">▾</span>
+          <div class="cum-unit-opts" onclick="event.stopPropagation()">
+            <div class="cum-unit-opt selected" data-metric="lbhr" onclick="selectCumUnit('lbhr','hr',this)">hr</div>
+            <div class="cum-unit-opt" data-metric="lbday" onclick="selectCumUnit('lbday','day',this)">day</div>
+            <div class="cum-unit-opt" data-metric="lbweek" onclick="selectCumUnit('lbweek','week',this)">week</div>
+          </div>
+        </div>
+        <button class="cum-tog" onclick="showCumMetric('lbamb',this)">lb / Ambassador</button>
+      </div>
+      <div class="cum-chart"><svg id="cum-svg" viewBox="0 0 460 210" preserveAspectRatio="xMidYMid meet"></svg></div>
     </div>
   </div>
   <div class="chart-section">
@@ -711,7 +743,7 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
     <div id="mfbf-bars"></div>
     <div class="stacked-legend">
       <div class="sl-item"><div class="sl-swatch" style="background:#6aaee6"></div>Mainfare</div>
-      <div class="sl-item"><div class="sl-swatch" style="background:#4a8fcb"></div>Butterfield</div>
+      <div class="sl-item"><div class="sl-swatch" style="background:#e05c5c"></div>Butterfield</div>
     </div>
   </div>
 
@@ -745,17 +777,6 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
   </div>
 </div>
 
-<!-- RETURNERS -->
-<div id="panel-returners" class="panel">
-  <div class="section-title">F25 → S26 · Returning Ambassadors</div>
-  <h2 class="section-heading">Your Progress This Year</h2>
-  <p class="section-sub">lb/hr efficiency: Fall 2025 full season vs. Spring 2026 full season · 9 returning ambassadors</p>
-  <div class="returner-grid" id="returner-grid"></div>
-  <div style="margin-top:24px;padding:20px;background:rgba(109,174,230,0.07);border:1px solid rgba(109,174,230,0.2);border-radius:10px;">
-    <p style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--light);margin-bottom:8px;">A Note on the Numbers</p>
-    <p style="font-size:13px;color:var(--muted);line-height:1.7;">Compares each returning ambassador's lb/hr efficiency from F25 to S26 — same metric, consecutive semesters. See who improved, who held steady, and where there's room to grow.</p>
-  </div>
-</div>
 
 </main>
 
@@ -767,13 +788,13 @@ const top5Lbs = [
   {name:"Leah Bucci",     val:4062,  extra:"156.2 lbs/shift"},
   {name:"Brynn Hornig",   val:3497,  extra:"102.9 lbs/shift"},
   {name:"Maureen Surgot", val:3159,  extra:"166.3 lbs/shift"},
-  {name:"Kaylie Forgue",  val:2702,  extra:"93.2 lbs/shift"},
+  {name:"Kaylie Forgue",  val:2749,  extra:"91.6 lbs/shift"},
 ];
 const top5Lbhr = [
   {name:"Orpheus Wilson",     val:75.67, extra:"2,477 lbs total"},
   {name:"Kyra Turner",        val:68.16, extra:"4,226 lbs total"},
-  {name:"Emmett Khan",        val:63.41, extra:"2,083 lbs total"},
-  {name:"Denise Romanszysn",  val:57.00, extra:"1,347 lbs total"},
+  {name:"Emmett Khan",        val:64.21, extra:"2,302 lbs total"},
+  {name:"Denise Romanszysn",  val:59.02, extra:"1,741 lbs total"},
   {name:"Leah Bucci",         val:53.97, extra:"4,062 lbs total"},
 ];
 const top5LbShift = [
@@ -783,50 +804,128 @@ const top5LbShift = [
   {name:"Orpheus Wilson", val:130.37, extra:"19 shifts"},
   {name:"Laila Maisuria", val:128.17, extra:"6 shifts"},
 ];
+// semDays = calendar days in semester (lb/day denominator, independent from semWeeks)
+// S24: ~Jan 22–May 3 2024 = 102d | F24: ~Aug 26–Dec 13 2024 = 109d
+// S25: ~Jan 21–May 2 2025 = 101d | F25: ~Aug 25–Dec 12 2025 = 109d
+// S26*: ~Jan 20–May 1 2026 = 101d (days elapsed through today)
 const yoySems = [
-  {sem:"S24", lbs:7111,  cum:7111,   co2:4519,  current:false},
-  {sem:"F24", lbs:26386, cum:33497,  co2:16769, current:false},
-  {sem:"S25", lbs:31073, cum:64570,  co2:19748, current:false},
-  {sem:"F25", lbs:36594, cum:101164, co2:23257, current:false},
-  {sem:"S26*",lbs:34009, cum:135173, co2:21614, current:true},
+  {sem:"S24",  lbs:7111,  cum:7111,   co2:4519,  ambs:8,  hrs:null, lbhr:null,  current:false, semWeeks:14, semDays:102, shifts:85,  collDays:42},
+  {sem:"F24",  lbs:26386, cum:33497,  co2:16769, ambs:10, hrs:null, lbhr:null,  current:false, semWeeks:15, semDays:109, shifts:277, collDays:65},
+  {sem:"S25",  lbs:31073, cum:64570,  co2:19748, ambs:13, hrs:null, lbhr:null,  current:false, semWeeks:14, semDays:101, shifts:262, collDays:65},
+  {sem:"F25",  lbs:33437, cum:98007,  co2:21250, ambs:14, hrs:558.6, lbhr:46.68, current:false, semWeeks:14, semDays:109, shifts:304, collDays:70},
+  {sem:"S26*", lbs:31345, cum:129352, co2:19921, ambs:14, hrs:632.6, lbhr:49.55, current:true,  semWeeks:14, semDays:101, shifts:280, collDays:67},
 ];
-const returners = [
-  {name:"Kyra Turner",           f25:45.14, s26:68.16, trend:"up"},
-  {name:"Evan Morgan",           f25:23.95, s26:48.15, trend:"up"},
-  {name:"Laila Maisuria",        f25:28.90, s26:45.73, trend:"up"},
-  {name:"Maureen Surgot",        f25:42.39, s26:47.03, trend:"up"},
-  {name:"Kaylie Forgue",         f25:49.60, s26:51.73, trend:"up"},
-  {name:"Emmett Khan",           f25:59.50, s26:63.41, trend:"up"},
-  {name:"Orpheus Wilson",        f25:75.50, s26:75.67, trend:"flat"},
-  {name:"Brynn Hornig",          f25:39.11, s26:38.70, trend:"down"},
-  {name:"Oluwatimilehin Shodipe",f25:59.63, s26:48.52, trend:"down"},
-];
-const top5Att = [
-  {name:"Brynn Hornig",   worked:34, expected:33},
-  {name:"Kyra Turner",    worked:23, expected:23},
-  {name:"Emmett Khan",    worked:22, expected:22},
-  {name:"Kaylie Forgue",  worked:29, expected:30},
-  {name:"Orpheus Wilson", worked:19, expected:20},
-];
+const _BAR_A_RED = '#6b0f0f';
+const _BAR_B_RED = '#e05c5c';
+// S26 current team + all historical ambassadors — each unique person has one color.
+// Variant spellings (typos/apostrophes) map to the same color as the canonical name.
+const ambColorMap = {
+  // ── S26 current team ──────────────────────────────────────────
+  'Kyra Turner':'#3abf7e','Leah Bucci':'#6aaee6','Brynn Hornig':'#f5c842',
+  'Maureen Surgot':'#e07b5c','Kaylie Forgue':'#b87fcf','Emmett Khan':'#5cade0',
+  'Orpheus Wilson':'#e0c55c','Oluwatimilehin Shodipe':'#7fbf9e','Evan Morgan':'#8aa4c8',
+  'Laila Maisuria':'#c8a47f','Arjya Aich':'#7e9fc8','Alexis Sylvestre':'#d4856a',
+  'Denise Romanszysn':'#a3c87e','Sophia Kluck':'#cf87b8',
+  // ── Alumni ────────────────────────────────────────────────────
+  'Westin Palumbo':'#ff9f43','Bitanya Hailu':'#ee5a24','Skyler Bobinski':'#0abde3',
+  'Kayleigh Omealia':'#48dbfb',"Kayleigh O'mealia":'#48dbfb', // same person, variant spelling
+  'Rushil Nepal':'#6c5ce7','Katie Field':'#fd79a8',
+  'Lizzie Welch':'#00b894','Lizzle Welch':'#00b894',           // same person, typo
+  'astou dieng':'#fdcb6e','Lucas Meier':'#e17055','Tyson Enes':'#74b9ff',
+  'Cassidy Haskell':'#a29bfe','Kaya Pernini':'#55efc4',
+  'Kaitlyn Deierlein':'#ffeaa7','Kate Stanwood':'#81ecec',
+  'Anna Cunha':'#fab1a0','Marley Ahlijanian':'#e84393',
+  'Leisly Aceituno':'#00cec9','Sarah Wilme':'#b2bec3',
+  'Greta Traynor':'#2ecc71','Emma Korsu':'#e67e22','Elliott Haber':'#9b59b6',
+};
+// Fallback palette for any truly unnamed slots (shouldn't repeat named colors above)
+const unknownAmbPal = ['#636e72','#dfe6e9','#2d3436','#74b9ff','#a29bfe'];
+const yoyRosters = {
+  'S26*':['Alexis Sylvestre','Arjya Aich','Brynn Hornig','Denise Romanszysn','Emmett Khan','Evan Morgan','Kaylie Forgue','Kyra Turner','Laila Maisuria','Leah Bucci','Maureen Surgot','Oluwatimilehin Shodipe','Orpheus Wilson','Sophia Kluck'],
+  'F25': ['Orpheus Wilson','Greta Traynor','Emma Korsu','Emmett Khan','Sarah Wilme','Maureen Surgot','Brynn Hornig','Leisly Aceituno','Kaylie Forgue','Evan Morgan','Elliott Haber','Oluwatimilehin Shodipe','Laila Maisuria','Kyra Turner'],
+  'S25': ['Kaitlyn Deierlein','Lizzle Welch','Kaya Pernini','Maureen Surgot','Kate Stanwood','Anna Cunha','Marley Ahlijanian','Bitanya Hailu','Leisly Aceituno','Sarah Wilme','Tyson Enes','Brynn Hornig','Skyler Bobinski'],
+  'F24': ['Skyler Bobinski','Bitanya Hailu','astou dieng','Lucas Meier','Tyson Enes','Westin Palumbo','Cassidy Haskell','Lizzie Welch','Kaya Pernini',"Kayleigh O'mealia"],
+  'S24': ['Westin Palumbo','Bitanya Hailu','Skyler Bobinski','Kayleigh Omealia','Rushil Nepal','Katie Field','Lizzie Welch',null],
+};
+function getAmbColor(name, fallbackIdx) {
+  if(name && ambColorMap[name]) return ambColorMap[name];
+  return unknownAmbPal[fallbackIdx % unknownAmbPal.length];
+}
+// Per-ambassador lbs by semester (from Master Sheet B40+ tables)
+const yoyAmbLbs = {
+  'S24': {'Westin Palumbo':764,'Bitanya Hailu':2806,'Skyler Bobinski':1134,'Kayleigh Omealia':1039,'Rushil Nepal':232,'Katie Field':1922,'Lizzie Welch':124},
+  'F24': {'Skyler Bobinski':1742,'Bitanya Hailu':1432,'astou dieng':1474,'Lucas Meier':440,'Tyson Enes':990,'Westin Palumbo':1584,'Cassidy Haskell':1481,'Lizzie Welch':7855,'Kaya Pernini':7101,"Kayleigh O'mealia":1711},
+  'S25': {'Kaitlyn Deierlein':2162,'Lizzle Welch':2760,'Kaya Pernini':4882,'Maureen Surgot':3738,'Kate Stanwood':2518,'Anna Cunha':775,'Marley Ahlijanian':2217,'Bitanya Hailu':1250,'Leisly Aceituno':3283,'Sarah Wilme':1841,'Tyson Enes':2910,'Brynn Hornig':1645,'Skyler Bobinski':1184},
+  'F25': {'Orpheus Wilson':3001,'Greta Traynor':1997,'Emma Korsu':1329,'Emmett Khan':4151,'Sarah Wilme':1699,'Maureen Surgot':3119,'Brynn Hornig':2620,'Leisly Aceituno':89,'Kaylie Forgue':4195,'Evan Morgan':800,'Elliott Haber':1076,'Oluwatimilehin Shodipe':798,'Laila Maisuria':540,'Kyra Turner':659},
+  'S26*':{'Alexis Sylvestre':193,'Arjya Aich':837,'Brynn Hornig':3497,'Denise Romanszysn':1741,'Emmett Khan':2302,'Evan Morgan':1481,'Kaylie Forgue':2749,'Kyra Turner':4226,'Laila Maisuria':769,'Leah Bucci':4062,'Maureen Surgot':3159,'Oluwatimilehin Shodipe':2591,'Orpheus Wilson':2477,'Sophia Kluck':1261},
+};
+let cumMetric = 'lbs';
+let _cumUnitMetric = 'lbhr';
+function showCumMetric(metric, btn) {
+  cumMetric = metric;
+  document.querySelectorAll('.cum-tog').forEach(t => t.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderCumChart();
+}
+let _hrsUnitMetric = 'hrs';
+function onCumHrsTogClick(e, el) {
+  const isOpen = el.classList.contains('open');
+  document.querySelectorAll('.cum-unit-tog.open').forEach(t=>t.classList.remove('open'));
+  if(!isOpen) el.classList.add('open');
+  showCumMetric(_hrsUnitMetric, el);
+}
+function selectCumHrs(metric, label, optEl) {
+  _hrsUnitMetric = metric;
+  const lbl = document.getElementById('cum-hrs-label');
+  if(lbl) lbl.textContent = label;
+  document.querySelectorAll('#cum-tog-hrs .cum-unit-opt').forEach(o=>o.classList.toggle('selected', o===optEl));
+  document.querySelectorAll('.cum-unit-tog').forEach(t=>t.classList.remove('open'));
+  const tog = document.getElementById('cum-tog-hrs');
+  showCumMetric(metric, tog);
+}
+function onCumUnitTogClick(e, el) {
+  // If dropdown is open and click is on the button body (not an option), close it
+  const isOpen = el.classList.contains('open');
+  // Close all dropdowns first
+  document.querySelectorAll('.cum-unit-tog.open').forEach(t=>t.classList.remove('open'));
+  if(!isOpen) el.classList.add('open');
+  // Always activate this tog and render current unit metric
+  showCumMetric(_cumUnitMetric, el);
+}
+function selectCumUnit(metric, label, optEl) {
+  _cumUnitMetric = metric;
+  const lbl = document.getElementById('cum-unit-label');
+  if(lbl) lbl.textContent = label;
+  document.querySelectorAll('.cum-unit-opt').forEach(o=>o.classList.toggle('selected', o===optEl));
+  document.querySelectorAll('.cum-unit-tog').forEach(t=>t.classList.remove('open'));
+  const tog = document.getElementById('cum-tog-lbunit');
+  showCumMetric(metric, tog);
+}
+// Close unit dropdown on outside click
+document.addEventListener('click', function(e) {
+  if(!e.target.closest('.cum-unit-tog')) {
+    document.querySelectorAll('.cum-unit-tog.open').forEach(t=>t.classList.remove('open'));
+  }
+});
 const mfbfData = [
   {sem:"F24",  mf:11781, bf:14605, current:false},
   {sem:"S25",  mf:14269, bf:16804, current:false},
-  {sem:"F25",  mf:20069, bf:16525, current:false},
-  {sem:"S26*", mf:17917, bf:16092, current:true},
+  {sem:"F25",  mf:17449, bf:15988, current:false},
+  {sem:"S26*", mf:16299, bf:15046, current:true},
 ];
 const periodData = [
-  {sem:"S24",  b:727,  l:3748,  d:2432,  current:false},
-  {sem:"F24",  b:2685, l:12163, d:10619, current:false},
+  {sem:"S24",  b:727,  l:3952,  d:2432,  current:false},
+  {sem:"F24",  b:3145, l:12623, d:10619, current:false},
   {sem:"S25",  b:4199, l:13311, d:13563, current:false},
-  {sem:"F25",  b:1851, l:14185, d:15727, current:false},
-  {sem:"S26*", b:2634, l:9821,  d:13964, current:true},
+  {sem:"F25",  b:2688, l:15022, d:15727, current:false},
+  {sem:"S26*", b:4252, l:12212, d:14881, current:true},
 ];
 const teamData = [
   {sem:"S24",  ambs:8,  lbs:7111,  current:false},
   {sem:"F24",  ambs:10, lbs:26386, current:false},
   {sem:"S25",  ambs:13, lbs:31073, current:false},
-  {sem:"F25",  ambs:14, lbs:36594, current:false},
-  {sem:"S26*", ambs:14, lbs:34009, current:true},
+  {sem:"F25",  ambs:14, lbs:33437, current:false},
+  {sem:"S26*", ambs:14, lbs:31345, current:true},
 ];
 
 function showPanel(id, btn) {
@@ -1090,65 +1189,212 @@ function renderEcoImpact() {
 function renderGrowth() {
   const maxLbs = Math.max(...yoySems.map(s=>s.lbs));
   const maxCo2 = Math.max(...yoySems.map(s=>s.co2));
-  document.getElementById('sem-bars').innerHTML = yoySems.map(s =>
-    `<div class="sem-row">
+
+  // Compute S26 peak/min weekly lb/hr
+  const s26WkLbhrs = s26WeekMeta.filter(w=>w.lbhr>0).map(w=>w.lbhr);
+  const s26PeakLbhr = s26WkLbhrs.length ? Math.max(...s26WkLbhrs).toFixed(1) : null;
+  const s26MinLbhr  = s26WkLbhrs.length ? Math.min(...s26WkLbhrs).toFixed(1) : null;
+
+  const semMeta = {
+    'S24': {hrs:null, lbhr:null, peakLbhr:null, minLbhr:null},
+    'F24': {hrs:null, lbhr:null, peakLbhr:null, minLbhr:null},
+    'S25': {hrs:null, lbhr:null, peakLbhr:null, minLbhr:null},
+    'F25': {hrs:558.6, lbhr:46.68, peakLbhr:null, minLbhr:null},
+    'S26*':{hrs:632.6, lbhr:49.55, peakLbhr:s26PeakLbhr, minLbhr:s26MinLbhr},
+  };
+
+  // ── Lbs Diverted Per Semester ─────────────────────────────
+  document.getElementById('sem-bars').innerHTML = yoySems.map(s => {
+    const t = s.lbs / maxLbs;
+    const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
+    const m = semMeta[s.sem];
+    let tipHtml = `<div class="tip-title">${s.sem} · Lbs Diverted</div>` +
+      `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>` +
+      `<div class="tip-row"><span>Ambassadors</span><span>${s.ambs}</span></div>`;
+    if(m.hrs)      tipHtml += `<div class="tip-row"><span>Hours worked</span><span>${m.hrs.toLocaleString()} hrs</span></div>`;
+    if(m.lbhr)     tipHtml += `<div class="tip-row"><span>Avg lb/hr</span><span>${m.lbhr} lb/hr</span></div>`;
+    if(m.peakLbhr) tipHtml += `<div class="tip-row"><span>Peak week lb/hr</span><span>${m.peakLbhr} lb/hr</span></div>`;
+    if(m.minLbhr)  tipHtml += `<div class="tip-row"><span>Min week lb/hr</span><span>${m.minLbhr} lb/hr</span></div>`;
+    const k = ++_tipIdx; _tipStore[k] = tipHtml;
+    return `<div class="sem-row" data-tipk="${k}"
+      onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
+      onmousemove="moveTip(event)" onmouseleave="hideTip()"
+      ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])">
       <div class="sem-label ${s.current?'current':''}">${s.sem}</div>
       <div class="sem-track">
-        <div class="sem-fill ${s.current?'current':'past'}" data-pct="${(s.lbs/maxLbs*100).toFixed(1)}">
+        <div class="sem-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
           <span class="sem-fill-val">${s.lbs.toLocaleString()}</span>
         </div>
       </div>
-    </div>`
-  ).join('');
-  document.getElementById('co2-bars').innerHTML = yoySems.map(s =>
-    `<div class="sem-row">
+    </div>`;
+  }).join('');
+
+  // ── CO₂e Per Semester ─────────────────────────────────────
+  document.getElementById('co2-bars').innerHTML = yoySems.map(s => {
+    const t = s.co2 / maxCo2;
+    const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
+    const m = semMeta[s.sem];
+    const co2hr = m.hrs ? (s.co2/m.hrs).toFixed(1) : null;
+    let tipHtml = `<div class="tip-title">${s.sem} · CO₂e Avoided</div>` +
+      `<div class="tip-row"><span>CO₂e avoided</span><span>${s.co2.toLocaleString()} lbs</span></div>`;
+    if(m.hrs)  tipHtml += `<div class="tip-row"><span>Hours worked</span><span>${m.hrs.toLocaleString()} hrs</span></div>`;
+    if(co2hr)  tipHtml += `<div class="tip-row"><span>CO₂e per hour</span><span>${co2hr} lbs CO₂e/hr</span></div>`;
+    const k = ++_tipIdx; _tipStore[k] = tipHtml;
+    return `<div class="sem-row" data-tipk="${k}"
+      onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
+      onmousemove="moveTip(event)" onmouseleave="hideTip()"
+      ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])">
       <div class="sem-label ${s.current?'current':''}">${s.sem}</div>
       <div class="sem-track">
-        <div class="sem-fill ${s.current?'current':'past'}" data-pct="${(s.co2/maxCo2*100).toFixed(1)}">
+        <div class="sem-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
           <span class="sem-fill-val">${s.co2.toLocaleString()} lbs CO₂e</span>
         </div>
       </div>
-    </div>`
-  ).join('');
+    </div>`;
+  }).join('');
 
-  // SVG cumulative line
-  const svg = document.getElementById('cum-svg');
-  const W=400, H=200, P=36;
-  const maxCum = yoySems[yoySems.length-1].cum;
-  const pts = yoySems.map((s,i) => {
-    const x = P + (i/(yoySems.length-1))*(W-P*2);
-    const y = H - P - (s.cum/maxCum)*(H-P*2);
-    return [x,y];
-  });
-  const linePts = pts.map(p=>p.join(',')).join(' L ');
-  const areaD = `M ${pts[0][0]},${H-P} L ${linePts} L ${pts[pts.length-1][0]},${H-P} Z`;
-  const lineD = `M ${linePts}`;
-  svg.innerHTML = `
-    <defs>
-      <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#6aaee6" stop-opacity="0.35"/>
-        <stop offset="100%" stop-color="#6aaee6" stop-opacity="0.02"/>
-      </linearGradient>
-    </defs>
-    <path d="${areaD}" fill="url(#cg)"/>
-    <path d="${lineD}" fill="none" stroke="#6aaee6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    ${pts.map((p,i) => `
-      <circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${yoySems[i].current?'#6aaee6':'#2d5f99'}" stroke="#0a1f44" stroke-width="2"/>
-      <text x="${p[0]}" y="${H-8}" text-anchor="middle" fill="#8aa4c8" font-size="10" font-family="Barlow Condensed,sans-serif">${yoySems[i].sem}</text>
-    `).join('')}
-  `;
+  renderCumChart();
   renderMFBF();
   renderPeriod();
   renderTeam();
 }
 
+function renderCumChart() {
+  const W=460, H=210, ML=56, MR=14, MT=20, MB=52;
+  const pw=W-ML-MR, ph=H-MT-MB;
+  let rawVals=[], label='', yFmt=v=>v, titleStr='', noteStr='';
+
+  if(cumMetric==='lbs') {
+    rawVals = yoySems.map(s=>s.cum);
+    label='lbs'; yFmt=v=>v>=1000?(v/1000).toFixed(0)+'k':String(v);
+    titleStr='Cumulative All-Time Pounds'; noteStr='The mountain keeps growing';
+  } else if(cumMetric==='hrs') {
+    rawVals = yoySems.map(s=>s.hrs||null);
+    label='hrs'; yFmt=v=>String(Math.round(v));
+    titleStr='Hours Worked Per Semester'; noteStr='F25 & S26 exact · earlier semesters unavailable';
+  } else if(cumMetric==='shifts') {
+    rawVals = yoySems.map(s=>s.shifts||null);
+    label='shifts'; yFmt=v=>String(Math.round(v));
+    titleStr='Shifts Worked Per Semester'; noteStr='F25 & S26 exact · S24–S25 from ambassador shift records';
+  } else if(cumMetric==='days') {
+    rawVals = yoySems.map(s=>s.collDays||null);
+    label='days'; yFmt=v=>String(Math.round(v));
+    titleStr='Collection Days Per Semester'; noteStr='Est. from shift records · S24 partial semester (launched Mar 18)';
+  } else if(cumMetric==='lbhr') {
+    rawVals = yoySems.map(s=>s.lbhr||null);
+    label='lb/hr'; yFmt=v=>v.toFixed(1);
+    titleStr='Avg lb / hr Per Semester'; noteStr='F25 & S26 exact · earlier semesters unavailable';
+  } else if(cumMetric==='lbday') {
+    rawVals = yoySems.map(s=>s.semDays ? Math.round(s.lbs/s.semDays) : null);
+    label='lb/day'; yFmt=v=>Math.round(v).toLocaleString();
+    titleStr='Avg lb / Calendar Day Per Semester'; noteStr='lbs ÷ calendar days in semester (incl. weekends)';
+  } else if(cumMetric==='lbweek') {
+    rawVals = yoySems.map(s=>s.semDays ? Math.round(s.lbs/(s.semDays/7)) : null);
+    label='lb/wk'; yFmt=v=>Math.round(v).toLocaleString();
+    titleStr='Avg lb / Calendar Week Per Semester'; noteStr='lbs ÷ calendar weeks in semester';
+  } else if(cumMetric==='lbamb') {
+    rawVals = yoySems.map(s=>Math.round(s.lbs/s.ambs));
+    label='lb/amb'; yFmt=v=>v>=1000?(v/1000).toFixed(1)+'k':String(v);
+    titleStr='Total lb per Ambassador · Per Semester'; noteStr='Lbs divided evenly across team size';
+  }
+
+  if(document.getElementById('cum-chart-title')) {
+    document.getElementById('cum-chart-title').textContent = titleStr;
+    document.getElementById('cum-chart-note').textContent = noteStr;
+  }
+
+  const maxData = Math.max(...rawVals.filter(v=>v!=null));
+  const pts = yoySems.map((s,i)=>[
+    ML+i/(yoySems.length-1)*pw,
+    rawVals[i]!=null ? MT+ph-(rawVals[i]/maxData)*ph : null
+  ]);
+
+  // Y-axis ticks (magnitude-aware step)
+  const tickCount = 4;
+  const roughStep = maxData / tickCount;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+  const tickStep = Math.ceil(roughStep / magnitude) * magnitude;
+  const ticks = [];
+  for(let v=tickStep; v<=maxData*1.05; v+=tickStep) ticks.push(v);
+
+  let yAxis='', grid='', dots='', xl='';
+  ticks.forEach(v=>{
+    const y = (MT+ph-(v/maxData)*ph).toFixed(1);
+    grid += `<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    yAxis += `<text x="${ML-5}" y="${(+y+3.5).toFixed(1)}" fill="#8aa4c8" font-size="9" text-anchor="end" font-family="Barlow Condensed,sans-serif">${yFmt(v)}</text>`;
+  });
+  yAxis += `<text x="11" y="${(MT+ph/2).toFixed(1)}" fill="#8aa4c8" font-size="9" text-anchor="middle" font-family="Barlow Condensed,sans-serif" transform="rotate(-90,11,${(MT+ph/2).toFixed(1)})">${label}</text>`;
+
+  const validPts = pts.filter(p=>p[1]!=null);
+  if(validPts.length>1) {
+    const lineD = validPts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+    if(cumMetric==='lbs') {
+      const areaD = `M${pts[0][0].toFixed(1)},${MT+ph} L${lineD.slice(1)} L${pts[pts.length-1][0].toFixed(1)},${MT+ph} Z`;
+      grid += `<defs><linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6aaee6" stop-opacity="0.35"/><stop offset="100%" stop-color="#6aaee6" stop-opacity="0.02"/></linearGradient></defs>`;
+      grid += `<path d="${areaD}" fill="url(#cg2)"/>`;
+    }
+    dots += `<path d="${lineD}" fill="none" stroke="#6aaee6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  pts.forEach((p,i)=>{
+    const s = yoySems[i];
+    xl += `<text x="${p[0].toFixed(1)}" y="${H-MB+18}" text-anchor="middle" fill="${s.current?'#6aaee6':'#8aa4c8'}" font-size="10" font-family="Barlow Condensed,sans-serif">${s.sem}</text>`;
+    if(p[1]!=null) {
+      // Build rich tooltip based on mode
+      let tipHtml = `<div class="tip-title">${s.sem} · ${titleStr}</div>`;
+      tipHtml += `<div class="tip-row"><span>${label}</span><span>${yFmt(rawVals[i])}</span></div>`;
+      if(cumMetric==='lbs') {
+        tipHtml += `<div class="tip-row"><span>Added this sem</span><span>+${s.lbs.toLocaleString()} lbs</span></div>`;
+        tipHtml += `<div class="tip-row"><span>CO₂e avoided</span><span>${s.co2.toLocaleString()} lbs</span></div>`;
+        tipHtml += `<div class="tip-row"><span>Ambassadors</span><span>${s.ambs}</span></div>`;
+      } else if(cumMetric==='hrs' || cumMetric==='shifts' || cumMetric==='days') {
+        tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
+        if(s.hrs) tipHtml += `<div class="tip-row"><span>Total hours</span><span>${s.hrs} hrs</span></div>`;
+      } else if(cumMetric==='lbhr') {
+        tipHtml += `<div class="tip-row"><span>Total hours</span><span>${s.hrs} hrs</span></div>`;
+        tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
+      } else if(cumMetric==='lbday') {
+        tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
+        tipHtml += `<div class="tip-row"><span>Calendar days</span><span>${s.semDays} days</span></div>`;
+      } else if(cumMetric==='lbweek') {
+        tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
+        tipHtml += `<div class="tip-row"><span>Calendar weeks</span><span>${(s.semDays/7).toFixed(1)}</span></div>`;
+      } else if(cumMetric==='lbamb') {
+        tipHtml += `<div class="tip-row"><span>Ambassadors</span><span>${s.ambs}</span></div>`;
+        tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
+      }
+      const k = ++_tipIdx; _tipStore[k] = tipHtml;
+      dots += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6" fill="${s.current?'#6aaee6':'#2d5f99'}" stroke="#0a1f44" stroke-width="2" style="cursor:pointer" data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()"/>`;
+    } else {
+      dots += `<text x="${p[0].toFixed(1)}" y="${(MT+ph/2+4).toFixed(1)}" fill="rgba(255,255,255,0.15)" font-size="9" text-anchor="middle" font-family="Barlow Condensed,sans-serif">—</text>`;
+    }
+  });
+
+  document.getElementById('cum-svg').setAttribute('viewBox',`0 0 ${W} ${H}`);
+  document.getElementById('cum-svg').innerHTML = `
+    ${grid}
+    <line x1="${ML}" y1="${MT+ph}" x2="${W-MR}" y2="${MT+ph}" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="${ML}" y1="${MT}" x2="${ML}" y2="${MT+ph}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    ${yAxis}${dots}${xl}
+  `;
+}
+
 function renderMFBF() {
-  const max = Math.max(...mfbfData.flatMap(s=>[s.mf, s.bf]));
+  const maxMF = Math.max(...mfbfData.map(s=>s.mf));
+  const maxBF = Math.max(...mfbfData.map(s=>s.bf));
   document.getElementById('mfbf-bars').innerHTML = mfbfData.map(s => {
-    const mfT = s.mf / max, bfT = s.bf / max;
+    const mfT = s.mf / maxMF;
+    const bfT = s.bf / maxBF;
     const mfGrad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,mfT)})`;
-    const bfGrad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,bfT)})`;
-    return `<div class="grouped-row">
+    const bfGrad = `linear-gradient(90deg,${_BAR_A_RED},${_lerpColor(_BAR_A_RED,_BAR_B_RED,bfT)})`;
+    const total = s.mf + s.bf;
+    const mfPct = (s.mf/total*100).toFixed(0);
+    const bfPct = (s.bf/total*100).toFixed(0);
+    const tipHtml = `<div class="tip-title">${s.sem} · MF vs. BF</div>` +
+      `<div class="tip-row"><span>🔵 Mainfare</span><span>${s.mf.toLocaleString()} lbs (${mfPct}%)</span></div>` +
+      `<div class="tip-row"><span>🔴 Butterfield</span><span>${s.bf.toLocaleString()} lbs (${bfPct}%)</span></div>` +
+      `<div class="tip-row"><span>Total</span><span>${total.toLocaleString()} lbs</span></div>`;
+    const k = ++_tipIdx; _tipStore[k] = tipHtml;
+    return `<div class="grouped-row" data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()">
       <div class="grouped-label ${s.current?'current':''}">${s.sem}</div>
       <div class="grouped-bars">
         <div class="gbar" style="width:0;background:${mfGrad}" data-w="${(mfT*100).toFixed(1)}%"><span>${s.mf.toLocaleString()} lbs</span></div>
@@ -1162,29 +1408,85 @@ function renderMFBF() {
 }
 
 function renderPeriod() {
+  const allTotals = periodData.map(s=>s.b+s.l+s.d);
+  const maxTotal = Math.max(...allTotals);
+  const fmt = v => v >= 1000 ? (v/1000).toFixed(1)+'k' : v;
+  const fmtFull = v => v.toLocaleString();
   document.getElementById('period-bars').innerHTML = periodData.map(s => {
     const total = s.b + s.l + s.d;
+    const trackPct = (total / maxTotal * 100).toFixed(1);
     const bp = (s.b/total*100).toFixed(1);
     const lp = (s.l/total*100).toFixed(1);
     const dp = (100 - parseFloat(bp) - parseFloat(lp)).toFixed(1);
-    const fmt = v => v >= 1000 ? (v/1000).toFixed(1)+'k' : v;
-    return `<div class="stacked-row">
+    const tipHtml = `<div class="tip-title">${s.sem} · Meal Period Breakdown</div>` +
+      `<div class="tip-row"><span>🌿 Breakfast</span><span>${fmtFull(s.b)} lbs (${bp}%)</span></div>` +
+      `<div class="tip-row"><span>☀️ Lunch</span><span>${fmtFull(s.l)} lbs (${lp}%)</span></div>` +
+      `<div class="tip-row"><span>🌙 Dinner</span><span>${fmtFull(s.d)} lbs (${dp}%)</span></div>` +
+      `<div class="tip-row"><span>Total</span><span>${fmtFull(total)} lbs</span></div>`;
+    const k = ++_tipIdx; _tipStore[k] = tipHtml;
+    return `<div class="stacked-row" data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()">
       <div class="stacked-label ${s.current?'current':''}">${s.sem}</div>
-      <div class="stacked-track">
-        <div class="stacked-seg seg-b" style="width:${bp}%" title="Breakfast: ${s.b.toLocaleString()} lbs">${parseFloat(bp)>7?fmt(s.b):''}</div>
-        <div class="stacked-seg seg-l" style="width:${lp}%" title="Lunch: ${s.l.toLocaleString()} lbs">${parseFloat(lp)>8?fmt(s.l):''}</div>
-        <div class="stacked-seg seg-d" style="width:${dp}%" title="Dinner: ${s.d.toLocaleString()} lbs">${parseFloat(dp)>8?fmt(s.d):''}</div>
+      <div class="stacked-track" style="width:${trackPct}%;flex:none">
+        <div class="stacked-seg seg-b" style="width:${bp}%"><span class="seg-val" data-orig="${fmt(s.b)}">${fmt(s.b)}</span></div>
+        <div class="stacked-seg seg-l" style="width:${lp}%"><span class="seg-val" data-orig="${fmt(s.l)}">${fmt(s.l)}</span></div>
+        <div class="stacked-seg seg-d" style="width:${dp}%"><span class="seg-val" data-orig="${fmt(s.d)}">${fmt(s.d)}</span></div>
       </div>
     </div>`;
   }).join('');
+  setTimeout(checkPeriodOverflow, 150);
+}
+
+function checkPeriodOverflow() {
+  document.querySelectorAll('.stacked-row').forEach(row => {
+    // Reset
+    row.querySelectorAll('.seg-val').forEach(v=>{ v.textContent=v.dataset.orig; });
+    const old = row.querySelector('.stacked-key');
+    if(old) old.remove();
+
+    const overflows = [];
+    row.querySelectorAll('.stacked-seg').forEach(seg => {
+      const v = seg.querySelector('.seg-val');
+      if(!v) return;
+      if(v.scrollWidth > seg.offsetWidth) overflows.push(v);
+    });
+    if(!overflows.length) return;
+
+    const keyLines = [];
+    if(overflows.length === 1) {
+      keyLines.push(`<span class="stacked-key-line"><strong>*</strong>${overflows[0].dataset.orig}</span>`);
+      overflows[0].textContent='*';
+    } else {
+      overflows.forEach((v,i)=>{
+        keyLines.push(`<span class="stacked-key-line"><strong>*${i+1}</strong>${v.dataset.orig}</span>`);
+        v.textContent=`*${i+1}`;
+      });
+    }
+    const kd = document.createElement('div');
+    kd.className='stacked-key';
+    kd.style.cssText='display:flex;gap:12px;flex-wrap:wrap;padding-left:52px';
+    kd.innerHTML = keyLines.join('');
+    row.appendChild(kd);
+  });
 }
 
 function renderTeam() {
-  const colors = ['#3abf7e','#6aaee6','#f5c842','#e07b5c','#b87fcf','#5cade0','#e0c55c','#7fbf9e','#8aa4c8','#c8a47f','#7e9fc8','#d4856a','#a3c87e','#cf87b8'];
   document.getElementById('team-chart').innerHTML = teamData.map(s => {
+    const roster = yoyRosters[s.sem] || null;
+    const ambLbs = yoyAmbLbs[s.sem] || {};
     let dots = '';
     for(let i=0;i<s.ambs;i++){
-      dots += `<div class="amb-dot" style="background:${colors[i]};opacity:${s.current?1:0.55}" title="Ambassador ${i+1}"></div>`;
+      const name = roster ? roster[i] : null;
+      const color = getAmbColor(name, i);
+      const displayName = name || `Ambassador ${i+1}`;
+      const lbs = name && ambLbs[name] ? ambLbs[name] : null;
+      const tipHtml = `<div class="tip-title">${displayName}</div>` +
+        `<div class="tip-row"><span>Semester</span><span>${s.sem}</span></div>` +
+        `<div class="tip-row"><span>Team total</span><span>${s.lbs.toLocaleString()} lbs</span></div>` +
+        (lbs ? `<div class="tip-row"><span>Share of team</span><span>${Math.round(lbs/s.lbs*100)}%</span></div>` : '');
+      const k = ++_tipIdx; _tipStore[k] = tipHtml;
+      dots += `<div class="amb-dot" style="background:${color};opacity:${s.current?1:0.55};cursor:pointer" data-tipk="${k}"
+        onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
+        onmousemove="moveTip(event)" onmouseleave="hideTip()"></div>`;
     }
     return `<div class="team-row">
       <div class="team-sem ${s.current?'current':''}">${s.sem}</div>
@@ -1194,32 +1496,6 @@ function renderTeam() {
   }).join('');
 }
 
-function renderReturners() {
-  const maxVal = Math.max(...returners.flatMap(r=>[r.f25, r.s26]));
-  document.getElementById('returner-grid').innerHTML = returners.map(r => {
-    const delta = ((r.s26 - r.f25)/r.f25*100).toFixed(1);
-    const deltaStr = delta > 0 ? `+${delta}%` : `${delta}%`;
-    const trendColor = r.trend==='up' ? 'var(--green)' : r.trend==='down' ? '#e05c5c' : 'var(--muted)';
-    const arrow = r.trend==='up' ? '↑' : r.trend==='down' ? '↓' : '→';
-    return `<div class="ret-card">
-      <div class="ret-name">${r.name}</div>
-      <div class="ret-compare">
-        <div class="ret-val past"><div class="rv-num">${r.f25.toFixed(1)}</div><div class="rv-label">F25 lb/hr</div></div>
-        <div class="ret-arrow ${r.trend}">${arrow}</div>
-        <div class="ret-val current"><div class="rv-num">${r.s26.toFixed(1)}</div><div class="rv-label">S26 lb/hr</div></div>
-      </div>
-      <div style="font-size:11px;color:${trendColor};font-weight:600;text-align:center;margin-bottom:12px;">${deltaStr} from last semester</div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;">F25</div>
-      <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-bottom:6px;">
-        <div style="height:100%;background:rgba(255,255,255,0.25);border-radius:3px;transition:width 1.3s cubic-bezier(0.22,1,0.36,1);width:0" data-pct="${(r.f25/maxVal*100).toFixed(1)}"></div>
-      </div>
-      <div style="font-size:10px;color:var(--light);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;">S26</div>
-      <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
-        <div style="height:100%;background:var(--light);border-radius:3px;transition:width 1.3s cubic-bezier(0.22,1,0.36,1);width:0" data-pct="${(r.s26/maxVal*100).toFixed(1)}"></div>
-      </div>
-    </div>`;
-  }).join('');
-}
 
 function animateBars() {
   document.querySelectorAll('[data-pct]').forEach(el => {
@@ -1269,7 +1545,7 @@ function checkAllBarOverflow() {
 let _resizeTO;
 window.addEventListener('resize', () => {
   clearTimeout(_resizeTO);
-  _resizeTO = setTimeout(checkAllBarOverflow, 200);
+  _resizeTO = setTimeout(() => { checkAllBarOverflow(); checkPeriodOverflow(); }, 200);
 });
 
 // ============================================================
@@ -2114,7 +2390,7 @@ function renderVizAmb() {
 renderLeaderboard('lbs');
 renderEcoImpact();
 renderGrowth();
-renderReturners();
+renderVizAmb();
 setTimeout(animateBars, 120);
 </script>
 <div id="tip"></div>
