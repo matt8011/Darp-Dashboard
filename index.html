@@ -255,7 +255,7 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 .amb-li.selected { background:rgba(109,174,230,0.12); color:var(--white); }
 /* Selector card grid — full-width, no scroll; children share equal width */
 .sel-grid { display:flex; gap:16px; margin-bottom:32px; }
-.sel-grid .hero-card { flex:1 1 0; min-width:0; cursor:pointer; }
+.sel-grid .hero-card { flex:1 1 auto; min-width:0; cursor:pointer; }
 /* Inactive: gradient bar dimmed; hover: lift */
 .sel-grid .hero-card::before { opacity:0.25; }
 .sel-grid .hero-card:hover { transform:translateY(-3px); border-color:var(--light); }
@@ -266,7 +266,8 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 .sel-grid .hero-card.active .hc-val { color:var(--light); }
 @media(max-width:640px) {
   .hero-grid, .sel-grid { flex-direction:column; }
-  .hero-grid .hero-card { flex:1 1 auto; min-width:0; }
+  .hero-grid .hero-card,
+  .sel-grid .hero-card { flex:0 0 auto; min-width:0; }
   .hero-grid .hero-card .hc-icon,
   .hero-grid .hero-card .hc-val,
   .hero-grid .hero-card .hc-label,
