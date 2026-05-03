@@ -154,8 +154,8 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 .sem-track { flex:1; height:36px; background:rgba(255,255,255,0.05); border-radius:4px; overflow:hidden; }
 .sem-fill { height:100%; display:flex; align-items:center; padding:0 10px; justify-content:flex-end; border-radius:4px; transition:width 1.4s cubic-bezier(0.22,1,0.36,1); width:0; }
 .sem-fill-val { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; }
-.cum-chart { position:relative; height:200px; }
-.cum-chart svg { width:100%; height:100%; }
+.cum-chart { position:relative; height:220px; }
+.cum-chart svg { width:100%; height:100%; display:block; }
 .cum-toggle { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; align-items:center; }
 .cum-tog { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:5px 12px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; border-radius:5px; transition:all 0.2s; }
 .cum-tog:hover { color:var(--light); border-color:var(--light); }
@@ -634,8 +634,11 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
   <div class="growth-grid">
     <div class="chart-section">
       <div class="chart-header">
-        <div><div class="chart-title">Lbs Diverted Per Semester</div><div class="chart-note">All semesters · S26 = current</div></div>
-        <span class="chart-badge badge-all">All Semesters</span>
+        <div><div class="chart-title" id="sem-bars-title">Lbs Diverted Per Semester</div><div class="chart-note" id="sem-bars-note">All semesters · S26 = current</div></div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="cum-tog active" id="semtog-lbs" onclick="switchSemBars('lbs',this)">Lbs</button>
+          <button class="cum-tog" id="semtog-co2" onclick="switchSemBars('co2',this)">CO₂e</button>
+        </div>
       </div>
       <div class="sem-bars" id="sem-bars"></div>
     </div>
@@ -666,16 +669,9 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
         </div>
         <button class="cum-tog" onclick="showCumMetric('lbamb',this)">lb / Ambassador</button>
       </div>
-      <div class="cum-chart"><svg id="cum-svg" viewBox="0 0 460 210" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <div class="cum-chart"><svg id="cum-svg" preserveAspectRatio="xMidYMid meet"></svg></div>
     </div>
   </div>
-  <div class="chart-section">
-    <div class="chart-header">
-      <div><div class="chart-title">CO₂e Avoided Per Semester</div><div class="chart-note">Pounds of carbon emissions offset by composting vs. landfill</div></div>
-    </div>
-    <div class="sem-bars" id="co2-bars"></div>
-  </div>
-
   <!-- Mainfare vs Butterfield YoY -->
   <div class="chart-section">
     <div class="chart-header">
@@ -1397,6 +1393,85 @@ function renderEcoImpact() {
   setTimeout(animateBars, 60);
 }
 
+let semBarMetric = 'lbs';
+function switchSemBars(metric, btn) {
+  semBarMetric = metric;
+  document.querySelectorAll('#semtog-lbs,#semtog-co2').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderSemBars();
+  setTimeout(animateBars, 60);
+}
+
+function renderSemBars() {
+  const maxLbs = Math.max(...yoySems.map(s=>s.lbs));
+  const maxCo2 = Math.max(...yoySems.map(s=>s.co2));
+  const _s26wl = (typeof s26WeekMeta!=='undefined') ? s26WeekMeta.filter(w=>w.lbhr>0).map(w=>w.lbhr) : [];
+  const semMeta = {
+    'S24': {hrs:null, lbhr:null, peakLbhr:null, minLbhr:null},
+    'F24': {hrs:null, lbhr:null, peakLbhr:null, minLbhr:null},
+    'S25': {hrs:null, lbhr:null, peakLbhr:null, minLbhr:null},
+    'F25': {hrs:558.6, lbhr:46.68, peakLbhr:null, minLbhr:null},
+    'S26': {hrs:632.6, lbhr:49.55,
+      peakLbhr: _s26wl.length ? Math.max(..._s26wl).toFixed(1) : null,
+      minLbhr:  _s26wl.length ? Math.min(..._s26wl).toFixed(1) : null},
+  };
+  const titleEl = document.getElementById('sem-bars-title');
+  const noteEl  = document.getElementById('sem-bars-note');
+  if (semBarMetric === 'co2') {
+    if(titleEl) titleEl.textContent = 'CO₂e Avoided Per Semester';
+    if(noteEl)  noteEl.textContent  = 'Pounds of carbon emissions offset by composting vs. landfill';
+    document.getElementById('sem-bars').innerHTML = yoySems.map(s => {
+      const t = s.co2 / maxCo2;
+      const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
+      const m = semMeta[s.sem];
+      const co2hr = m.hrs ? (s.co2/m.hrs).toFixed(1) : null;
+      let tipHtml = `<div class="tip-title">${s.sem} · CO₂e Avoided</div>` +
+        `<div class="tip-row"><span>CO₂e avoided</span><span>${s.co2.toLocaleString()} lbs</span></div>`;
+      if(m.hrs)  tipHtml += `<div class="tip-row"><span>Hours worked</span><span>${m.hrs.toLocaleString()} hrs</span></div>`;
+      if(co2hr)  tipHtml += `<div class="tip-row"><span>CO₂e per hour</span><span>${co2hr} lbs CO₂e/hr</span></div>`;
+      const k = ++_tipIdx; _tipStore[k] = tipHtml;
+      return `<div class="sem-row" data-tipk="${k}"
+        onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
+        onmousemove="moveTip(event)" onmouseleave="hideTip()"
+        ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])">
+        <div class="sem-label ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
+        <div class="sem-track">
+          <div class="sem-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
+            <span class="sem-fill-val">${s.co2.toLocaleString()} lbs CO₂e</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    if(titleEl) titleEl.textContent = 'Lbs Diverted Per Semester';
+    if(noteEl)  noteEl.textContent  = 'All semesters · S26 = current';
+    document.getElementById('sem-bars').innerHTML = yoySems.map(s => {
+      const t = s.lbs / maxLbs;
+      const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
+      const m = semMeta[s.sem];
+      let tipHtml = `<div class="tip-title">${s.sem} · Lbs Diverted</div>` +
+        `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>` +
+        `<div class="tip-row"><span>Ambassadors</span><span>${s.ambs}</span></div>`;
+      if(m.hrs)      tipHtml += `<div class="tip-row"><span>Hours worked</span><span>${m.hrs.toLocaleString()} hrs</span></div>`;
+      if(m.lbhr)     tipHtml += `<div class="tip-row"><span>Avg lb/hr</span><span>${m.lbhr} lb/hr</span></div>`;
+      if(m.peakLbhr) tipHtml += `<div class="tip-row"><span>Peak week lb/hr</span><span>${m.peakLbhr} lb/hr</span></div>`;
+      if(m.minLbhr)  tipHtml += `<div class="tip-row"><span>Min week lb/hr</span><span>${m.minLbhr} lb/hr</span></div>`;
+      const k = ++_tipIdx; _tipStore[k] = tipHtml;
+      return `<div class="sem-row" data-tipk="${k}"
+        onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
+        onmousemove="moveTip(event)" onmouseleave="hideTip()"
+        ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])">
+        <div class="sem-label ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
+        <div class="sem-track">
+          <div class="sem-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
+            <span class="sem-fill-val">${s.lbs.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+
 function renderGrowth() {
   const maxLbs = Math.max(...yoySems.map(s=>s.lbs));
   const maxCo2 = Math.max(...yoySems.map(s=>s.co2));
@@ -1414,56 +1489,7 @@ function renderGrowth() {
     'S26':{hrs:632.6, lbhr:49.55, peakLbhr:s26PeakLbhr, minLbhr:s26MinLbhr},
   };
 
-  // ── Lbs Diverted Per Semester ─────────────────────────────
-  document.getElementById('sem-bars').innerHTML = yoySems.map(s => {
-    const t = s.lbs / maxLbs;
-    const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
-    const m = semMeta[s.sem];
-    let tipHtml = `<div class="tip-title">${s.sem} · Lbs Diverted</div>` +
-      `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>` +
-      `<div class="tip-row"><span>Ambassadors</span><span>${s.ambs}</span></div>`;
-    if(m.hrs)      tipHtml += `<div class="tip-row"><span>Hours worked</span><span>${m.hrs.toLocaleString()} hrs</span></div>`;
-    if(m.lbhr)     tipHtml += `<div class="tip-row"><span>Avg lb/hr</span><span>${m.lbhr} lb/hr</span></div>`;
-    if(m.peakLbhr) tipHtml += `<div class="tip-row"><span>Peak week lb/hr</span><span>${m.peakLbhr} lb/hr</span></div>`;
-    if(m.minLbhr)  tipHtml += `<div class="tip-row"><span>Min week lb/hr</span><span>${m.minLbhr} lb/hr</span></div>`;
-    const k = ++_tipIdx; _tipStore[k] = tipHtml;
-    return `<div class="sem-row" data-tipk="${k}"
-      onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
-      onmousemove="moveTip(event)" onmouseleave="hideTip()"
-      ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])">
-      <div class="sem-label ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
-      <div class="sem-track">
-        <div class="sem-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
-          <span class="sem-fill-val">${s.lbs.toLocaleString()}</span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
-  // ── CO₂e Per Semester ─────────────────────────────────────
-  document.getElementById('co2-bars').innerHTML = yoySems.map(s => {
-    const t = s.co2 / maxCo2;
-    const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
-    const m = semMeta[s.sem];
-    const co2hr = m.hrs ? (s.co2/m.hrs).toFixed(1) : null;
-    let tipHtml = `<div class="tip-title">${s.sem} · CO₂e Avoided</div>` +
-      `<div class="tip-row"><span>CO₂e avoided</span><span>${s.co2.toLocaleString()} lbs</span></div>`;
-    if(m.hrs)  tipHtml += `<div class="tip-row"><span>Hours worked</span><span>${m.hrs.toLocaleString()} hrs</span></div>`;
-    if(co2hr)  tipHtml += `<div class="tip-row"><span>CO₂e per hour</span><span>${co2hr} lbs CO₂e/hr</span></div>`;
-    const k = ++_tipIdx; _tipStore[k] = tipHtml;
-    return `<div class="sem-row" data-tipk="${k}"
-      onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
-      onmousemove="moveTip(event)" onmouseleave="hideTip()"
-      ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])">
-      <div class="sem-label ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
-      <div class="sem-track">
-        <div class="sem-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
-          <span class="sem-fill-val">${s.co2.toLocaleString()} lbs CO₂e</span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
+  renderSemBars();
   renderCumChart();
   renderMFBF();
   renderPeriod();
@@ -1471,7 +1497,9 @@ function renderGrowth() {
 }
 
 function renderCumChart() {
-  const W=460, H=210, ML=56, MR=14, MT=20, MB=52;
+  const svgEl = document.getElementById('cum-svg');
+  const W = svgEl ? Math.max(460, svgEl.parentElement.offsetWidth || 460) : 460;
+  const H=220, ML=56, MR=20, MT=20, MB=52;
   const pw=W-ML-MR, ph=H-MT-MB;
   let rawVals=[], label='', yFmt=v=>v, titleStr='', noteStr='';
 
@@ -1496,13 +1524,18 @@ function renderCumChart() {
     label='lb/hr'; yFmt=v=>v.toFixed(1);
     titleStr='Avg lb / hr Per Semester'; noteStr='F25 & S26 exact · earlier semesters unavailable';
   } else if(cumMetric==='lbday') {
-    rawVals = yoySems.map(s=>s.semDays ? Math.round(s.lbs/s.semDays) : null);
+    rawVals = yoySems.map(s=>s.collDays ? Math.round(s.lbs/s.collDays) : null);
     label='lb/day'; yFmt=v=>Math.round(v).toLocaleString();
-    titleStr='Avg lb / Calendar Day Per Semester'; noteStr='lbs ÷ calendar days in semester (incl. weekends)';
+    titleStr='Avg lb / Collection Day Per Semester'; noteStr='Average of per-day totals · collection days only';
   } else if(cumMetric==='lbweek') {
-    rawVals = yoySems.map(s=>s.semDays ? Math.round(s.lbs/(s.semDays/7)) : null);
+    rawVals = yoySems.map(s=>{
+      const sd = SEASON_DATA[s.sem?.toLowerCase()];
+      const wt = sd?.weekTotals;
+      const activeWks = wt ? wt.filter(v=>v>0).length : s.semWeeks;
+      return activeWks ? Math.round(s.lbs/activeWks) : null;
+    });
     label='lb/wk'; yFmt=v=>Math.round(v).toLocaleString();
-    titleStr='Avg lb / Calendar Week Per Semester'; noteStr='lbs ÷ calendar weeks in semester';
+    titleStr='Avg lb / Active Week Per Semester'; noteStr='Average of per-week totals · active collection weeks only';
   } else if(cumMetric==='lbamb') {
     rawVals = yoySems.map(s=>Math.round(s.lbs/s.ambs));
     label='lb/amb'; yFmt=v=>v>=1000?(v/1000).toFixed(1)+'k':String(v);
@@ -1565,10 +1598,13 @@ function renderCumChart() {
         tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
       } else if(cumMetric==='lbday') {
         tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
-        tipHtml += `<div class="tip-row"><span>Calendar days</span><span>${s.semDays} days</span></div>`;
+        tipHtml += `<div class="tip-row"><span>Collection days</span><span>${s.collDays} days</span></div>`;
       } else if(cumMetric==='lbweek') {
+        const _sd = SEASON_DATA[s.sem?.toLowerCase()];
+        const _wt = _sd?.weekTotals;
+        const _awk = _wt ? _wt.filter(v=>v>0).length : s.semWeeks;
         tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
-        tipHtml += `<div class="tip-row"><span>Calendar weeks</span><span>${(s.semDays/7).toFixed(1)}</span></div>`;
+        tipHtml += `<div class="tip-row"><span>Active weeks</span><span>${_awk} weeks</span></div>`;
       } else if(cumMetric==='lbamb') {
         tipHtml += `<div class="tip-row"><span>Ambassadors</span><span>${s.ambs}</span></div>`;
         tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
@@ -1756,7 +1792,7 @@ function checkAllBarOverflow() {
 let _resizeTO;
 window.addEventListener('resize', () => {
   clearTimeout(_resizeTO);
-  _resizeTO = setTimeout(() => { checkAllBarOverflow(); checkPeriodOverflow(); }, 200);
+  _resizeTO = setTimeout(() => { checkAllBarOverflow(); checkPeriodOverflow(); renderCumChart(); }, 200);
 });
 
 // ============================================================
