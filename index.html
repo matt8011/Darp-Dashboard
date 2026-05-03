@@ -19,10 +19,11 @@
   --border:rgba(255,255,255,0.12);
 }
 * { box-sizing:border-box; margin:0; padding:0; }
+html { overflow-x:hidden; }
 body { font-family:'Barlow',sans-serif; background:var(--navy); color:var(--white); min-height:100vh; overflow-x:hidden; }
 body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse at 20% 0%, rgba(29,78,143,0.3) 0%, transparent 60%), radial-gradient(ellipse at 80% 100%, rgba(10,31,68,0.8) 0%, transparent 50%); pointer-events:none; z-index:0; }
 
-header { position:relative; background:linear-gradient(135deg,#060f22 0%,var(--navy) 50%,#0d2a5e 100%); border-bottom:3px solid var(--light); padding:32px 48px 28px; display:flex; align-items:center; gap:28px; overflow:hidden; z-index:1; }
+header { position:relative; background:linear-gradient(135deg,#060f22 0%,var(--navy) 50%,#0d2a5e 100%); border-bottom:3px solid var(--light); padding:32px 48px 28px; display:flex; align-items:center; gap:28px; overflow:visible; z-index:200; }
 header::after { content:''; position:absolute; right:-80px; top:-80px; width:400px; height:400px; background:radial-gradient(circle,rgba(109,174,230,0.12) 0%,transparent 70%); pointer-events:none; }
 .logo-wrap img { height:80px; filter:drop-shadow(0 4px 16px rgba(109,174,230,0.4)); }
 .header-text h1 { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:clamp(28px,4vw,48px); letter-spacing:0.04em; text-transform:uppercase; line-height:1; }
@@ -31,6 +32,12 @@ header::after { content:''; position:absolute; right:-80px; top:-80px; width:400
 .header-badge { margin-left:auto; background:rgba(245,200,66,0.15); border:1px solid rgba(245,200,66,0.4); border-radius:6px; padding:8px 16px; text-align:center; flex-shrink:0; }
 .header-badge .badge-label { font-size:10px; color:var(--gold); letter-spacing:0.15em; text-transform:uppercase; }
 .header-badge .badge-val { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; color:var(--gold); }
+.season-select { position:relative; cursor:pointer; user-select:none; }
+.season-drop { display:none; position:absolute; top:calc(100% + 6px); right:0; background:#0c1e3d; border:1px solid rgba(109,174,230,0.35); border-radius:8px; overflow:hidden; z-index:500; min-width:160px; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
+.season-select.open .season-drop { display:block; }
+.sdrop-item { padding:10px 16px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:background 0.12s,color 0.12s; }
+.sdrop-item:hover { background:rgba(109,174,230,0.12); color:var(--white); }
+.sdrop-item.active { color:var(--gold); }
 
 nav { display:flex; gap:4px; padding:20px 48px 0; border-bottom:1px solid var(--border); position:relative; z-index:1; overflow-x:auto; scrollbar-width:none; }
 nav::-webkit-scrollbar { display:none; }
@@ -46,6 +53,13 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 .section-title { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--light); margin-bottom:6px; }
 .section-heading { font-family:'Barlow Condensed',sans-serif; font-size:clamp(24px,3vw,36px); font-weight:800; letter-spacing:0.02em; text-transform:uppercase; margin-bottom:4px; }
 .section-sub { font-size:13px; color:var(--muted); margin-bottom:32px; }
+
+.glance-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(255,255,255,0.06); border-radius:8px; overflow:hidden; margin-top:4px; }
+.glance-stat { padding:16px 12px; text-align:center; background:var(--card); }
+.glance-val { font-family:'Barlow Condensed',sans-serif; font-size:clamp(20px,2.4vw,30px); font-weight:800; color:var(--white); line-height:1; }
+.glance-val.na { color:var(--muted); font-size:clamp(14px,1.6vw,20px); }
+.glance-lbl { font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-top:5px; font-weight:500; }
+@media(max-width:680px) { .glance-grid { grid-template-columns:repeat(2,1fr); } }
 
 .hero-grid { display:flex; flex-direction:row; gap:16px; margin-bottom:40px; flex-wrap:wrap; }
 .hero-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; position:relative; overflow:hidden; transition:transform 0.2s,border-color 0.2s; flex:0 0 200px; min-width:200px; }
@@ -96,6 +110,32 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 .lst-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.12em; font-weight:600; }
 .lst-val { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:800; color:var(--light); }
 .lst-sub { font-size:11px; color:var(--muted); }
+.amb-stat-strip { display:flex; gap:24px; padding:10px 4px 18px; border-bottom:1px solid var(--border); margin-bottom:20px; }
+.amb-stat-strip .lst-val { font-size:22px; }
+
+/* Rate comparison rows (viz-lbhr redesign) */
+.rate-compare { width:100%; }
+.rate-row { display:grid; grid-template-columns:140px 1fr 28px 1fr 1fr; gap:8px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+.rate-row-hdr { padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.12); }
+.rate-row-hdr .rr-avg,.rate-row-hdr .rr-best,.rate-row-hdr .rr-worst { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); }
+.rr-label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; }
+.rr-avg { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; color:var(--light); }
+.rr-vs { font-size:10px; color:var(--muted); text-align:center; }
+.rr-best,.rr-worst { display:flex; flex-direction:column; gap:2px; }
+.rr-hi { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; color:var(--green); }
+.rr-lo { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; color:#e87a6a; }
+.rr-sub { font-size:10px; color:var(--muted); }
+.rr-muted { font-size:14px; color:var(--muted); }
+@media(max-width:720px){.rate-row{grid-template-columns:100px 1fr 20px 1fr 1fr;font-size:12px}}
+/* Period × Hall lb/hr grid */
+.ph-grid-title { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; margin-top:4px; }
+.ph-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.ph-cell { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:12px 14px; }
+.ph-label { font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:4px; }
+.ph-val { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; color:var(--white); }
+.ph-bar { height:4px; background:rgba(255,255,255,0.08); border-radius:2px; margin-top:6px; }
+.ph-bar-fill { height:100%; background:var(--light); border-radius:2px; transition:width .3s; }
+@media(max-width:700px){.ph-grid{grid-template-columns:repeat(2,1fr)}}
 
 .toggle-group { display:flex; gap:6px; margin-bottom:24px; flex-wrap:wrap; }
 .tog { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:7px 16px; border:1px solid var(--border); background:transparent; color:var(--muted); cursor:pointer; border-radius:6px; transition:all 0.2s; }
@@ -220,8 +260,8 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 .hero-card.accent .hc-val { color:var(--white); }
 
 /* === Visualization panels === */
-.viz-container { margin-bottom:24px; }
-.viz-panel { display:none; }
+.viz-container { margin-bottom:24px; width:100%; box-sizing:border-box; }
+.viz-panel { display:none; width:100%; box-sizing:border-box; }
 .viz-panel.active { display:block; animation:fadeUp 0.3s ease forwards; }
 
 /* === CO₂ Visual === */
@@ -249,6 +289,8 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 .tip-title { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:var(--white); letter-spacing:.05em; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,0.1); }
 .tip-row { display:flex; justify-content:space-between; gap:12px; margin-top:4px; color:var(--muted); }
 .tip-row span:last-child { color:var(--white); font-weight:600; text-align:right; }
+.tip-note span:last-child { color:var(--gold); font-weight:500; font-style:italic; }
+.tip-divider { border-top:1px solid rgba(255,255,255,0.1); margin:6px 0 2px; }
 /* === Ambassador legend interactive === */
 .amb-li { cursor:pointer; transition:opacity 0.2s; border-radius:4px; padding:2px 5px; }
 .amb-li.dimmed { opacity:0.2; }
@@ -300,9 +342,16 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
     <h1>DaRP <span>Spring 2026</span></h1>
     <p>Diversion &amp; Recovery Program · Ambassador Impact Dashboard</p>
   </div>
-  <div class="header-badge">
+  <div class="header-badge season-select" id="season-btn" onclick="toggleSeasonDrop(event)">
     <div class="badge-label">Season Status</div>
-    <div class="badge-val">Spring 2026</div>
+    <div class="badge-val" id="season-label">Spring 2026 ▾</div>
+    <div class="season-drop" id="season-drop">
+      <div class="sdrop-item active" onclick="event.stopPropagation();switchSeason('s26')">Spring 2026</div>
+      <div class="sdrop-item" onclick="event.stopPropagation();switchSeason('f25')">Fall 2025</div>
+      <div class="sdrop-item" onclick="event.stopPropagation();switchSeason('s25')">Spring 2025</div>
+      <div class="sdrop-item" onclick="event.stopPropagation();switchSeason('f24')">Fall 2024</div>
+      <div class="sdrop-item" onclick="event.stopPropagation();switchSeason('s24')">Spring 2024</div>
+    </div>
   </div>
 </header>
 
@@ -317,39 +366,84 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 
 <!-- IMPACT -->
 <div id="panel-impact" class="panel active">
-  <div class="section-title">Spring 2026 · Highlights</div>
+  <div class="section-title" id="impact-section-title">Spring 2026 · Highlights</div>
   <h2 class="section-heading">Season Highlights</h2>
   <p class="section-sub">Complete Spring 2026 data — tap any card to explore the story behind the numbers</p>
+
+  <div class="chart-section" id="glance-panel" style="margin-bottom:28px">
+    <div class="chart-header" style="margin-bottom:16px">
+      <div>
+        <div class="chart-title">At a Glance</div>
+        <div class="chart-note" id="glance-note">Spring 2026 · complete semester overview</div>
+      </div>
+      <span class="chart-badge badge-all" id="glance-badge">S26</span>
+    </div>
+    <div class="glance-grid">
+      <div class="glance-stat">
+        <div class="glance-val" id="glance-lbs">31,345</div>
+        <div class="glance-lbl">Total Lbs Diverted</div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-val" id="glance-co2">19,921</div>
+        <div class="glance-lbl">CO₂e Avoided (lbs)</div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-val" id="glance-hrs">633</div>
+        <div class="glance-lbl">Total Hours</div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-val" id="glance-lbhr">49.6</div>
+        <div class="glance-lbl">Avg lb / hr</div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-val" id="glance-shifts">280</div>
+        <div class="glance-lbl">Total Shifts</div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-val" id="glance-ambs">14</div>
+        <div class="glance-lbl">Ambassadors</div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-val" id="glance-lbshift">111.9</div>
+        <div class="glance-lbl">Avg lb / shift</div>
+      </div>
+      <div class="glance-stat">
+        <div class="glance-val" id="glance-lbamb">2,239</div>
+        <div class="glance-lbl">Avg lb / ambassador</div>
+      </div>
+    </div>
+  </div>
+
   <div class="hero-grid">
     <div class="hero-card" id="hcard-lbs" onclick="selectCard('lbs')">
       <div class="hc-icon">🌿</div>
-      <div class="hc-val"><span>31,345</span></div>
+      <div class="hc-val" id="hcard-lbs-val"><span>31,345</span></div>
       <div class="hc-label">Pounds Diverted</div>
-      <div class="hc-sub">Spring 2026 full semester</div>
+      <div class="hc-sub" id="hcard-lbs-sub">Spring 2026 full semester</div>
     </div>
     <div class="hero-card" id="hcard-co2" onclick="selectCard('co2')">
       <div class="hc-icon">💨</div>
-      <div class="hc-val">19,921</div>
+      <div class="hc-val" id="hcard-co2-val">19,921</div>
       <div class="hc-label">Pounds of CO₂e Avoided</div>
-      <div class="hc-sub">≈ 22,358 miles not driven</div>
+      <div class="hc-sub" id="hcard-co2-sub">≈ 22,358 miles not driven</div>
     </div>
     <div class="hero-card" id="hcard-hrs" onclick="selectCard('hrs')">
       <div class="hc-icon">⏱️</div>
-      <div class="hc-val">633</div>
+      <div class="hc-val" id="hcard-hrs-val">633</div>
       <div class="hc-label">Total Hours Worked</div>
-      <div class="hc-sub">Across 280 shifts</div>
+      <div class="hc-sub" id="hcard-hrs-sub">Across 280 shifts</div>
     </div>
     <div class="hero-card" id="hcard-lbhr" onclick="selectCard('lbhr')">
       <div class="hc-icon">⚡</div>
-      <div class="hc-val">49.55</div>
-      <div class="hc-label">Avg lb/hr This Semester</div>
-      <div class="hc-sub">↑ +6.1% vs. F25 (46.7 lb/hr)</div>
+      <div class="hc-val" id="hcard-lbhr-val">49.55</div>
+      <div class="hc-label">Rate Breakdown</div>
+      <div class="hc-sub" id="hcard-lbhr-sub">↑ +6.1% vs. F25 (46.7 lb/hr)</div>
     </div>
     <div class="hero-card" id="hcard-alltime" onclick="selectCard('alltime')">
       <div class="hc-icon">🏛️</div>
-      <div class="hc-val"><span>129,352</span></div>
+      <div class="hc-val" id="hcard-alltime-val"><span>129,352</span></div>
       <div class="hc-label">All-Time Cumulative Pounds</div>
-      <div class="hc-sub">Since program launch S24</div>
+      <div class="hc-sub" id="hcard-alltime-sub">Since program launch S24</div>
     </div>
   </div>
 
@@ -359,11 +453,12 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
     <div class="viz-panel chart-section" id="viz-lbs">
       <div class="chart-header">
         <div>
-          <div class="chart-title">Weekly Pounds Diverted · Spring 2026</div>
-          <div class="chart-note">Week-by-week from January through April · Spring Break = gap</div>
+          <div class="chart-title" id="viz-lbs-title">Weekly Pounds Diverted · Spring 2026</div>
+          <div class="chart-note" id="viz-lbs-note">Week-by-week from January through April · Spring Break = gap</div>
         </div>
       </div>
       <div id="viz-lbs-inner"></div>
+      <div id="viz-lbs-wkday"></div>
     </div>
 
     <div class="viz-panel chart-section" id="viz-co2">
@@ -396,8 +491,8 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
     <div class="viz-panel chart-section" id="viz-lbhr">
       <div class="chart-header">
         <div>
-          <div class="chart-title">Avg lb/hr by Weekday · Spring 2026</div>
-          <div class="chart-note">Which days are most productive? Top: program total · Bottom: Mainfare vs. Butterfield</div>
+          <div class="chart-title" id="viz-lbhr-title">Rate Breakdown · Spring 2026</div>
+          <div class="chart-note" id="viz-lbhr-note">Semester averages vs. single-session extremes · lb/hr · lb/shift · lb/day</div>
         </div>
       </div>
       <div id="viz-lbhr-inner"></div>
@@ -418,61 +513,25 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 
   </div>
 
-  <!-- Dining hall split donut -->
-  <div class="chart-section">
-    <div class="chart-header">
-      <div>
-        <div class="chart-title">Dining Hall Split · Spring 2026</div>
-        <div class="chart-note">Almost even between Mainfare and Butterfield — both halls are pulling their weight</div>
-      </div>
-      <span class="chart-badge badge-all">S26</span>
-    </div>
-    <div class="donut-wrap">
-      <svg viewBox="0 0 160 160" width="160" height="160" style="flex-shrink:0">
-        <circle cx="80" cy="80" r="60" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="22"/>
-        <path d="M 80 20 A 60 60 0 1 1 69.87 139.14" fill="none" stroke="#6aaee6" stroke-width="22" stroke-linecap="butt"/>
-        <path d="M 69.87 139.14 A 60 60 0 0 1 80 20" fill="none" stroke="#1d4e8f" stroke-width="22" stroke-linecap="butt"/>
-        <text x="80" y="76" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="20" font-weight="900" fill="white">34,009</text>
-        <text x="80" y="91" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" fill="#8aa4c8" letter-spacing="1.5">TOTAL LBS</text>
-      </svg>
-      <div class="donut-legend">
-        <div class="donut-item">
-          <div class="donut-swatch" style="background:#6aaee6"></div>
-          <div class="donut-stat">
-            <div class="ds-val" style="color:#6aaee6">17,917 lbs</div>
-            <div class="ds-label">Mainfare · 52.7%</div>
-          </div>
-        </div>
-        <div class="donut-item">
-          <div class="donut-swatch" style="background:#4a8fcb"></div>
-          <div class="donut-stat">
-            <div class="ds-val" style="color:#4a8fcb">16,092 lbs</div>
-            <div class="ds-label">Butterfield · 47.3%</div>
-          </div>
-        </div>
-        <div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6;max-width:260px">Both dining halls contribute nearly equally — no single location carries the team.</div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- LEADERBOARD -->
 <div id="panel-leaderboard" class="panel">
-  <div class="section-title">Spring 2026 · Team</div>
-  <h2 class="section-heading">S26 Weekly Team Output</h2>
-  <p class="section-sub">Filter by ambassador · toggle output vs. efficiency mode</p>
-  <div class="chart-section" style="margin-bottom:32px">
+  <div class="section-title" id="lb-section-title">Spring 2026 · Team</div>
+  <h2 class="section-heading" id="lb-section-heading">S26 Weekly Team Output</h2>
+  <p class="section-sub" id="lb-section-sub">Filter by ambassador · toggle output vs. efficiency mode</p>
+  <div class="chart-section" id="amb-viz-section" style="margin-bottom:32px">
     <div class="chart-header">
       <div>
-        <div class="chart-title">Ambassador Weekly Output · Spring 2026</div>
-        <div class="chart-note">Stacked by ambassador — 👑 marks each week's top contributor</div>
+        <div class="chart-title" id="amb-chart-title">Ambassador Weekly Output · Spring 2026</div>
+        <div class="chart-note" id="amb-chart-note">Stacked by ambassador — 👑 marks each week's top contributor</div>
       </div>
     </div>
     <button class="eff-toggle" id="eff-btn" onclick="toggleEff()">⚡ Show Efficiency View</button>
     <div id="viz-amb-inner"></div>
     <div class="amb-legend" id="amb-legend"></div>
   </div>
-  <div class="section-title">Spring 2026 · Ambassadors</div>
+  <div class="section-title" id="amb-section-title">Spring 2026 · Ambassadors</div>
   <h2 class="section-heading">Top Performers</h2>
   <p class="section-sub">Top 5 in each category — every ambassador contributes; this highlights standout performances</p>
   <div class="sel-grid">
@@ -482,17 +541,17 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
       <div class="hc-label">Semester output</div>
       <div class="hc-sub">34,009 lbs · S26</div>
     </div>
+    <div class="hero-card lb-sel-card"        id="ltog-avglbs"  onclick="showLeaderboard('avglbs',this)">
+      <div class="hc-icon">📊</div>
+      <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">Avg Lbs</div>
+      <div class="hc-label">Rate breakdown</div>
+      <div class="hc-sub">lb/hr · lb/shift · lb/day · lb/wk</div>
+    </div>
     <div class="hero-card lb-sel-card"        id="ltog-eff"     onclick="showLeaderboard('eff',this)">
       <div class="hc-icon">⚡</div>
       <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">Efficiency</div>
       <div class="hc-label">Effectiveness score</div>
       <div class="hc-sub">vs. dining hall baseline</div>
-    </div>
-    <div class="hero-card lb-sel-card"        id="ltog-lbhr"    onclick="showLeaderboard('lbhr',this)">
-      <div class="hc-icon">🚀</div>
-      <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">lb / hr</div>
-      <div class="hc-label">Pounds per hour</div>
-      <div class="hc-sub">Most intense shifts</div>
     </div>
     <div class="hero-card lb-sel-card"        id="ltog-busybee" onclick="showLeaderboard('busybee',this)">
       <div class="hc-icon">🐝</div>
@@ -500,20 +559,15 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
       <div class="hc-label">Dedication ranking</div>
       <div class="hc-sub">Hours &amp; shifts worked</div>
     </div>
-    <div class="hero-card lb-sel-card"        id="ltog-lbshift" onclick="showLeaderboard('lbshift',this)">
-      <div class="hc-icon">📦</div>
-      <div class="hc-val" style="font-size:clamp(20px,2.2vw,30px);color:var(--white)">lb / shift</div>
-      <div class="hc-label">Per-shift output</div>
-      <div class="hc-sub">Avg yield per shift</div>
-    </div>
   </div>
+  <div class="amb-stat-strip" id="amb-stat-strip"></div>
   <div class="chart-section">
     <div class="chart-header">
       <div>
         <div class="chart-title" id="lb-chart-title">Top 5 · Total Pounds Diverted</div>
         <div class="chart-note" id="lb-chart-note">More pounds = more food kept out of landfill</div>
       </div>
-      <span class="chart-badge badge-all">Spring 2026</span>
+      <span class="chart-badge badge-all" id="lb-chart-badge">Spring 2026</span>
     </div>
     <div id="leaderboard-content"></div>
   </div>
@@ -521,7 +575,7 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 
 <!-- ECO IMPACT -->
 <div id="panel-attendance" class="panel">
-  <div class="section-title">Spring 2026 · Environmental</div>
+  <div class="section-title" id="eco-section-title">Spring 2026 · Environmental</div>
   <h2 class="section-heading">Eco Impact</h2>
   <p class="section-sub">Every pound diverted keeps methane out of landfills — processed by Remix Organics into compost and renewable energy · tap a card to explore</p>
 
@@ -529,160 +583,37 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
   <div class="sel-grid">
     <div class="hero-card eco-sel-card active" id="ecard-co2" onclick="showEco('co2',this)">
       <div class="hc-icon">🌡️</div>
-      <div class="hc-val"><span>19,921</span> lbs</div>
-      <div class="hc-label">CO₂e Avoided · S26</div>
-      <div class="hc-sub">↑ 82,207 lbs all-time</div>
+      <div class="hc-val" id="ecard-co2-val"><span>19,921</span> lbs</div>
+      <div class="hc-label" id="ecard-co2-label">CO₂e Avoided · S26</div>
+      <div class="hc-sub" id="ecard-co2-sub">↑ 82,207 lbs all-time</div>
     </div>
     <div class="hero-card eco-sel-card" id="ecard-lbs" onclick="showEco('lbs',this)">
       <div class="hc-icon">♻️</div>
-      <div class="hc-val"><span>31,345</span> lbs</div>
-      <div class="hc-label">Food Waste Diverted · S26</div>
-      <div class="hc-sub">↑ 129,352 lbs all-time</div>
+      <div class="hc-val" id="ecard-lbs-val"><span>31,345</span> lbs</div>
+      <div class="hc-label" id="ecard-lbs-label">Food Waste Diverted · S26</div>
+      <div class="hc-sub" id="ecard-lbs-sub">↑ 129,352 lbs all-time</div>
     </div>
     <div class="hero-card eco-sel-card" id="ecard-compost" onclick="showEco('compost',this)">
       <div class="hc-icon">🌱</div>
-      <div class="hc-val">~<span>12,500</span> lbs</div>
-      <div class="hc-label">Compost Produced · S26</div>
+      <div class="hc-val" id="ecard-compost-val">~<span>12,500</span> lbs</div>
+      <div class="hc-label" id="ecard-compost-label">Compost Produced · S26</div>
       <div class="hc-sub">Est. via Remix Organics</div>
     </div>
   </div>
 
   <!-- ── CO₂e viz ─────────────────────────────────────── -->
   <div class="eco-viz" id="eco-viz-co2">
-    <div class="lb-pair">
-      <div class="chart-section">
-        <div class="chart-header">
-          <div><div class="chart-title">What 19,921 lbs CO₂e Looks Like</div>
-          <div class="chart-note">Spring 2026 emissions avoided — in everyday terms</div></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🚗</div>
-          <div class="eco-equiv-val">22,358</div>
-          <div class="eco-equiv-label">miles not driven<br><span style="opacity:0.6">≈ 90% of Earth's circumference · EPA avg car 0.891 lbs CO₂/mile</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">📱</div>
-          <div class="eco-equiv-val">139</div>
-          <div class="eco-equiv-label">iPhones worth of production emissions<br><span style="opacity:0.6">Apple reports ~143 lbs CO₂e per iPhone 15 full lifecycle</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🌳</div>
-          <div class="eco-equiv-val">415</div>
-          <div class="eco-equiv-label">trees absorbing CO₂ for a full year<br><span style="opacity:0.6">1 urban tree sequesters ~48 lbs CO₂/year · EPA Urban Forestry</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🏠</div>
-          <div class="eco-equiv-val">486</div>
-          <div class="eco-equiv-label">days of avg household electricity emissions<br><span style="opacity:0.6">US avg home ~41 lbs CO₂e/day · EPA</span></div>
-        </div>
-        <div class="eco-source">Sources: EPA (epa.gov) · Apple Environmental Progress Report 2023 · EPA Urban Forestry Program · UW-Madison CO₂ Calculator</div>
-      </div>
-      <div class="chart-section">
-        <div class="chart-header">
-          <div><div class="chart-title">CO₂e Avoided · By Semester</div>
-          <div class="chart-note">Pounds of CO₂ equivalent kept out of atmosphere</div></div>
-          <span class="chart-badge badge-all">All Semesters</span>
-        </div>
-        <div class="bar-chart" id="eco-co2-chart"></div>
-      </div>
-    </div>
+    <div id="eco-co2-inner"></div>
   </div>
 
   <!-- ── Food waste lbs viz ─────────────────────────── -->
   <div class="eco-viz" id="eco-viz-lbs" style="display:none">
-    <div class="chart-section">
-      <div class="chart-header">
-        <div><div class="chart-title">31,345 lbs — How Heavy Is That?</div>
-        <div class="chart-note">Spring 2026 food waste diverted — in relatable terms</div></div>
-      </div>
-      <div class="eco-equiv-grid">
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🍔</div>
-          <div class="eco-equiv-val">62,690</div>
-          <div class="eco-equiv-label">quarter-pound cheeseburgers<br><span style="opacity:0.6">avg full burger ~0.5 lbs with bun, cheese &amp; toppings</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🐘</div>
-          <div class="eco-equiv-val">2.4</div>
-          <div class="eco-equiv-label">African elephants<br><span style="opacity:0.6">avg African elephant ≈ 13,000 lbs</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🚌</div>
-          <div class="eco-equiv-val">2.2</div>
-          <div class="eco-equiv-label">fully loaded school buses<br><span style="opacity:0.6">avg loaded school bus ≈ 14,500 lbs</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🛁</div>
-          <div class="eco-equiv-val">87</div>
-          <div class="eco-equiv-label">bathtubs of soup<br><span style="opacity:0.6">standard tub ≈ 42 gal · soup ~8.6 lbs/gal = 361 lbs/tub</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🍟</div>
-          <div class="eco-equiv-val">120,600</div>
-          <div class="eco-equiv-label">medium orders of french fries<br><span style="opacity:0.6">avg medium fries ≈ 4.1 oz = 0.26 lbs</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🏈</div>
-          <div class="eco-equiv-val">1.1</div>
-          <div class="eco-equiv-label">football fields covered ankle-deep in food<br><span style="opacity:0.6">field = 57,600 sq ft · 1" deep at ~6 lbs/cu ft = 28,800 lbs</span></div>
-        </div>
-      </div>
-    </div>
+    <div id="eco-lbs-inner"></div>
   </div>
 
   <!-- ── Compost viz ────────────────────────────────── -->
   <div class="eco-viz" id="eco-viz-compost" style="display:none">
-    <div class="lb-pair">
-      <div class="chart-section">
-        <div class="chart-header">
-          <div><div class="chart-title">Where the Food Waste Goes</div>
-          <div class="chart-note">31,345 lbs collected → what Remix Organics does with it</div></div>
-        </div>
-        <div class="eco-remix-fact">
-          <strong>Remix Organics</strong> — RI-based organics recycler, 40,000+ tons diverted from landfills since 2013. Collected food scraps are routed to one of two processing pathways:
-        </div>
-        <div class="eco-remix-fact">
-          <strong>🌱 Composting Path</strong> → ~40% of input weight becomes finished compost (~12,500 lbs this semester). The remaining ~60% is lost as water vapor and CO₂ during natural microbial decomposition — no methane, no landfill.
-        </div>
-        <div class="eco-remix-fact">
-          <strong>⚡ Anaerobic Digestion Path</strong> → Some loads go to sealed digesters. Microbes break down food anaerobically, producing methane that is <em>captured</em> and used as renewable natural gas or electricity — instead of escaping into the atmosphere.
-        </div>
-        <div class="eco-remix-fact">
-          <strong>🚫 What doesn't happen:</strong> None of it goes to landfill, where food waste decomposes anaerobically with no methane capture — generating greenhouse gases for decades.
-        </div>
-        <div class="eco-source">Source: Remix Organics (remixorganics.com) · Industry compost yield: 35–45% of wet input weight</div>
-      </div>
-      <div class="chart-section">
-        <div class="chart-header">
-          <div><div class="chart-title">What ~12,500 lbs of Compost Can Do</div>
-          <div class="chart-note">S26 estimated yield — applied to local farmland</div></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🌱</div>
-          <div class="eco-equiv-val">2,160</div>
-          <div class="eco-equiv-label">sq ft of garden soil amended<br><span style="opacity:0.6">standard 2-inch application layer · ~5.8 lbs/sq ft</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🥕</div>
-          <div class="eco-equiv-val">~103</div>
-          <div class="eco-equiv-label">raised garden beds supplied for a season<br><span style="opacity:0.6">standard 4×8 ft beds at 2-inch compost depth</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🍎</div>
-          <div class="eco-equiv-val">~14</div>
-          <div class="eco-equiv-label">apple trees' annual compost needs met<br><span style="opacity:0.6">mature tree needs ~870 lbs/yr around drip line → ~6,000 lbs apples</span></div>
-        </div>
-        <div class="eco-equiv-row">
-          <div class="eco-equiv-icon">🌾</div>
-          <div class="eco-equiv-val">~51,700</div>
-          <div class="eco-equiv-label">lbs of compost returned all-time<br><span style="opacity:0.6">est. from 129,352 lbs diverted since S24 launch</span></div>
-        </div>
-        <div style="margin-top:16px">
-          <div class="lb-section-title">Compost Produced · By Semester</div>
-          <div class="bar-chart" id="eco-compost-chart"></div>
-        </div>
-      </div>
-    </div>
+    <div id="eco-compost-inner"></div>
   </div>
 </div>
 
@@ -699,7 +630,7 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
   <div class="yoy-grid">
     <div class="chart-section">
       <div class="chart-header">
-        <div><div class="chart-title">Lbs Diverted Per Semester</div><div class="chart-note">S26* is the current semester</div></div>
+        <div><div class="chart-title">Lbs Diverted Per Semester</div><div class="chart-note">All semesters · S26 = current</div></div>
         <span class="chart-badge badge-all">All Semesters</span>
       </div>
       <div class="sem-bars" id="sem-bars"></div>
@@ -817,13 +748,13 @@ const top5LbShift = [
 // semDays = calendar days in semester (lb/day denominator, independent from semWeeks)
 // S24: ~Jan 22–May 3 2024 = 102d | F24: ~Aug 26–Dec 13 2024 = 109d
 // S25: ~Jan 21–May 2 2025 = 101d | F25: ~Aug 25–Dec 12 2025 = 109d
-// S26*: ~Jan 20–May 1 2026 = 101d (days elapsed through today)
+// S26: ~Jan 20–May 1 2026 = 101d (days elapsed through today)
 const yoySems = [
   {sem:"S24",  lbs:7111,  cum:7111,   co2:4519,  ambs:8,  hrs:null, lbhr:null,  current:false, semWeeks:14, semDays:102, shifts:85,  collDays:42},
   {sem:"F24",  lbs:26386, cum:33497,  co2:16769, ambs:10, hrs:null, lbhr:null,  current:false, semWeeks:15, semDays:109, shifts:277, collDays:65},
   {sem:"S25",  lbs:31073, cum:64570,  co2:19748, ambs:13, hrs:null, lbhr:null,  current:false, semWeeks:14, semDays:101, shifts:262, collDays:65},
   {sem:"F25",  lbs:33437, cum:98007,  co2:21250, ambs:14, hrs:558.6, lbhr:46.68, current:false, semWeeks:14, semDays:109, shifts:304, collDays:70},
-  {sem:"S26*", lbs:31345, cum:129352, co2:19921, ambs:14, hrs:632.6, lbhr:49.55, current:true,  semWeeks:14, semDays:101, shifts:280, collDays:67},
+  {sem:"S26", lbs:31345, cum:129352, co2:19921, ambs:14, hrs:632.6, lbhr:49.55, current:true,  semWeeks:14, semDays:101, shifts:280, collDays:67},
 ];
 const _BAR_A_RED = '#6b0f0f';
 const _BAR_B_RED = '#e05c5c';
@@ -851,7 +782,7 @@ const ambColorMap = {
 // Fallback palette for any truly unnamed slots (shouldn't repeat named colors above)
 const unknownAmbPal = ['#636e72','#dfe6e9','#2d3436','#74b9ff','#a29bfe'];
 const yoyRosters = {
-  'S26*':['Alexis Sylvestre','Arjya Aich','Brynn Hornig','Denise Romanszysn','Emmett Khan','Evan Morgan','Kaylie Forgue','Kyra Turner','Laila Maisuria','Leah Bucci','Maureen Surgot','Oluwatimilehin Shodipe','Orpheus Wilson','Sophia Kluck'],
+  'S26':['Alexis Sylvestre','Arjya Aich','Brynn Hornig','Denise Romanszysn','Emmett Khan','Evan Morgan','Kaylie Forgue','Kyra Turner','Laila Maisuria','Leah Bucci','Maureen Surgot','Oluwatimilehin Shodipe','Orpheus Wilson','Sophia Kluck'],
   'F25': ['Orpheus Wilson','Greta Traynor','Emma Korsu','Emmett Khan','Sarah Wilme','Maureen Surgot','Brynn Hornig','Leisly Aceituno','Kaylie Forgue','Evan Morgan','Elliott Haber','Oluwatimilehin Shodipe','Laila Maisuria','Kyra Turner'],
   'S25': ['Kaitlyn Deierlein','Lizzle Welch','Kaya Pernini','Maureen Surgot','Kate Stanwood','Anna Cunha','Marley Ahlijanian','Bitanya Hailu','Leisly Aceituno','Sarah Wilme','Tyson Enes','Brynn Hornig','Skyler Bobinski'],
   'F24': ['Skyler Bobinski','Bitanya Hailu','astou dieng','Lucas Meier','Tyson Enes','Westin Palumbo','Cassidy Haskell','Lizzie Welch','Kaya Pernini',"Kayleigh O'mealia"],
@@ -867,7 +798,7 @@ const yoyAmbLbs = {
   'F24': {'Skyler Bobinski':1742,'Bitanya Hailu':1432,'astou dieng':1474,'Lucas Meier':440,'Tyson Enes':990,'Westin Palumbo':1584,'Cassidy Haskell':1481,'Lizzie Welch':7855,'Kaya Pernini':7101,"Kayleigh O'mealia":1711},
   'S25': {'Kaitlyn Deierlein':2162,'Lizzle Welch':2760,'Kaya Pernini':4882,'Maureen Surgot':3738,'Kate Stanwood':2518,'Anna Cunha':775,'Marley Ahlijanian':2217,'Bitanya Hailu':1250,'Leisly Aceituno':3283,'Sarah Wilme':1841,'Tyson Enes':2910,'Brynn Hornig':1645,'Skyler Bobinski':1184},
   'F25': {'Orpheus Wilson':3001,'Greta Traynor':1997,'Emma Korsu':1329,'Emmett Khan':4151,'Sarah Wilme':1699,'Maureen Surgot':3119,'Brynn Hornig':2620,'Leisly Aceituno':89,'Kaylie Forgue':4195,'Evan Morgan':800,'Elliott Haber':1076,'Oluwatimilehin Shodipe':798,'Laila Maisuria':540,'Kyra Turner':659},
-  'S26*':{'Alexis Sylvestre':193,'Arjya Aich':837,'Brynn Hornig':3497,'Denise Romanszysn':1741,'Emmett Khan':2302,'Evan Morgan':1481,'Kaylie Forgue':2749,'Kyra Turner':4226,'Laila Maisuria':769,'Leah Bucci':4062,'Maureen Surgot':3159,'Oluwatimilehin Shodipe':2591,'Orpheus Wilson':2477,'Sophia Kluck':1261},
+  'S26':{'Alexis Sylvestre':193,'Arjya Aich':837,'Brynn Hornig':3497,'Denise Romanszysn':1741,'Emmett Khan':2302,'Evan Morgan':1481,'Kaylie Forgue':2749,'Kyra Turner':4226,'Laila Maisuria':769,'Leah Bucci':4062,'Maureen Surgot':3159,'Oluwatimilehin Shodipe':2591,'Orpheus Wilson':2477,'Sophia Kluck':1261},
 };
 let cumMetric = 'lbs';
 let _cumUnitMetric = 'lbhr';
@@ -921,29 +852,31 @@ const mfbfData = [
   {sem:"F24",  mf:11781, bf:14605, current:false},
   {sem:"S25",  mf:14269, bf:16804, current:false},
   {sem:"F25",  mf:17449, bf:15988, current:false},
-  {sem:"S26*", mf:16299, bf:15046, current:true},
+  {sem:"S26", mf:16299, bf:15046, current:true},
 ];
 const periodData = [
   {sem:"S24",  b:727,  l:3952,  d:2432,  current:false},
   {sem:"F24",  b:3145, l:12623, d:10619, current:false},
   {sem:"S25",  b:4199, l:13311, d:13563, current:false},
   {sem:"F25",  b:2688, l:15022, d:15727, current:false},
-  {sem:"S26*", b:4252, l:12212, d:14881, current:true},
+  {sem:"S26", b:4252, l:12212, d:14881, current:true},
 ];
 const teamData = [
   {sem:"S24",  ambs:8,  lbs:7111,  current:false},
   {sem:"F24",  ambs:10, lbs:26386, current:false},
   {sem:"S25",  ambs:13, lbs:31073, current:false},
   {sem:"F25",  ambs:14, lbs:33437, current:false},
-  {sem:"S26*", ambs:14, lbs:31345, current:true},
+  {sem:"S26", ambs:14, lbs:31345, current:true},
 ];
 
 function showPanel(id, btn) {
+  currentTab = id;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
   setTimeout(animateBars, 60);
+  updateHash();
 }
 
 let currentLb = 'lbs';
@@ -968,7 +901,8 @@ const _tipStore = {};
 let _tipIdx = 0;
 function _tip(title, rows) {
   return `<div class="tip-title">${title}</div>` +
-    rows.filter(r=>r[1]!==null&&r[1]!==undefined&&r[1]!=='').map(r=>
+    rows.map(r => r[0]==='—' ? `<div class="tip-divider"></div>` :
+      (r[1]===null||r[1]===undefined||r[1]==='') ? '' :
       `<div class="tip-row"><span>${r[0]}</span><span>${r[1]}</span></div>`).join('');
 }
 
@@ -1018,46 +952,94 @@ function _section(title, data, fmt) {
   return `<div class="lb-section">${_chart(title,data,fmt)}</div>`;
 }
 
+function updateAmbStatStrip() {
+  const el = document.getElementById('amb-stat-strip');
+  if (!el) return;
+  const avgLbs = Math.round(SD.lbs / SD.ambs).toLocaleString() + ' lbs avg';
+  let avgLbhr = null;
+  if (SD.ambTotalsLbhr) {
+    const vals = Object.values(SD.ambTotalsLbhr);
+    avgLbhr = (vals.reduce((s,v)=>s+v,0) / vals.length).toFixed(1) + ' lb/hr avg';
+  } else if (SD.lbhr) {
+    avgLbhr = SD.lbhr.toFixed(1) + ' lb/hr avg';
+  }
+  const divider = avgLbhr ? `<div style="width:1px;background:rgba(255,255,255,0.12);align-self:stretch;margin:0 2px"></div>` : '';
+  el.innerHTML = `<div><div class="lst-label">Semester Total</div><div class="lst-val">${avgLbs}</div></div>
+    ${divider}
+    ${avgLbhr ? `<div><div class="lst-label">Avg Rate</div><div class="lst-val">${avgLbhr}</div></div>` : ''}`;
+}
+
 function renderLeaderboard(type) {
   const WKDAYS = ['Mon','Tue','Wed','Thu','Fri'];
+  const _wl = SD.ambWeeklyLbs, _wh = SD.ambWeeklyHrs, _we = SD.ambWeeklyEff, _ws = SD.ambWeeklyShifts;
+  const _wm = SD.weekMeta, _wt = SD.weekTotals;
 
-  // Per-ambassador totals from matrices
-  const tots = ambNames.map((name, ai) => {
-    const totalLbs    = ambWeeklyLbs[ai].reduce((a,b)=>a+b,0);
-    const totalHrs    = ambWeeklyHrs[ai].reduce((a,b)=>a+b,0);
-    const totalShifts = ambWeeklyShifts[ai].reduce((a,b)=>a+b,0);
-    const lbhr        = totalHrs  > 0 ? totalLbs / totalHrs    : 0;
-    const avgLbShift  = totalShifts > 0 ? totalLbs / totalShifts : 0;
-    // Best single week for each stat — track index too
-    let bestWkLbhr=0, bestWkLbhrIdx=0;
-    for(let wi=0;wi<15;wi++){
-      const h=ambWeeklyHrs[ai][wi], l=ambWeeklyLbs[ai][wi];
-      if(h>0&&l>0){ const v=l/h; if(v>bestWkLbhr){bestWkLbhr=v; bestWkLbhrIdx=wi;} }
-    }
-    let bestWkEff=0, bestWkEffIdx=0;
-    for(let wi=0;wi<15;wi++){
-      const v=ambWeeklyEff[ai][wi]*100; if(v>bestWkEff){bestWkEff=v; bestWkEffIdx=wi;}
-    }
-    let bestWkLbs=0, bestWkLbsIdx=0;
-    for(let wi=0;wi<15;wi++){
-      const v=ambWeeklyLbs[ai][wi]; if(v>bestWkLbs){bestWkLbs=v; bestWkLbsIdx=wi;}
-    }
-    // Weighted avg efficiency
-    let effSum=0, effN=0;
-    for(let wi=0;wi<15;wi++){
-      if(ambWeeklyEff[ai][wi]>0&&ambWeeklyShifts[ai][wi]>0){
-        effSum+=ambWeeklyEff[ai][wi]*ambWeeklyShifts[ai][wi];
-        effN+=ambWeeklyShifts[ai][wi];
+  // Update leaderboard selector card semester total text
+  const lbSubEl = document.querySelector('#ltog-lbs .hc-sub');
+  if (lbSubEl) lbSubEl.textContent = `${SD.lbs.toLocaleString()} lbs · ${SD.shortLabel}`;
+
+  // Show/hide detail selectors based on available data
+  const _effEl = document.getElementById('ltog-eff');
+  if (_effEl) _effEl.style.display = SD.hasEff ? '' : 'none';
+  const _bbEl = document.getElementById('ltog-busybee');
+  if (_bbEl) _bbEl.style.display = (SD.ambWeeklyHrs || SD.ambWeeklyShifts) ? '' : 'none';
+  // avglbs always visible (content adapts); eff hidden when no eff data
+  const _typeNeedsEff = (type === 'eff');
+  const _typeNeedsBB  = (type === 'busybee');
+  if ((_typeNeedsEff && !SD.hasEff) || (_typeNeedsBB && !SD.ambWeeklyHrs && !SD.ambWeeklyShifts)) {
+    type = 'lbs';
+    currentLb = 'lbs';
+    document.querySelectorAll('.lb-sel-card').forEach(t => t.classList.remove('active'));
+    const lbsBtn = document.getElementById('ltog-lbs');
+    if (lbsBtn) lbsBtn.classList.add('active');
+  }
+
+  // Build ambassador totals
+  let tots;
+  if (_wl) {
+    const nWk = _wl[0].length;
+    tots = SD.ambNames.map((name, ai) => {
+      const totalLbs    = _wl[ai].reduce((a,b)=>a+b,0);
+      const totalHrs    = _wh ? _wh[ai].reduce((a,b)=>a+b,0) : (SD.ambTotalsHrs?.[name] || 0);
+      const totalShifts = _ws ? _ws[ai].reduce((a,b)=>a+b,0) : 0;
+      const lbhr        = totalHrs > 0 ? totalLbs / totalHrs : (SD.ambTotalsLbhr?.[name] || 0);
+      const avgLbShift  = totalShifts > 0 ? totalLbs / totalShifts : 0;
+      let bestWkLbhr=0, bestWkLbhrIdx=0;
+      if (_wh) for(let wi=0;wi<nWk;wi++){
+        const h=_wh[ai][wi], l=_wl[ai][wi];
+        if(h>0&&l>0){ const v=l/h; if(v>bestWkLbhr){bestWkLbhr=v; bestWkLbhrIdx=wi;} }
       }
-    }
-    const avgEff = effN>0 ? effSum/effN*100 : 0;
-    return {ai,name,totalLbs,totalHrs,totalShifts,lbhr,avgLbShift,avgEff,
-      bestWkLbhr,bestWkLbhrIdx,bestWkEff,bestWkEffIdx,bestWkLbs,bestWkLbsIdx,
-      maxShiftLbs: ambMaxShiftLbs[name]||0,
-      maxShiftLbhr: ambMaxShiftLbhr[name]||0,
-      maxShiftEff:  ambMaxShiftEff[name]||0,
-      period: ambMostFreqPeriod[name]||'—'};
-  }).filter(a=>a.totalShifts>0);
+      let bestWkEff=0, bestWkEffIdx=0;
+      if (_we) for(let wi=0;wi<nWk;wi++){
+        const v=_we[ai][wi]*100; if(v>bestWkEff){bestWkEff=v; bestWkEffIdx=wi;}
+      }
+      let bestWkLbs=0, bestWkLbsIdx=0;
+      for(let wi=0;wi<nWk;wi++){
+        const v=_wl[ai][wi]; if(v>bestWkLbs){bestWkLbs=v; bestWkLbsIdx=wi;}
+      }
+      let effSum=0, effN=0;
+      if (_we && _ws) for(let wi=0;wi<nWk;wi++){
+        if(_we[ai][wi]>0&&_ws[ai][wi]>0){ effSum+=_we[ai][wi]*_ws[ai][wi]; effN+=_ws[ai][wi]; }
+      }
+      const avgEff = effN>0 ? effSum/effN*100 : 0;
+        return {ai,name,totalLbs,totalHrs,totalShifts,lbhr,avgLbShift,avgEff,
+        bestWkLbhr,bestWkLbhrIdx,bestWkEff,bestWkEffIdx,bestWkLbs,bestWkLbsIdx,
+        maxShiftLbs: SD.ambMaxShiftLbs?.[name]||0,
+        maxShiftLbhr: SD.ambMaxShiftLbhr?.[name]||0,
+        maxShiftEff:  SD.ambMaxShiftEff?.[name]||0,
+        period: SD.ambMostFreqPeriod?.[name]||'—'};
+    }).filter(a=>a.totalShifts>0||a.totalLbs>0);
+  } else {
+    tots = Object.entries(SD.ambTotals)
+      .map(([name, totalLbs]) => ({
+        ai: SD.ambNames.indexOf(name), name, totalLbs,
+        totalHrs:0, totalShifts:SD.shifts||0, lbhr:0,
+        avgLbShift: SD.shifts ? totalLbs/SD.shifts : 0, avgEff:0,
+        bestWkLbhr:0, bestWkLbhrIdx:0, bestWkEff:0, bestWkEffIdx:0,
+        bestWkLbs:totalLbs, bestWkLbsIdx:0,
+        maxShiftLbs:0, maxShiftLbhr:0, maxShiftEff:0, period:'—'
+      })).filter(a => a.totalLbs > 0);
+  }
 
   const top5 = (arr, key) => [...arr].sort((a,b)=>b[key]-a[key]).slice(0,5);
   const el = document.getElementById('leaderboard-content');
@@ -1070,129 +1052,250 @@ function renderLeaderboard(type) {
   }
   // Helper: tooltip for a week-level row
   function weekTip(wi, ambTot) {
-    const m = s26WeekMeta[wi];
-    if(ambTot){
-      const wl=ambWeeklyLbs[ambTot.ai][wi], wh=ambWeeklyHrs[ambTot.ai][wi];
-      return _tip(ambTot.name+' · '+m.range,[
-        ['Week',m.range],['Lbs that week',wl.toLocaleString()+' lbs'],
-        ['Hrs that week',wh.toFixed(1)+' hrs'],
-        ['lb/hr that week',(wh>0?(wl/wh).toFixed(1):'—')+' lb/hr'],
-        ['Efficiency',(ambWeeklyEff[ambTot.ai][wi]*100).toFixed(0)+' pts'],
-        ['Shifts',ambWeeklyShifts[ambTot.ai][wi]]]);
+    const m = _wm ? _wm[wi] : null;
+    const label = m ? (m.range || m.date) : ('Week '+wi);
+    if(ambTot && _wl){
+      const wl=_wl[ambTot.ai][wi];
+      const wh=_wh ? _wh[ambTot.ai][wi] : 0;
+      const rows = [['Week',label],['Lbs that week',wl.toLocaleString()+' lbs']];
+      if(wh>0) rows.push(['Hrs that week',wh.toFixed(1)+' hrs'],['lb/hr that week',(wl/wh).toFixed(1)+' lb/hr']);
+      if(_we) rows.push(['Efficiency',(_we[ambTot.ai][wi]*100).toFixed(0)+' pts']);
+      if(_ws) rows.push(['Shifts',_ws[ambTot.ai][wi]]);
+      return _tip(ambTot.name+' · '+label, rows);
     }
-    return _tip(m.range,[['Week',m.range],['Total lbs',s26WeekTotals[wi].toLocaleString()+' lbs'],
-      ['Total hrs',m.hrs+' hrs'],['Avg lb/hr',(m.lbhr||'—')+' lb/hr'],
-      ['Avg eff',weekAvgEff[wi].toFixed(1)+' pts']]);
+    const totLbs = _wt ? _wt[wi] : (m ? m.lbs : 0);
+    const rows = [['Week',label],['Total lbs',(totLbs||0).toLocaleString()+' lbs']];
+    if(m && m.hrs) rows.push(['Total hrs',m.hrs+' hrs'],['Avg lb/hr',(m.lbhr||'—')+' lb/hr']);
+    if(SD.weekAvgEff && SD.weekAvgEff[wi]) rows.push(['Avg eff',SD.weekAvgEff[wi].toFixed(1)+' pts']);
+    return _tip(label, rows);
   }
   // Helper: tooltip for a semester-long ambassador row
   function semTip(a, extra) {
-    const rows = [['Total lbs',a.totalLbs.toLocaleString()+' lbs'],
-      ['Total hrs',a.totalHrs.toFixed(1)+' hrs'],['Avg lb/hr',a.lbhr.toFixed(1)+' lb/hr'],
-      ['Avg eff',a.avgEff.toFixed(0)+' pts'],['Shifts',a.totalShifts],
-      ['Most freq period',a.period]];
-    if(extra) rows.push(...extra);
+    const hasWkData = !!_wl;
+    const activeWks = hasWkData ? _wl[a.ai].filter(v => v > 0).length : null;
+    // lb/shift: use per-amb shifts if available, else fall back to SD.shifts as denominator
+    const shiftDenom = hasWkData ? a.totalShifts : SD.shifts;
+    const lbShift = shiftDenom > 0 ? (a.totalLbs / shiftDenom).toFixed(1) : null;
+    // lb/week: use active weeks if known, else SD.semWeeks
+    const wkDenom  = activeWks || SD.semWeeks;
+    const lbWk    = wkDenom ? Math.round(a.totalLbs / wkDenom).toLocaleString() : null;
+    // lb/day only for pre-week-data seasons
+    const lbDay   = (!hasWkData && SD.collDays) ? (a.totalLbs / SD.collDays).toFixed(1) : null;
+    const rows = [['Total lbs', a.totalLbs.toLocaleString() + ' lbs']];
+    if (a.totalHrs > 0) rows.push(['Total hrs', a.totalHrs.toFixed(1) + ' hrs'], ['Avg lb/hr', a.lbhr.toFixed(1) + ' lb/hr']);
+    if (a.avgEff > 0) rows.push(['Avg eff', a.avgEff.toFixed(0) + ' pts']);
+    if (lbShift) rows.push(['lb / shift', lbShift]);
+    if (lbDay) rows.push(['lb / day', lbDay]);
+    if (lbWk) rows.push(['lb / week', lbWk]);
+    if (hasWkData && a.bestWkLbs > 0) rows.push(['Best week', a.bestWkLbs.toLocaleString() + ' lbs']);
+    if (hasWkData) rows.push(['Total shifts', a.totalShifts]);
+    if (a.period && a.period !== '—') rows.push(['Most freq period', a.period]);
+    if (extra) rows.push(...extra);
     return _tip(a.name, rows);
   }
 
+  // ── Pre-hour seasons: no tab system, render flat ────────────────────────
+  const selGrid = document.querySelector('#panel-leaderboard .sel-grid');
+  if (!_wl) {
+    if (selGrid) selGrid.style.display = 'none';
+    title = `${SD.shortLabel} · Top Ambassadors`;
+    note  = 'Total lbs · lb/shift · lb/day · lb/week';
+    const t5Lbs = top5(tots,'totalLbs').map(a => ({name:a.name, val:a.totalLbs, tip:semTip(a)}));
+    const t5Shift = SD.shifts ? top5(tots,'totalLbs').map(a => ({
+      name: a.name, val: +(a.totalLbs / SD.shifts).toFixed(1),
+      extra: SD.shifts + ' team shifts', tip: semTip(a)
+    })) : null;
+    const t5Day = SD.collDays ? top5(tots,'totalLbs').map(a => ({
+      name: a.name, val: +(a.totalLbs / SD.collDays).toFixed(1),
+      extra: SD.collDays + ' coll. days', tip: semTip(a)
+    })) : null;
+    const t5Week = SD.semWeeks ? top5(tots,'totalLbs').map(a => ({
+      name: a.name, val: +(a.totalLbs / SD.semWeeks).toFixed(1),
+      extra: SD.semWeeks + ' weeks', tip: semTip(a)
+    })) : null;
+    html = `<div class="bar-chart">${_lbBarHTML(t5Lbs, v => v.toLocaleString() + ' lbs')}</div>`;
+    if (t5Shift && t5Day) html += _pair(
+      _chart('Top 5 · lb / shift', t5Shift, v => v.toFixed(1) + ' lb/sh'),
+      _chart('Top 5 · lb / day',   t5Day,   v => v.toFixed(1) + ' lb/day')
+    );
+    if (t5Week) html += _chart('Top 5 · lb / week', t5Week, v => v.toFixed(1) + ' lb/wk');
+    document.getElementById('lb-chart-title').textContent = title;
+    document.getElementById('lb-chart-note').textContent  = note;
+    const _badge = document.getElementById('lb-chart-badge');
+    if (_badge) _badge.textContent = SD.label;
+    el.innerHTML = html;
+    return;
+  }
+  if (selGrid) selGrid.style.display = '';
+
+  // ── Aggregate season stat strip (above chart panel) ──────────────────────
+  updateAmbStatStrip();
+
   if (type === 'lbs') {
     title = 'Top 5 · Total Pounds Diverted';
-    note  = 'More pounds = more food kept out of landfill';
-    const semTotalShifts = tots.reduce((s,a)=>s+a.totalShifts,0);
-    const t5 = top5(tots,'totalLbs').map(a=>({name:a.name, val:a.totalLbs,
-      extra:a.lbhr.toFixed(1)+' lb/hr', tip:semTip(a)}));
-    html = `<div class="lb-sem-total">
-      <span class="lst-label">Semester Total</span>
-      <span class="lst-val">34,009 lbs</span>
-      <span class="lst-sub">across ${semTotalShifts} shifts</span>
-    </div>
-    <div class="bar-chart">${_lbBarHTML(t5, v=>v.toLocaleString()+' lbs')}</div>`;
+    note  = 'Total lbs · best week · best shift · best day';
+    const t5Lbs = top5(tots,'totalLbs').map(a => {
+      const shiftDenom = a.totalShifts || 0;
+      const wkDenom = _wl ? _wl[a.ai].filter(v=>v>0).length || SD.semWeeks || 1 : SD.semWeeks || 1;
+      const lbShift = shiftDenom > 0 ? (a.totalLbs / shiftDenom).toFixed(1) : '—';
+      const lbDay = SD.collDays ? (a.totalLbs / SD.collDays).toFixed(1) : '—';
+      const lbWk = Math.round(a.totalLbs / wkDenom).toLocaleString();
+      return {name: a.name, val: a.totalLbs,
+        extra: a.totalShifts > 0 ? a.totalShifts + ' shifts' : '',
+        tip: _tip(a.name, [
+          ['Total lbs', a.totalLbs.toLocaleString() + ' lbs'],
+          ['lb/shift', lbShift], ['lb/day', lbDay], ['lb/week', lbWk + ' lbs'],
+          ['—','—'],
+          ['Best week', a.bestWkLbs > 0 ? a.bestWkLbs.toLocaleString() + ' lbs' : '—'],
+          ['Best shift', a.maxShiftLbs ? a.maxShiftLbs.toLocaleString() + ' lbs' : '—'],
+          ['Best day', SD.ambBestDay_lbs?.[a.name]?.val ? SD.ambBestDay_lbs[a.name].val.toLocaleString() + ' lbs' : '—'],
+        ])};
+    });
+    const t5BestWk = top5(tots,'bestWkLbs').map(a => {
+      const wi = a.bestWkLbsIdx;
+      const wm = _wm ? (_wm[wi]||{}) : {};
+      const weekLabel = wm.range || wm.date || ('Week '+(wi+1));
+      const wl = _wl ? _wl[a.ai][wi] : a.bestWkLbs;
+      const ws = _ws ? _ws[a.ai][wi] : null;
+      const we = _we ? (_we[a.ai][wi]*100).toFixed(0) : null;
+      return {name: a.name, val: a.bestWkLbs,
+        extra: weekLabel,
+        tip: _tip(a.name + ' · ' + weekLabel, [
+          ['Lbs that week', wl.toLocaleString() + ' lbs'],
+          ['Shifts that week', ws != null ? ws : '—'],
+          ['Efficiency that week', we != null ? we + ' pts' : '—'],
+          ['Most freq period', a.period || '—'],
+          ['—','—'],
+          ['Total lbs', a.totalLbs.toLocaleString() + ' lbs'],
+          ['Best shift', a.maxShiftLbs ? a.maxShiftLbs.toLocaleString() + ' lbs' : '—'],
+          ['Best day', SD.ambBestDay_lbs?.[a.name]?.val ? SD.ambBestDay_lbs[a.name].val.toLocaleString() + ' lbs' : '—'],
+        ])};
+    });
+    const maxShift = SD.ambMaxShiftLbs;
+    const t5Shift = (maxShift && Object.keys(maxShift).length) ? Object.entries(maxShift)
+      .map(([n, v]) => {
+        const a = tots.find(t => t.name === n);
+        return {name: n, val: v,
+          extra: a ? a.totalLbs.toLocaleString() + ' total' : '',
+          tip: _tip(n + ' · Best shift', [
+            ['Best lbs/shift', v.toLocaleString() + ' lbs'],
+            ['Eff that shift', SD.ambMaxShiftEff?.[n] ? (SD.ambMaxShiftEff[n]*100).toFixed(0)+' pts' : '—'],
+            ['lb/hr that shift', SD.ambMaxShiftLbhr?.[n] ? SD.ambMaxShiftLbhr[n].toFixed(1)+' lb/hr' : '—'],
+            ['—','—'],
+            ['Total lbs', a ? a.totalLbs.toLocaleString()+' lbs' : '—'],
+            ['Best week', a && a.bestWkLbs > 0 ? a.bestWkLbs.toLocaleString()+' lbs' : '—'],
+            ['Best day', SD.ambBestDay_lbs?.[n]?.val ? SD.ambBestDay_lbs[n].val.toLocaleString()+' lbs' : '—'],
+          ])};
+      }).sort((a,b) => b.val - a.val).slice(0,5) : null;
+    const bestDay = SD.ambBestDay_lbs;
+    const t5Day = (bestDay && Object.keys(bestDay).length) ? Object.entries(bestDay)
+      .map(([n, d]) => {
+        const a = tots.find(t => t.name === n);
+        return {name: n, val: d.val, extra: d.label,
+          tip: _tip(n + ' · ' + d.label, [
+            ['Total lbs that day', d.val.toLocaleString() + ' lbs'],
+            ['Shifts that day', d.shifts != null ? d.shifts : '—'],
+            ['lb/hr that day', d.lbhr ? d.lbhr + ' lb/hr' : '—'],
+            ['Efficiency that day', d.eff ? d.eff + ' pts' : '—'],
+            ['—','—'],
+            ['Total lbs', a ? a.totalLbs.toLocaleString() + ' lbs' : '—'],
+            ['Best week', a && a.bestWkLbs > 0 ? a.bestWkLbs.toLocaleString() + ' lbs' : '—'],
+            ['Best shift', a && a.maxShiftLbs ? a.maxShiftLbs.toLocaleString() + ' lbs' : '—'],
+          ])};
+      }).sort((a,b) => b.val - a.val).slice(0,5) : null;
+
+    html = '';
+    const totalChart = _chart('Top 5 · Total Lbs', t5Lbs, v => v.toLocaleString() + ' lbs');
+    const wkChart = t5BestWk.some(a => a.val > 0) ? _chart('Top 5 · Best Single Week', t5BestWk, v => v.toLocaleString() + ' lbs') : '';
+    html += _pair(totalChart, wkChart);
+    if (t5Shift && t5Day)       html += _pair(_chart('Top 5 · Best Single Shift', t5Shift, v => v.toLocaleString() + ' lbs'),
+                                               _chart('Top 5 · Best Single Day',   t5Day,   v => v.toLocaleString() + ' lbs'));
+    else if (t5Shift)           html += _chart('Top 5 · Best Single Shift', t5Shift, v => v.toLocaleString() + ' lbs');
+    else if (t5Day)             html += _chart('Top 5 · Best Single Day',   t5Day,   v => v.toLocaleString() + ' lbs');
+
+  } else if (type === 'avglbs') {
+    title = 'Avg Lbs · Rate Breakdown';
+    note  = ((_wh || SD.ambTotalsLbhr) ? 'lb/hr · ' : '') + 'lb/shift · lb/day · lb/week';
+    const t5Hr = (_wh || SD.ambTotalsLbhr) ? top5(tots.filter(a=>a.lbhr>0),'lbhr').map(a => ({
+      name: a.name, val: a.lbhr, extra: a.totalLbs.toLocaleString() + ' total', tip: semTip(a)
+    })) : null;
+    const t5Sh = _ws ? top5(tots,'avgLbShift').map(a => ({
+      name: a.name, val: a.avgLbShift, extra: a.totalShifts + ' shifts', tip: semTip(a)
+    })) : null;
+    const t5Day = SD.collDays ? top5(tots,'totalLbs').map(a => ({
+      name: a.name, val: +(a.totalLbs / SD.collDays).toFixed(1),
+      extra: SD.collDays + ' coll. days', tip: semTip(a)
+    })) : null;
+    const t5Wk = top5(tots.map(a => {
+      const aw = _wl[a.ai].filter(v => v > 0).length || SD.semWeeks || 1;
+      return {...a, _lbWk: a.totalLbs / aw};
+    }), '_lbWk').map(a => {
+      const aw = _wl[a.ai].filter(v => v > 0).length || SD.semWeeks || 1;
+      return {name: a.name, val: Math.round(a.totalLbs / aw), extra: aw + ' active wks', tip: semTip(a)};
+    });
+    html = '';
+    const hrChart  = t5Hr  ? _chart('Top 5 · Avg lb / hr',    t5Hr,  v => v.toFixed(1) + ' lb/hr')  : '';
+    const shChart  = t5Sh  ? _chart('Top 5 · Avg lb / shift', t5Sh,  v => v.toFixed(1) + ' lb/sh')  : '';
+    const dayChart = t5Day ? _chart('Top 5 · Avg lb / day',   t5Day, v => v.toFixed(1) + ' lb/day') : '';
+    const wkChart  = _chart('Top 5 · Avg lb / week', t5Wk, v => v.toLocaleString() + ' lb/wk');
+    if (hrChart && shChart) html += _pair(hrChart, shChart);
+    else html += hrChart + shChart;
+    if (dayChart) html += _pair(dayChart, wkChart);
+    else html += wkChart;
 
   } else if (type === 'eff') {
-    title = 'Efficiency Score · 5 Views';
+    title = 'Efficiency Score · Top Ambassadors';
     note  = '100 = hall avg for that dining hall & time — higher = more diverted per opportunity';
-    // Semester (top, full width)
     const semData = top5(tots,'avgEff').map(a=>({name:a.name,val:a.avgEff,extra:a.period,tip:semTip(a)}));
-    // Day pair
-    const dayAmbData = Object.entries(ambBestDay_eff)
-      .map(([n,d])=>({name:n,val:d.val,extra:d.label,tip:dateTip(n+' · '+d.label,d)}))
-      .sort((a,b)=>b.val-a.val).slice(0,5);
-    const dayDateData = topDateBy_eff.map(d=>({name:d.label,val:d.eff,extra:d.lbs.toLocaleString()+' lbs',tip:dateTip(d.label,d)}));
-    // Week pair
-    const wkAmbData = top5(tots,'bestWkEff').map(a=>({name:a.name,val:a.bestWkEff,
-      extra:s26WeekMeta[a.bestWkEffIdx].range.split(' – ')[0],tip:weekTip(a.bestWkEffIdx,a)}));
-    const wkDateData = weekAvgEff.map((v,wi)=>v>0?({name:s26WeekMeta[wi].range.split(' – ')[0],
-      val:v,extra:s26WeekTotals[wi].toLocaleString()+' lbs',tip:weekTip(wi,null)}):null)
-      .filter(Boolean).sort((a,b)=>b.val-a.val).slice(0,5);
-    html  = _section('Semester Avg Efficiency · Top 5 Ambassadors', semData, v=>v.toFixed(0)+' pts');
-    html += _pair(_chart('Top 5 Ambassadors · Best Single Day', dayAmbData, v=>v.toFixed(0)+' pts'),
-                  _chart('Top 5 Dates · Highest Efficiency', dayDateData, v=>v.toFixed(0)+' pts'));
-    html += _pair(_chart('Top 5 Ambassadors · Best Week Efficiency', wkAmbData, v=>v.toFixed(0)+' pts'),
-                  _chart('Top 5 Weeks · Highest Avg Efficiency', wkDateData, v=>v.toFixed(0)+' pts'));
+    const wkAmbData = _wm ? top5(tots,'bestWkEff').map(a=>({name:a.name,val:a.bestWkEff,
+      extra:(_wm[a.bestWkEffIdx]||{}).date||'',tip:weekTip(a.bestWkEffIdx,a)})) : [];
+    const wkDateData = (SD.weekAvgEff && _wm) ? SD.weekAvgEff.map((v,wi)=>v>0?({name:(_wm[wi]||{}).date||'',
+      val:v,extra:(_wt&&_wt[wi]||0).toLocaleString()+' lbs',tip:weekTip(wi,null)}):null)
+      .filter(Boolean).sort((a,b)=>b.val-a.val).slice(0,5) : [];
+    const t5ShiftEff = _we && _ws ? top5(tots,'maxShiftEff').map(a=>({name:a.name,val:a.maxShiftEff,extra:a.period,tip:semTip(a)})) : [];
+    html = _pair(
+      _chart('Top 5 · Avg Eff / Semester',   semData,    v=>v.toFixed(0)+' pts'),
+      _chart('Top 5 · Best Single Week Eff',  wkAmbData,  v=>v.toFixed(0)+' pts')
+    );
+    html += _pair(
+      _chart('Top 5 Weeks · Highest Team Avg Eff', wkDateData,  v=>v.toFixed(0)+' pts'),
+      t5ShiftEff.length ? _chart('Top 5 · Best Single Shift Eff', t5ShiftEff, v=>v.toFixed(0)+' pts') : ''
+    );
 
-  } else if (type === 'lbhr') {
-    title = 'Pounds per Hour · 5 Views';
-    note  = 'Total lbs ÷ total hours on shift — rewards intensity, not just volume';
-    const semData = top5(tots,'lbhr').map(a=>({name:a.name,val:a.lbhr,extra:a.totalLbs.toLocaleString()+' lbs',tip:semTip(a)}));
-    const dayAmbData = Object.entries(ambBestDay_lbhr)
-      .map(([n,d])=>({name:n,val:d.val,extra:d.label,tip:dateTip(n+' · '+d.label,d)}))
-      .sort((a,b)=>b.val-a.val).slice(0,5);
-    const dayDateData = topDateBy_lbhr.map(d=>({name:d.label,val:d.lbhr,extra:d.lbs.toLocaleString()+' lbs',tip:dateTip(d.label,d)}));
-    const wkAmbData = top5(tots,'bestWkLbhr').map(a=>({name:a.name,val:a.bestWkLbhr,
-      extra:s26WeekMeta[a.bestWkLbhrIdx].range.split(' – ')[0],tip:weekTip(a.bestWkLbhrIdx,a)}));
-    const wkDateData = s26WeekMeta.map((m,wi)=>m.lbhr?({name:m.range.split(' – ')[0],
-      val:m.lbhr,extra:s26WeekTotals[wi].toLocaleString()+' lbs',tip:weekTip(wi,null)}):null)
-      .filter(Boolean).sort((a,b)=>b.val-a.val).slice(0,5);
-    html  = _section('Semester Avg lb/hr · Top 5 Ambassadors', semData, v=>v.toFixed(1)+' lb/hr');
-    html += _pair(_chart('Top 5 Ambassadors · Best Single Day lb/hr', dayAmbData, v=>v.toFixed(1)+' lb/hr'),
-                  _chart('Top 5 Dates · Highest lb/hr', dayDateData, v=>v.toFixed(1)+' lb/hr'));
-    html += _pair(_chart('Top 5 Ambassadors · Best Week lb/hr', wkAmbData, v=>v.toFixed(1)+' lb/hr'),
-                  _chart('Top 5 Weeks · Highest lb/hr', wkDateData, v=>v.toFixed(1)+' lb/hr'));
-
-  } else if (type === 'busybee') {
-    title = '🐝 Busy Bee · Most Hours & Most Shifts';
-    note  = 'Recognizing the ambassadors who put in the most time on the floor';
-    const byHrs    = top5(tots,'totalHrs').map(a=>({name:a.name,val:a.totalHrs,extra:a.totalShifts+' shifts',tip:semTip(a)}));
-    const byShifts = top5(tots,'totalShifts').map(a=>({name:a.name,val:a.totalShifts,extra:a.totalHrs.toFixed(1)+' hrs',tip:semTip(a)}));
-    html = `<div class="dual-split">
-      <div><div class="dual-title">Top 5 · Most Hours Worked</div><div class="bar-chart">${_lbBarHTML(byHrs,v=>v.toFixed(1)+' hrs')}</div></div>
-      <div><div class="dual-title">Top 5 · Most Shifts Worked</div><div class="bar-chart">${_lbBarHTML(byShifts,v=>v+' shifts')}</div></div>
-    </div>`;
-
-  } else { // lbshift
-    title = 'Pounds per Shift · 5 Views';
-    note  = 'How much was yielded per shift, day, or week';
-    const semData = top5(tots,'avgLbShift').map(a=>({name:a.name,val:a.avgLbShift,extra:a.totalLbs.toLocaleString()+' total',tip:semTip(a)}));
-    const dayAmbData = Object.entries(ambBestDay_lbs)
-      .map(([n,d])=>({name:n,val:d.val,extra:d.label,tip:dateTip(n+' · '+d.label,d)}))
-      .sort((a,b)=>b.val-a.val).slice(0,5);
-    const dayDateData = topDateBy_lbs.map(d=>({name:d.label,val:d.lbs,extra:d.lbhr+' lb/hr',tip:dateTip(d.label,d)}));
-    const wkAmbData = top5(tots,'bestWkLbs').map(a=>({name:a.name,val:a.bestWkLbs,
-      extra:s26WeekMeta[a.bestWkLbsIdx].range.split(' – ')[0],tip:weekTip(a.bestWkLbsIdx,a)}));
-    const wkDateData = s26WeekTotals.map((v,wi)=>v>0?({name:s26WeekMeta[wi].range.split(' – ')[0],
-      val:v,extra:(s26WeekMeta[wi].lbhr||'—')+' lb/hr',tip:weekTip(wi,null)}):null)
-      .filter(Boolean).sort((a,b)=>b.val-a.val).slice(0,5);
-    html  = _section('Semester Avg Lbs/Shift · Top 5 Ambassadors', semData, v=>v.toFixed(1)+' lbs/shift');
-    html += _pair(_chart('Top 5 Ambassadors · Best Single Day Lbs', dayAmbData, v=>v.toLocaleString()+' lbs'),
-                  _chart('Top 5 Dates · Highest Total Lbs', dayDateData, v=>v.toLocaleString()+' lbs'));
-    html += _pair(_chart('Top 5 Ambassadors · Best Single Week Lbs', wkAmbData, v=>v.toLocaleString()+' lbs'),
-                  _chart('Top 5 Weeks · Highest Total Lbs', wkDateData, v=>v.toLocaleString()+' lbs'));
+  } else { // busybee
+    title = '🐝 Busy Bee · Most Dedication';
+    const hasHrsData = _wh || tots.some(t => t.totalHrs > 0);
+    if (hasHrsData && _ws) {
+      note = 'Ambassadors who put in the most hours and most shifts';
+      const byHrs    = top5(tots,'totalHrs').map(a=>({name:a.name,val:a.totalHrs,extra:a.totalShifts+' shifts',tip:semTip(a)}));
+      const byShifts = top5(tots,'totalShifts').map(a=>({name:a.name,val:a.totalShifts,extra:a.totalHrs.toFixed(1)+' hrs',tip:semTip(a)}));
+      html = `<div class="dual-split">
+        <div><div class="dual-title">Top 5 · Most Hours Worked</div><div class="bar-chart">${_lbBarHTML(byHrs,v=>v.toFixed(1)+' hrs')}</div></div>
+        <div><div class="dual-title">Top 5 · Most Shifts Worked</div><div class="bar-chart">${_lbBarHTML(byShifts,v=>v+' shifts')}</div></div>
+      </div>`;
+    } else if (_ws) {
+      note = 'Ambassadors who logged the most shifts this semester';
+      const byShifts = top5(tots,'totalShifts').map(a=>({name:a.name,val:a.totalShifts,extra:a.totalLbs.toLocaleString()+' lbs',tip:semTip(a)}));
+      html = `<div class="bar-chart">${_lbBarHTML(byShifts, v => v + ' shifts')}</div>`;
+    }
   }
 
   document.getElementById('lb-chart-title').textContent = title;
   document.getElementById('lb-chart-note').textContent  = note;
+  const badge = document.getElementById('lb-chart-badge');
+  if (badge) badge.textContent = SD.label;
   el.innerHTML = html;
 }
 
 function renderEcoImpact() {
-  // CO2e by semester — uses yoySems global array
   const co2Data = yoySems.map(s => ({name: s.sem, val: s.co2}));
-  document.getElementById('eco-co2-chart').innerHTML = _lbBarHTML(co2Data, v => v.toLocaleString() + ' lbs');
+  const co2El = document.getElementById('eco-co2-chart');
+  if (co2El) co2El.innerHTML = _lbBarHTML(co2Data, v => v.toLocaleString() + ' lbs');
 
-  // Compost by semester (40% yield est.)
   const compostData = yoySems.map(s => ({name: s.sem, val: Math.round(s.lbs * 0.4)}));
-  document.getElementById('eco-compost-chart').innerHTML = _lbBarHTML(compostData, v => v.toLocaleString() + ' lbs');
+  const compostEl = document.getElementById('eco-compost-chart');
+  if (compostEl) compostEl.innerHTML = _lbBarHTML(compostData, v => v.toLocaleString() + ' lbs');
 
-  // Animate new bars
   setTimeout(animateBars, 60);
 }
 
@@ -1210,7 +1313,7 @@ function renderGrowth() {
     'F24': {hrs:null, lbhr:null, peakLbhr:null, minLbhr:null},
     'S25': {hrs:null, lbhr:null, peakLbhr:null, minLbhr:null},
     'F25': {hrs:558.6, lbhr:46.68, peakLbhr:null, minLbhr:null},
-    'S26*':{hrs:632.6, lbhr:49.55, peakLbhr:s26PeakLbhr, minLbhr:s26MinLbhr},
+    'S26':{hrs:632.6, lbhr:49.55, peakLbhr:s26PeakLbhr, minLbhr:s26MinLbhr},
   };
 
   // ── Lbs Diverted Per Semester ─────────────────────────────
@@ -1230,7 +1333,7 @@ function renderGrowth() {
       onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
       onmousemove="moveTip(event)" onmouseleave="hideTip()"
       ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])">
-      <div class="sem-label ${s.current?'current':''}">${s.sem}</div>
+      <div class="sem-label ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
       <div class="sem-track">
         <div class="sem-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
           <span class="sem-fill-val">${s.lbs.toLocaleString()}</span>
@@ -1254,7 +1357,7 @@ function renderGrowth() {
       onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
       onmousemove="moveTip(event)" onmouseleave="hideTip()"
       ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])">
-      <div class="sem-label ${s.current?'current':''}">${s.sem}</div>
+      <div class="sem-label ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
       <div class="sem-track">
         <div class="sem-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
           <span class="sem-fill-val">${s.co2.toLocaleString()} lbs CO₂e</span>
@@ -1347,7 +1450,7 @@ function renderCumChart() {
   }
   pts.forEach((p,i)=>{
     const s = yoySems[i];
-    xl += `<text x="${p[0].toFixed(1)}" y="${H-MB+18}" text-anchor="middle" fill="${s.current?'#6aaee6':'#8aa4c8'}" font-size="10" font-family="Barlow Condensed,sans-serif">${s.sem}</text>`;
+    xl += `<text x="${p[0].toFixed(1)}" y="${H-MB+18}" text-anchor="middle" fill="${(s.sem===SD.semKey)?'#6aaee6':'#8aa4c8'}" font-size="10" font-family="Barlow Condensed,sans-serif">${s.sem}</text>`;
     if(p[1]!=null) {
       // Build rich tooltip based on mode
       let tipHtml = `<div class="tip-title">${s.sem} · ${titleStr}</div>`;
@@ -1373,7 +1476,7 @@ function renderCumChart() {
         tipHtml += `<div class="tip-row"><span>Lbs diverted</span><span>${s.lbs.toLocaleString()} lbs</span></div>`;
       }
       const k = ++_tipIdx; _tipStore[k] = tipHtml;
-      dots += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6" fill="${s.current?'#6aaee6':'#2d5f99'}" stroke="#0a1f44" stroke-width="2" style="cursor:pointer" data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()"/>`;
+      dots += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6" fill="${(s.sem===SD.semKey)?'#6aaee6':'#2d5f99'}" stroke="#0a1f44" stroke-width="2" style="cursor:pointer" data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()"/>`;
     } else {
       dots += `<text x="${p[0].toFixed(1)}" y="${(MT+ph/2+4).toFixed(1)}" fill="rgba(255,255,255,0.15)" font-size="9" text-anchor="middle" font-family="Barlow Condensed,sans-serif">—</text>`;
     }
@@ -1405,7 +1508,7 @@ function renderMFBF() {
       `<div class="tip-row"><span>Total</span><span>${total.toLocaleString()} lbs</span></div>`;
     const k = ++_tipIdx; _tipStore[k] = tipHtml;
     return `<div class="grouped-row" data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()">
-      <div class="grouped-label ${s.current?'current':''}">${s.sem}</div>
+      <div class="grouped-label ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
       <div class="grouped-bars">
         <div class="gbar" style="width:0;background:${mfGrad}" data-w="${(mfT*100).toFixed(1)}%"><span>${s.mf.toLocaleString()} lbs</span></div>
         <div class="gbar" style="width:0;background:${bfGrad}" data-w="${(bfT*100).toFixed(1)}%"><span>${s.bf.toLocaleString()} lbs</span></div>
@@ -1435,7 +1538,7 @@ function renderPeriod() {
       `<div class="tip-row"><span>Total</span><span>${fmtFull(total)} lbs</span></div>`;
     const k = ++_tipIdx; _tipStore[k] = tipHtml;
     return `<div class="stacked-row" data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()">
-      <div class="stacked-label ${s.current?'current':''}">${s.sem}</div>
+      <div class="stacked-label ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
       <div class="stacked-track" style="width:${trackPct}%;flex:none">
         <div class="stacked-seg seg-b" style="width:${bp}%"><span class="seg-val" data-orig="${fmt(s.b)}">${fmt(s.b)}</span></div>
         <div class="stacked-seg seg-l" style="width:${lp}%"><span class="seg-val" data-orig="${fmt(s.l)}">${fmt(s.l)}</span></div>
@@ -1494,12 +1597,12 @@ function renderTeam() {
         `<div class="tip-row"><span>Team total</span><span>${s.lbs.toLocaleString()} lbs</span></div>` +
         (lbs ? `<div class="tip-row"><span>Share of team</span><span>${Math.round(lbs/s.lbs*100)}%</span></div>` : '');
       const k = ++_tipIdx; _tipStore[k] = tipHtml;
-      dots += `<div class="amb-dot" style="background:${color};opacity:${s.current?1:0.55};cursor:pointer" data-tipk="${k}"
+      dots += `<div class="amb-dot" style="background:${color};opacity:${(s.sem===SD.semKey)?1:0.55};cursor:pointer" data-tipk="${k}"
         onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])"
         onmousemove="moveTip(event)" onmouseleave="hideTip()"></div>`;
     }
     return `<div class="team-row">
-      <div class="team-sem ${s.current?'current':''}">${s.sem}</div>
+      <div class="team-sem ${(s.sem===SD.semKey)?'current':''}">${s.sem}</div>
       <div class="team-dots">${dots}</div>
       <div class="team-lbs">${s.lbs.toLocaleString()} lbs · ${s.ambs} amb</div>
     </div>`;
@@ -1570,7 +1673,7 @@ const s26WeekMeta = [
   {range:'Feb 2 – Feb 8',mf:1686,bf:1758,hrs:68.0,lbhr:50.6},
   {range:'Feb 9 – Feb 15',mf:1398,bf:1203,hrs:57.9,lbhr:44.9},
   {range:'Feb 16 – Feb 22',mf:1621,bf:1051,hrs:44.8,lbhr:59.6},
-  {range:'Feb 23 – Mar 1',mf:410,bf:206,hrs:15.1,lbhr:40.8},
+  {range:'Feb 23 – Mar 1',mf:410,bf:206,hrs:15.1,lbhr:40.8,note:'3 snow days'},
   {range:'Mar 2 – Mar 8',mf:1494,bf:1133,hrs:56.4,lbhr:46.6},
   {range:'Mar 9 – Mar 15',mf:936,bf:1794,hrs:56.1,lbhr:48.7},
   {range:'Mar 16 – Mar 22',mf:0,bf:0,hrs:0,lbhr:null},
@@ -1826,6 +1929,261 @@ const ambBestDay_lbs = {
 // F25 per-week lb/hr (matched by lbs total; null = no hours data for that week)
 const F25_LBHR = {32:null,33:null,34:null,35:46.2,36:46.6,37:46.2,38:46.9,39:47.1,40:45.9,41:46.5,42:48.0,43:32.9,44:54.6,45:42.8};
 
+// ── F25 extracted per-ambassador weekly data ───────────────────────────────
+// Row order matches yoyRosters['F25'] order (same as f25AmbNames)
+const f25AmbWeeklyLbs = [
+  /* Orpheus Wilson */           [166,344,367,318,328,228,346,380,322,252,360,96,371,0],
+  /* Greta Traynor */            [167,0,210,191,162,211,201,284,261,278,192,63,103,51],
+  /* Emma Korsu */               [352,324,303,358,156,147,344,324,0,0,0,0,0,0],
+  /* Emmett Khan */              [299,557,452,526,363,278,585,409,524,269,436,57,463,241],
+  /* Sarah Wilme */              [337,289,319,150,184,167,201,243,184,259,311,0,0,0],
+  /* Maureen Surgot */           [213,260,360,309,323,258,234,308,427,190,367,69,330,304],
+  /* Brynn Hornig */             [196,174,245,232,243,249,263,367,230,157,282,0,433,164],
+  /* Leisly Aceituno */          [225,232,221,76,13,0,0,0,0,0,0,0,0,0],
+  /* Kaylie Forgue */            [81,341,330,381,426,225,434,416,378,509,411,313,417,285],
+  /* Evan Morgan */              [0,0,0,96,0,0,95,95,53,107,166,0,150,38],
+  /* Elliott Haber */            [0,0,0,0,0,97,0,85,264,361,269,0,0,0],
+  /* Oluwatimilehin Shodipe */   [0,0,0,0,0,0,63,0,96,86,163,0,205,185],
+  /* Laila Maisuria */           [0,0,0,0,0,0,86,63,70,0,97,55,80,89],
+  /* Kyra Turner */              [0,0,0,0,0,0,0,104,131,0,142,21,149,112]
+];
+const f25AmbWeeklyShifts = [
+  /* Orpheus Wilson */           [2,3,5,4,3,3,3,3,4,2,4,1,3,0],
+  /* Greta Traynor */            [3,0,4,4,3,3,3,4,4,4,3,1,2,1],
+  /* Emma Korsu */               [2,2,3,4,1,1,2,3,0,0,0,0,0,0],
+  /* Emmett Khan */              [3,3,4,5,4,2,4,4,5,2,4,1,4,3],
+  /* Sarah Wilme */              [3,2,2,2,3,2,2,3,2,3,3,0,0,0],
+  /* Maureen Surgot */           [2,3,3,3,3,2,3,3,3,2,3,1,3,2],
+  /* Brynn Hornig */             [2,3,3,4,3,3,3,4,4,2,5,0,6,2],
+  /* Leisly Aceituno */          [1,2,1,1,1,0,0,0,0,0,0,0,0,0],
+  /* Kaylie Forgue */            [1,3,2,3,3,2,3,4,3,3,3,2,3,3],
+  /* Evan Morgan */              [0,0,0,2,0,0,1,1,1,2,2,0,2,1],
+  /* Elliott Haber */            [0,0,0,0,0,1,0,1,3,4,2,0,0,0],
+  /* Oluwatimilehin Shodipe */   [0,0,0,0,0,0,1,0,1,1,2,0,2,2],
+  /* Laila Maisuria */           [0,0,0,0,0,0,1,1,2,0,2,1,2,2],
+  /* Kyra Turner */              [0,0,0,0,0,0,0,1,2,0,2,1,2,2]
+];
+const f25WeekTotals = [2036,2521,2807,2637,2198,1860,2852,3078,2940,2468,3196,674,2701,1469];
+const f25WeekLabels = ['Sep 8','Sep 15','Sep 22','Sep 29','Oct 6','Oct 13','Oct 20','Oct 27','Nov 3','Nov 10','Nov 17','Nov 24','Dec 1','Dec 8'];
+const f25WeekMeta = [
+  {range:'Sep 8–Sep 12', date:'Sep 8', lbs:2036,mf:1186,bf: 850,hrs:null, lbhr:null},
+  {range:'Sep 15–Sep 19',date:'Sep 15',lbs:2521,mf:1287,bf:1234,hrs:null, lbhr:null},
+  {range:'Sep 22–Sep 26',date:'Sep 22',lbs:2807,mf:1294,bf:1513,hrs:null, lbhr:null},
+  {range:'Sep 29–Oct 3', date:'Sep 29',lbs:2637,mf:1147,bf:1490,hrs:57.03,lbhr:46.24},
+  {range:'Oct 6–Oct 10', date:'Oct 6', lbs:2198,mf:1102,bf:1096,hrs:49.30,lbhr:44.58},
+  {range:'Oct 13–Oct 17',date:'Oct 13',lbs:1860,mf:1156,bf: 704,hrs:38.17,lbhr:48.73,note:'Columbus Day'},
+  {range:'Oct 20–Oct 24',date:'Oct 20',lbs:2852,mf:1302,bf:1550,hrs:60.77,lbhr:46.93},
+  {range:'Oct 27–Oct 31',date:'Oct 27',lbs:3078,mf:1431,bf:1647,hrs:65.33,lbhr:47.11},
+  {range:'Nov 3–Nov 7',  date:'Nov 3', lbs:2940,mf:1803,bf:1137,hrs:64.08,lbhr:45.88},
+  {range:'Nov 10–Nov 14',date:'Nov 10',lbs:2468,mf:1650,bf: 818,hrs:53.10,lbhr:46.48},
+  {range:'Nov 17–Nov 21',date:'Nov 17',lbs:3196,mf:1710,bf:1486,hrs:66.53,lbhr:48.04},
+  {range:'Nov 24–Nov 25',date:'Nov 24',lbs: 674,mf: 441,bf: 233,hrs:20.50,lbhr:32.88,note:'Thanksgiving week'},
+  {range:'Dec 1–Dec 5',  date:'Dec 1', lbs:2701,mf:1327,bf:1374,hrs:49.45,lbhr:54.62},
+  {range:'Dec 8–Dec 11', date:'Dec 8', lbs:1469,mf: 613,bf: 856,hrs:34.30,lbhr:42.83},
+];
+const f25AmbNames = yoyRosters['F25'];
+const f25AmbColors = f25AmbNames.map((_,i) => `hsl(${Math.round(i*360/14)},62%,62%)`);
+const f25wkdayLbhr = {
+  labels:['Mon','Tue','Wed','Thu','Fri'],
+  total: [57.72, 54.27, 66.89, 54.34, 77.15],
+  mf:    [45.93, 45.61, 60.49, 44.32, 61.73],
+  bf:    [45.92, 39.92, 40.38, 41.69, 53.27],
+};
+const f25wkdayMeta = {
+  activeWeeks: [14, 14, 12, 13, 12],
+  totalLbs:    [9322, 6971, 6486, 6154, 4504],
+  totalHrs:    [161.52, 128.45, 96.97, 113.25, 58.38],
+};
+const f25AmbMaxShiftLbs = {
+  'Orpheus Wilson':159,'Greta Traynor':90,'Emma Korsu':194,'Emmett Khan':209,
+  'Sarah Wilme':199,'Maureen Surgot':197,'Brynn Hornig':151,'Leisly Aceituno':225,
+  'Kaylie Forgue':180,'Evan Morgan':97,'Elliott Haber':141,'Oluwatimilehin Shodipe':107,
+  'Laila Maisuria':86,'Kyra Turner':104,
+};
+const f25AmbTotalsHrs = {
+  'Orpheus Wilson':39.75,'Greta Traynor':44.75,'Emma Korsu':24.97,
+  'Emmett Khan':69.77,'Sarah Wilme':51.00,'Maureen Surgot':73.58,
+  'Brynn Hornig':66.98,'Leisly Aceituno':2.50,'Kaylie Forgue':84.58,
+  'Evan Morgan':33.40,'Elliott Haber':20.62,'Oluwatimilehin Shodipe':13.38,
+  'Laila Maisuria':18.68,'Kyra Turner':14.60,
+};
+const f25AmbTotalsLbhr = {
+  'Orpheus Wilson':75.50,'Greta Traynor':44.63,'Emma Korsu':53.23,
+  'Emmett Khan':59.50,'Sarah Wilme':33.31,'Maureen Surgot':42.39,
+  'Brynn Hornig':39.11,'Leisly Aceituno':35.60,'Kaylie Forgue':49.60,
+  'Evan Morgan':23.95,'Elliott Haber':52.19,'Oluwatimilehin Shodipe':59.63,
+  'Laila Maisuria':28.90,'Kyra Turner':45.14,
+};
+const f25AmbMostFreqPeriod = {
+  'Orpheus Wilson':'Lunch','Greta Traynor':'Lunch','Emma Korsu':'Dinner',
+  'Emmett Khan':'Dinner','Sarah Wilme':'Dinner','Maureen Surgot':'Lunch',
+  'Brynn Hornig':'Lunch','Leisly Aceituno':'Dinner','Kaylie Forgue':'Dinner',
+  'Evan Morgan':'Breakfast','Elliott Haber':'Dinner','Oluwatimilehin Shodipe':'Breakfast/Lunch',
+  'Laila Maisuria':'Dinner','Kyra Turner':'Dinner',
+};
+const f25AmbBestDayLbs = {
+  'Orpheus Wilson':{val:226,label:'Dec 3'},
+  'Greta Traynor':{val:90,label:'Oct 27'},
+  'Emma Korsu':{val:260,label:'Sep 29'},
+  'Emmett Khan':{val:403,label:'Sep 19'},
+  'Sarah Wilme':{val:201,label:'Nov 19'},
+  'Maureen Surgot':{val:197,label:'Dec 9'},
+  'Brynn Hornig':{val:182,label:'Oct 28'},
+  'Leisly Aceituno':{val:232,label:'Sep 18'},
+  'Kaylie Forgue':{val:332,label:'Nov 12'},
+  'Evan Morgan':{val:97,label:'Nov 20'},
+  'Elliott Haber':{val:269,label:'Nov 20'},
+  'Oluwatimilehin Shodipe':{val:205,label:'Dec 1'},
+  'Laila Maisuria':{val:97,label:'Nov 17'},
+  'Kyra Turner':{val:149,label:'Dec 2'},
+};
+
+// Helper: extract weekly totals/labels/meta from allTimeData for a given semester
+function _semWeekData(sem) {
+  const rows = allTimeData.filter(x => x.s === sem);
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function fmtD(d) { const dt = new Date(d+'T12:00:00'); return months[dt.getMonth()]+' '+dt.getDate(); }
+  return {
+    weekTotals: rows.map(x => x.y),
+    weekLabels: rows.map(x => fmtD(x.d)),
+    weekMeta:   rows.map(x => ({range: fmtD(x.d), date: fmtD(x.d), lbs: x.y})),
+  };
+}
+
+// ── SEASON_DATA: one object per season ────────────────────────────────────
+const SEASON_DATA = (() => {
+  const s25wd = _semWeekData('S25');
+  const f24wd = _semWeekData('F24');
+  if (f24wd.weekMeta[5])  f24wd.weekMeta[5].note  = 'Columbus Day';
+  if (f24wd.weekMeta[11]) f24wd.weekMeta[11].note = 'Thanksgiving week';
+  const s24wd = _semWeekData('S24');
+
+  // ── F25 computed constants ─────────────────────────────────────────────────
+  const f25AmbWeeklyLbShift = f25AmbWeeklyLbs.map((row, ai) =>
+    row.map((lbs, wi) => f25AmbWeeklyShifts[ai][wi] > 0 ? +(lbs / f25AmbWeeklyShifts[ai][wi]).toFixed(1) : 0)
+  );
+  const f25TopDateByLbhr = f25WeekMeta
+    .filter(w => w.lbhr != null)
+    .map(w => ({lbhr:w.lbhr, lbs:w.lbs, hrs:w.hrs, label:w.range, range:w.range}))
+    .sort((a,b) => b.lbhr - a.lbhr);
+  const f25WorstDateByLbhr = [...f25TopDateByLbhr].sort((a,b) => a.lbhr - b.lbhr)[0];
+  const f25TopDateByLbs = [...f25WeekMeta]
+    .map(w => ({lbs:w.lbs, lbhr:w.lbhr, label:w.range, range:w.range}))
+    .sort((a,b) => b.lbs - a.lbs);
+  const f25WorstDateByLbs = f25WeekMeta.filter(w => w.lbs > 0).reduce((w,m) => m.lbs < w.lbs ? m : w);
+  const f25WkdayAvgLbhr = f25wkdayLbhr.total.reduce((s,v) => s+v, 0) / f25wkdayLbhr.total.filter(v => v > 0).length;
+
+  return {
+    s26: {
+      key:'s26', label:'Spring 2026', shortLabel:'S26', semKey:'S26',
+      lbs:31345, co2:19921, cumCO2:82207, hrs:632.6, lbhr:49.55, cum:129352, ambs:14, shifts:280,
+      mf:16299, bf:15046, hasMFBF:true,
+      periods:{b:4252,l:12212,d:14881},
+      lbhrVsPrev:'↑ +6.1% vs. F25 (46.7 lb/hr)', cumSince:'S24',
+      weekTotals:s26WeekTotals, weekLabels:s26WeekLabels, weekMeta:s26WeekMeta,
+      weekAvgEff:weekAvgEff, SPRING_BREAK:8,
+      ambNames:ambNames, ambColors:ambColors,
+      ambWeeklyLbs:ambWeeklyLbs, ambWeeklyHrs:ambWeeklyHrs,
+      ambWeeklyEff:ambWeeklyEff, ambWeeklyShifts:ambWeeklyShifts,
+      ambMaxShiftLbs:ambMaxShiftLbs, ambMaxShiftLbhr:ambMaxShiftLbhr,
+      ambMaxShiftEff:ambMaxShiftEff, ambMostFreqPeriod:ambMostFreqPeriod,
+      ambTotals:yoyAmbLbs['S26'],
+      wkdayLbhr:wkdayLbhr, wkdayMeta:wkdayMeta, wkdayAvgLbhr:wkdayAvgLbhr, wkdayAvgEff:wkdayAvgEff,
+      topDateBy_lbhr, topDateBy_eff, topDateBy_lbs,
+      allDayStats:null, ambBestDay_lbhr, ambBestDay_eff, ambBestDay_lbs,
+      worstDay_lbhr:{label:'Feb 26',lbs:144,hrs:5.25,lbhr:27.43},
+      worstDay_lbs: {label:'May 1', lbs:47},
+      worstShiftLbs:5,
+      periodHallLbhr:{
+        mf_b:{lbs:24,   hrs:3.35,  lbhr:7.16},
+        mf_l:{lbs:7023, hrs:112.95,lbhr:62.18},
+        mf_d:{lbs:9252, hrs:163.78,lbhr:56.49},
+        bf_b:{lbs:3030, hrs:84.57, lbhr:35.83},
+        bf_l:{lbs:3992, hrs:108.12,lbhr:36.92},
+        bf_d:{lbs:5629, hrs:115.68,lbhr:48.66},
+      },
+      collDays:67, semWeeks:14,
+      hasWeeklyAmb:true, hasHours:true, hasEff:true,
+    },
+    f25: {
+      key:'f25', label:'Fall 2025', shortLabel:'F25', semKey:'F25',
+      lbs:33437, co2:21250, cumCO2:62286, hrs:558.6, lbhr:46.68, cum:98007, ambs:14, shifts:304,
+      mf:17449, bf:15988, hasMFBF:true,
+      periods:{b:2688,l:15022,d:15727},
+      lbhrVsPrev:'First semester with hour tracking',
+      cumSince:'S24',
+      weekTotals:f25WeekTotals, weekLabels:f25WeekLabels, weekMeta:f25WeekMeta,
+      weekAvgEff:null, SPRING_BREAK:null,
+      ambNames:f25AmbNames, ambColors:f25AmbColors,
+      ambWeeklyLbs:f25AmbWeeklyLbs, ambWeeklyHrs:null,
+      ambWeeklyEff:f25AmbWeeklyLbShift, ambWeeklyShifts:f25AmbWeeklyShifts,
+      ambMaxShiftLbs:f25AmbMaxShiftLbs, ambMaxShiftLbhr:null, ambMaxShiftEff:null, ambMostFreqPeriod:f25AmbMostFreqPeriod,
+      ambTotals:yoyAmbLbs['F25'], ambTotalsHrs:f25AmbTotalsHrs, ambTotalsLbhr:f25AmbTotalsLbhr,
+      wkdayLbhr:f25wkdayLbhr, wkdayMeta:f25wkdayMeta, wkdayAvgLbhr:f25WkdayAvgLbhr, wkdayAvgEff:null,
+      topDateBy_lbhr:f25TopDateByLbhr, topDateBy_eff:null, topDateBy_lbs:f25TopDateByLbs,
+      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:f25AmbBestDayLbs,
+      worstDay_lbhr:f25WorstDateByLbhr, worstDay_lbs:f25WorstDateByLbs, worstShiftLbs:null, periodHallLbhr:null,
+      collDays:70, semWeeks:14,
+      hasWeeklyAmb:true, hasHours:true, hasEff:false,
+    },
+    s25: {
+      key:'s25', label:'Spring 2025', shortLabel:'S25', semKey:'S25',
+      lbs:31073, co2:19748, cumCO2:41036, hrs:null, lbhr:null, cum:64570, ambs:13, shifts:262,
+      mf:14269, bf:16804, hasMFBF:true,
+      periods:{b:4199,l:13311,d:13563},
+      cumSince:'S24',
+      ...s25wd, weekAvgEff:null, SPRING_BREAK:null,
+      ambNames:yoyRosters['S25'], ambColors:yoyRosters['S25'].map((_,i)=>`hsl(${Math.round(i*360/13)},62%,62%)`),
+      ambWeeklyLbs:null, ambWeeklyHrs:null, ambWeeklyEff:null, ambWeeklyShifts:null,
+      ambMaxShiftLbs:null, ambMaxShiftLbhr:null, ambMaxShiftEff:null, ambMostFreqPeriod:null,
+      ambTotals:yoyAmbLbs['S25'],
+      wkdayLbhr:null, wkdayMeta:null, wkdayAvgLbhr:null, wkdayAvgEff:null,
+      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:null,
+      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:null,
+      collDays:65, semWeeks:14,
+      hasWeeklyAmb:false, hasHours:false, hasEff:false,
+    },
+    f24: {
+      key:'f24', label:'Fall 2024', shortLabel:'F24', semKey:'F24',
+      lbs:26386, co2:16755, cumCO2:21288, hrs:null, lbhr:null, cum:33497, ambs:10, shifts:277,
+      mf:11781, bf:14605, hasMFBF:true,
+      periods:{b:3145,l:12623,d:10619},
+      cumSince:'S24',
+      ...f24wd, weekAvgEff:null, SPRING_BREAK:null,
+      ambNames:yoyRosters['F24'], ambColors:yoyRosters['F24'].map((_,i)=>`hsl(${Math.round(i*360/10)},62%,62%)`),
+      ambWeeklyLbs:null, ambWeeklyHrs:null, ambWeeklyEff:null, ambWeeklyShifts:null,
+      ambMaxShiftLbs:null, ambMaxShiftLbhr:null, ambMaxShiftEff:null, ambMostFreqPeriod:null,
+      ambTotals:yoyAmbLbs['F24'],
+      wkdayLbhr:null, wkdayMeta:null, wkdayAvgLbhr:null, wkdayAvgEff:null,
+      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:null,
+      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:null,
+      collDays:65, semWeeks:15,
+      hasWeeklyAmb:false, hasHours:false, hasEff:false,
+    },
+    s24: {
+      key:'s24', label:'Spring 2024', shortLabel:'S24', semKey:'S24',
+      lbs:7111, co2:4517, cumCO2:4517, hrs:null, lbhr:null, cum:7111, ambs:8, shifts:85,
+      mf:null, bf:null, hasMFBF:false,
+      periods:{b:727,l:3952,d:2432},
+      cumSince:'S24',
+      ...s24wd, weekAvgEff:null, SPRING_BREAK:null,
+      ambNames:yoyRosters['S24'].filter(Boolean), ambColors:yoyRosters['S24'].filter(Boolean).map((_,i)=>`hsl(${Math.round(i*360/7)},62%,62%)`),
+      ambWeeklyLbs:null, ambWeeklyHrs:null, ambWeeklyEff:null, ambWeeklyShifts:null,
+      ambMaxShiftLbs:null, ambMaxShiftLbhr:null, ambMaxShiftEff:null, ambMostFreqPeriod:null,
+      ambTotals:yoyAmbLbs['S24'],
+      wkdayLbhr:null, wkdayMeta:null, wkdayAvgLbhr:null, wkdayAvgEff:null,
+      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:null,
+      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:null,
+      collDays:42, semWeeks:14,
+      hasWeeklyAmb:false, hasHours:false, hasEff:false,
+    },
+  };
+})();
+
+let SD = SEASON_DATA.s26;
+let currentSeason = 's26';
+let currentTab = 'impact';
+
 const PROG_AVG_LBHR = 49.65;
 let selectedCard = null;
 let effMode = false;
@@ -1869,19 +2227,20 @@ document.addEventListener('touchstart', function(e) {
 
 // ── Weekly bar tooltip ────────────────────────────────────────────────────
 function showBarTip(e, wi) {
-  const m = s26WeekMeta[wi];
-  const total = s26WeekTotals[wi];
-  if (!total) return;
-  const mfPct = Math.round(m.mf / total * 100);
-  const bfPct = 100 - mfPct;
-  tipShow(e,
-    `<div class="tip-title">${m.range}</div>` +
-    `<div class="tip-row"><span>Total lbs</span><span>${total.toLocaleString()}</span></div>` +
-    `<div class="tip-row"><span>Mainfare</span><span>${m.mf.toLocaleString()} (${mfPct}%)</span></div>` +
-    `<div class="tip-row"><span>Butterfield</span><span>${m.bf.toLocaleString()} (${bfPct}%)</span></div>` +
-    `<div class="tip-row"><span>Hours worked</span><span>${m.hrs > 0 ? m.hrs.toFixed(1) + ' hrs' : '—'}</span></div>` +
-    `<div class="tip-row"><span>Avg lb/hr</span><span>${m.lbhr != null ? m.lbhr.toFixed(1) : '—'}</span></div>`
-  );
+  const m = SD.weekMeta ? SD.weekMeta[wi] : null;
+  const total = SD.weekTotals ? SD.weekTotals[wi] : 0;
+  if (!total || !m) return;
+  const rows = [`<div class="tip-title">${m.range||m.date||''}</div>`,
+    `<div class="tip-row"><span>Total lbs</span><span>${total.toLocaleString()}</span></div>`];
+  if (m.mf != null) {
+    const mfPct = Math.round(m.mf/total*100);
+    rows.push(`<div class="tip-row"><span>Mainfare</span><span>${m.mf.toLocaleString()} (${mfPct}%)</span></div>`);
+    rows.push(`<div class="tip-row"><span>Butterfield</span><span>${m.bf.toLocaleString()} (${100-mfPct}%)</span></div>`);
+  }
+  if (m.hrs) rows.push(`<div class="tip-row"><span>Hours worked</span><span>${m.hrs.toFixed(1)} hrs</span></div>`);
+  if (m.lbhr != null) rows.push(`<div class="tip-row"><span>Avg lb/hr</span><span>${m.lbhr.toFixed(1)}</span></div>`);
+  if (m.note) rows.push(`<div class="tip-row tip-note"><span>📌</span><span>${m.note}</span></div>`);
+  tipShow(e, rows.join(''));
 }
 
 // ── Card selection + toggle ───────────────────────────────────────────────
@@ -1921,25 +2280,28 @@ function selectWeekIdx(xi) {
 
 // ── Viz 1: Weekly lbs bar chart ───────────────────────────────────────────
 function renderVizLbs() {
+  const weekTotals = SD.weekTotals, weekLabels = SD.weekLabels, weekMeta = SD.weekMeta;
+  const hasSB = SD.SPRING_BREAK !== null && SD.SPRING_BREAK !== undefined;
   const W=780, H=270, ML=48, MR=14, MT=22, MB=58;
-  const pw=W-ML-MR, ph=H-MT-MB, maxY=3600;
-  const n=s26WeekTotals.length, sw=pw/n, bw=Math.floor(sw*0.72);
-  const maxVal=Math.max(...s26WeekTotals);
+  const pw=W-ML-MR, ph=H-MT-MB;
+  const n=weekTotals.length, sw=pw/n, bw=Math.floor(sw*0.72);
+  const maxVal=Math.max(...weekTotals.filter(v=>v>0), 100);
+  const maxY=Math.ceil(maxVal/1000)*1000 || 3600;
   let defs='', g='', xl='';
-  [1000,2000,3000].forEach(v => {
+  [1000,2000,3000].filter(v=>v<=maxY).forEach(v => {
     const y=(MT+ph-(v/maxY)*ph).toFixed(1);
     g+=`<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
     g+=`<text x="${ML-5}" y="${(+y+4).toFixed(1)}" fill="#8aa4c8" font-size="9" text-anchor="end" font-family="Barlow Condensed,sans-serif">${v/1000}k</text>`;
   });
-  s26WeekTotals.forEach((lbs,i) => {
+  weekTotals.forEach((lbs,i) => {
     const cx=(ML+i*sw+sw/2).toFixed(1);
     const bx=(ML+i*sw+(sw-bw)/2).toFixed(1);
-    const isSB=(lbs===0);
-    xl+=`<text x="${cx}" y="${H-MB+18}" fill="#8aa4c8" font-size="8.5" text-anchor="middle" font-family="Barlow Condensed,sans-serif">${s26WeekLabels[i]}</text>`;
+    const isSB=(hasSB && lbs===0);
+    xl+=`<text x="${cx}" y="${H-MB+18}" fill="#8aa4c8" font-size="8.5" text-anchor="middle" font-family="Barlow Condensed,sans-serif">${weekLabels[i]||''}</text>`;
     if (isSB) {
       g+=`<rect x="${bx}" y="${MT}" width="${bw}" height="${ph}" fill="rgba(255,255,255,0.02)" rx="2"/>`;
       g+=`<text x="${cx}" y="${(MT+ph/2+4).toFixed(1)}" fill="rgba(255,255,255,0.18)" font-size="8" text-anchor="middle" font-family="Barlow Condensed,sans-serif" transform="rotate(-90,${cx},${(MT+ph/2).toFixed(1)})">SPRING BREAK</text>`;
-    } else {
+    } else if (lbs > 0) {
       const t = lbs / maxVal;
       const topColor = _lerpColor(_BAR_A, _BAR_B, t);
       defs += `<linearGradient id="wbg${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${topColor}"/><stop offset="100%" stop-color="${_BAR_A}"/></linearGradient>`;
@@ -1958,18 +2320,37 @@ function renderVizLbs() {
     </svg>`;
   document.querySelectorAll('#viz-lbs-inner [data-wi]').forEach(el => {
     const wi = +el.dataset.wi;
-    el.addEventListener('mousemove', e => showBarTip(e, wi));
-    el.addEventListener('touchstart', e => showBarTip(e, wi), {passive:true});
+    function _vbTip(e) {
+      const m = weekMeta ? weekMeta[wi] : null;
+      const lbs = weekTotals[wi];
+      if (!lbs || !m) return;
+      const rows = [['Total lbs',lbs.toLocaleString()]];
+      if (m.mf != null) rows.push(['Mainfare',m.mf.toLocaleString()+' ('+Math.round(m.mf/lbs*100)+'%)'],['Butterfield',m.bf.toLocaleString()+' ('+Math.round(m.bf/lbs*100)+'%)']);
+      if (m.hrs) rows.push(['Hours worked',m.hrs.toFixed(1)+' hrs']);
+      if (m.lbhr) rows.push(['Avg lb/hr',m.lbhr.toFixed(1)]);
+      if (m.note) rows.push(['📌',m.note]);
+      tipShow(e, _tip(m.range||m.date||('Week '+wi), rows));
+    }
+    el.addEventListener('mousemove', _vbTip);
+    el.addEventListener('touchstart', _vbTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
-    el.addEventListener('click', e => showBarTip(e, wi));
+    el.addEventListener('click', _vbTip);
   });
+  // Update viz panel title
+  const titleEl = document.querySelector('#viz-lbs .chart-title');
+  if (titleEl) titleEl.textContent = `Weekly Pounds Diverted · ${SD.label}`;
+  // Append weekday lb/hr section if data available
+  _renderWkdayChart(document.getElementById('viz-lbs-wkday'));
 }
 
 // ── Viz 2: CO₂ Earth visual ───────────────────────────────────────────────
 function renderVizCO2() {
+  const miles = Math.round(SD.co2 / 0.891);
+  const earthPct = (miles / 24901 * 100).toFixed(1);
+  const remaining = 24901 - miles;
   const cx=170, cy=170, r=130;
   const circ=(2*Math.PI*r).toFixed(2);
-  const pct=24258/24901;
+  const pct=miles/24901;
   const filled=(pct*circ).toFixed(2);
   const gap=(circ-filled).toFixed(2);
   document.getElementById('co2-svg').innerHTML=`
@@ -1982,18 +2363,34 @@ function renderVizCO2() {
     <circle cx="${cx}" cy="${cy}" r="${r+10}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="20"/>
     <circle cx="${cx}" cy="${cy}" r="${r+10}" fill="none" stroke="#3abf7e" stroke-width="20"
       stroke-dasharray="${filled} ${gap}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>
-    <text x="${cx}" y="${cy-16}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="30" font-weight="900" fill="white">97.4%</text>
+    <text x="${cx}" y="${cy-16}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="30" font-weight="900" fill="white">${earthPct}%</text>
     <text x="${cx}" y="${cy+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9.5" fill="#8aa4c8" letter-spacing="1.5">OF EARTH</text>
     <text x="${cx}" y="${cy+19}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9.5" fill="#8aa4c8" letter-spacing="1.5">CIRCUMFERENCE</text>
     <circle cx="16" cy="312" r="5" fill="#3abf7e"/>
-    <text x="26" y="316" font-family="Barlow Condensed,sans-serif" font-size="10" fill="#8aa4c8">DaRP offset · 24,258 mi</text>
+    <text x="26" y="316" font-family="Barlow Condensed,sans-serif" font-size="10" fill="#8aa4c8">DaRP offset · ${miles.toLocaleString()} mi</text>
     <circle cx="16" cy="330" r="5" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-    <text x="26" y="334" font-family="Barlow Condensed,sans-serif" font-size="10" fill="#8aa4c8">Remaining · 643 mi</text>`;
+    <text x="26" y="334" font-family="Barlow Condensed,sans-serif" font-size="10" fill="#8aa4c8">Remaining · ${remaining.toLocaleString()} mi</text>`;
+  // Update stats panel
+  const statsEl = document.querySelector('#viz-co2 .co2-stats');
+  if (statsEl) {
+    const csvs = statsEl.querySelectorAll('.csv');
+    if (csvs[0]) csvs[0].textContent = miles.toLocaleString();
+    if (csvs[1]) csvs[1].textContent = earthPct + '%';
+  }
+  const titleEl = document.querySelector('#viz-co2 .chart-title');
+  if (titleEl) titleEl.textContent = `CO₂e Avoided · ${SD.label}`;
 }
 
 // ── Viz 3: KFP grid ───────────────────────────────────────────────────────
 function renderVizHrs() {
-  const totalFilms = 673 * 60 / 92;
+  const kfpGrid = document.getElementById('kfp-grid');
+  const titleEl = document.querySelector('#viz-hrs .chart-title');
+  if (!SD.hrs) {
+    if (kfpGrid) kfpGrid.innerHTML = `<p style="color:var(--muted);padding:20px 0">Hours not tracked for ${SD.label}.</p>`;
+    if (titleEl) titleEl.textContent = 'Hours Worked · Not Available';
+    return;
+  }
+  const totalFilms = SD.hrs * 60 / 92;
   const full = Math.floor(totalFilms);
   const partial = totalFilms - full;
   const TW=28, TH=42, GAP=2;
@@ -2004,35 +2401,166 @@ function renderVizHrs() {
     html += `<div style="width:${TW}px;height:${TH}px;background:url('${imgPath}') center/cover no-repeat;border-radius:2px;flex-shrink:0;opacity:${op}"></div>`;
   }
   html += `</div><div style="margin-top:12px;font-size:11px;color:var(--muted)"><span style="color:var(--green);font-weight:600">${totalFilms.toFixed(2)} screenings</span> of Kung Fu Panda 2</div>`;
-  document.getElementById('kfp-grid').innerHTML = html;
+  if (kfpGrid) kfpGrid.innerHTML = html;
+  if (titleEl) titleEl.textContent = `Hours Worked · In Movie Terms`;
+  const noteEl = document.querySelector('#viz-hrs .chart-note');
+  if (noteEl) noteEl.innerHTML = `${Math.round(SD.hrs)} hours ÷ 92 min per film = <strong style="color:var(--green)">${Math.floor(totalFilms)} full screenings</strong> of Kung Fu Panda 2`;
 }
 
 // ── Viz 4: Weekday lb/hr grouped chart ────────────────────────────────────
 function renderVizLbhr() {
+  const innerEl = document.getElementById('viz-lbhr-inner');
+  const titleEl = document.getElementById('viz-lbhr-title');
+  const noteEl  = document.getElementById('viz-lbhr-note');
+  if (!SD.lbhr) {
+    if (innerEl) innerEl.innerHTML = `<p style="color:var(--muted);padding:20px 0">Rate breakdown not available for ${SD.label}.</p>`;
+    return;
+  }
+  if (titleEl) titleEl.textContent = `Rate Breakdown · ${SD.label}`;
+  if (noteEl)  noteEl.textContent  = 'Semester averages vs. single-session extremes · lb/hr · lb/shift · lb/day · lb/week';
+
+  // ── helper: render one comparison row ─────────────────────────────────
+  function _rateRow(label, avgVal, avgFmt, bestObj, worstObj, valKey, fmtFn) {
+    const avgStr  = avgFmt || (avgVal != null ? fmtFn(avgVal) : '—');
+    const bestStr = bestObj  ? `<span class="rr-hi">${fmtFn(bestObj[valKey])}</span><span class="rr-sub"> ${bestObj.label||''}</span>` : '<span class="rr-muted">—</span>';
+    const worstStr= worstObj ? `<span class="rr-lo">${fmtFn(worstObj[valKey])}</span><span class="rr-sub"> ${worstObj.label||''}</span>` : '<span class="rr-muted">—</span>';
+    return `<div class="rate-row">
+      <div class="rr-label">${label}</div>
+      <div class="rr-avg">${avgStr}</div>
+      <div class="rr-vs">vs</div>
+      <div class="rr-best">${bestStr}</div>
+      <div class="rr-worst">${worstStr}</div>
+    </div>`;
+  }
+
+  // ── data ───────────────────────────────────────────────────────────────
+  const avgLbhr   = SD.lbhr;
+  const avgLbShift= SD.shifts ? +(SD.lbs / SD.shifts).toFixed(1) : null;
+  const avgLbDay  = SD.collDays ? +(SD.lbs / SD.collDays).toFixed(1) : null;
+  const avgLbWeek = SD.semWeeks ? +(SD.lbs / SD.semWeeks).toFixed(0) : null;
+
+  const bestDayLbhr  = SD.topDateBy_lbhr  ? SD.topDateBy_lbhr[0]  : null;
+  const bestDayLbs   = SD.topDateBy_lbs   ? SD.topDateBy_lbs[0]   : null;
+  const worstDayLbhr = SD.worstDay_lbhr   || null;
+  const worstDayLbs  = SD.worstDay_lbs    || null;
+  const worstShiftLbs= SD.worstShiftLbs   || null;
+  const bestShiftLbs = SD.ambMaxShiftLbs
+    ? Math.max(...Object.values(SD.ambMaxShiftLbs))
+    : null;
+  const bestShiftObj = bestShiftLbs != null
+    ? {label: SD.ambMaxShiftLbs ? Object.entries(SD.ambMaxShiftLbs).sort((a,b)=>b[1]-a[1])[0]?.[0] : '', lbs: bestShiftLbs}
+    : null;
+  const worstShiftObj= worstShiftLbs != null
+    ? (typeof worstShiftLbs === 'object' ? worstShiftLbs : {label:'', lbs: worstShiftLbs})
+    : null;
+  // Best/worst single week — computed from weekTotals
+  const _wkActive = SD.weekTotals ? SD.weekTotals.map((v,i)=>({v,i})).filter(x=>x.v>0) : [];
+  const _bestWkIdx = _wkActive.length ? _wkActive.reduce((a,b)=>b.v>a.v?b:a).i : null;
+  const _worstWkIdx= _wkActive.length ? _wkActive.reduce((a,b)=>b.v<a.v?b:a).i : null;
+  const _wkLabel = i => SD.weekMeta ? (SD.weekMeta[i]?.date || SD.weekMeta[i]?.range || ('Wk '+(i+1))) : ('Wk '+(i+1));
+  const bestWkObj = _bestWkIdx != null ? {label: _wkLabel(_bestWkIdx), lbs: SD.weekTotals[_bestWkIdx]} : null;
+  const worstWkObj= _worstWkIdx!= null ? {label: _wkLabel(_worstWkIdx),lbs: SD.weekTotals[_worstWkIdx]} : null;
+
+  // ── rows ───────────────────────────────────────────────────────────────
+  let rowsHtml = '';
+  if (avgLbhr != null) {
+    const best  = bestDayLbhr  ? {label: bestDayLbhr.label,  lbhr: bestDayLbhr.lbhr}  : null;
+    const worst = worstDayLbhr ? {label: worstDayLbhr.label, lbhr: worstDayLbhr.lbhr} : null;
+    rowsHtml += _rateRow('Avg lb / hr', avgLbhr, avgLbhr.toFixed(1) + ' lb/hr', best, worst, 'lbhr', v => v.toFixed(1) + ' lb/hr');
+  }
+  if (avgLbShift != null) {
+    rowsHtml += _rateRow('Avg lb / shift', avgLbShift, avgLbShift.toFixed(1) + ' lb/sh',
+      bestShiftObj  ? {...bestShiftObj,  lbs: bestShiftObj.lbs}  : null,
+      worstShiftObj ? {...worstShiftObj, lbs: worstShiftObj.lbs} : null,
+      'lbs', v => v.toLocaleString() + ' lbs');
+  }
+  if (avgLbDay != null) {
+    const best  = bestDayLbs  ? {label: bestDayLbs.label,  lbs: bestDayLbs.lbs}  : null;
+    const worst = worstDayLbs ? {label: worstDayLbs.label, lbs: worstDayLbs.lbs} : null;
+    rowsHtml += _rateRow('Avg lb / day', avgLbDay, avgLbDay.toFixed(1) + ' lb/day', best, worst, 'lbs', v => v.toLocaleString() + ' lbs');
+  }
+  if (avgLbWeek != null) {
+    rowsHtml += _rateRow('Avg lb / week', +avgLbWeek, (+avgLbWeek).toLocaleString() + ' lbs',
+      bestWkObj  ? {label: bestWkObj.label,  lbs: bestWkObj.lbs}  : null,
+      worstWkObj ? {label: worstWkObj.label, lbs: worstWkObj.lbs} : null,
+      'lbs', v => v.toLocaleString() + ' lbs');
+  }
+
+  // ── period × hall grid ─────────────────────────────────────────────────
+  let phHtml = '';
+  const ph = SD.periodHallLbhr;  // {mf_b, mf_l, mf_d, bf_b, bf_l, bf_d} each {lbs, hrs, lbhr}
+  if (ph) {
+    const phLabels = {mf_b:'MF · Breakfast', mf_l:'MF · Lunch', mf_d:'MF · Dinner',
+                      bf_b:'BF · Breakfast', bf_l:'BF · Lunch', bf_d:'BF · Dinner'};
+    const entries = Object.entries(ph).filter(([,v])=>v && v.lbhr != null)
+      .map(([k,v])=>({key:k, label:phLabels[k]||k, lbhr:v.lbhr, lbs:v.lbs, hrs:v.hrs}))
+      .sort((a,b)=>b.lbhr-a.lbhr);
+    if (entries.length) {
+      const maxLbhr = entries[0].lbhr;
+      phHtml = `<div class="ph-grid-title">lb/hr by Period &amp; Hall</div><div class="ph-grid">` +
+        entries.map(e => {
+          const pct = (e.lbhr / maxLbhr * 100).toFixed(0);
+          return `<div class="ph-cell" style="--ph-pct:${pct}%">
+            <div class="ph-label">${e.label}</div>
+            <div class="ph-val">${e.lbhr.toFixed(1)}</div>
+            <div class="ph-bar"><div class="ph-bar-fill" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('') + `</div>`;
+    }
+  }
+
+  // ── column headers ─────────────────────────────────────────────────────
+  const headersHtml = `<div class="rate-row rate-row-hdr">
+    <div class="rr-label"></div>
+    <div class="rr-avg">Semester avg</div>
+    <div class="rr-vs"></div>
+    <div class="rr-best">Best session ↑</div>
+    <div class="rr-worst">Worst session ↓</div>
+  </div>`;
+
+  innerEl.innerHTML = `<div class="rate-compare">${headersHtml}${rowsHtml}</div>${phHtml ? '<div class="chart-section" style="margin-top:24px">'+phHtml+'</div>' : ''}`;
+}
+
+// ── Shared weekday lb/hr chart renderer (used by renderVizLbs + standalone) ─
+function _renderWkdayChart(container, titleStr) {
+  if (!container) return;
+  if (!SD.wkdayLbhr) {
+    if (SD.lbhr) {
+      container.innerHTML = `<div style="margin-top:16px;padding:14px 20px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:#ccd8ee;margin-bottom:4px">PROGRAM TOTAL · lb/hr</div>
+        <div style="font-size:24px;font-weight:700;color:var(--light)">${SD.lbhr.toFixed(1)} <span style="font-size:13px;font-weight:400;color:#9090c0">lb/hr program avg</span></div>
+        <div style="font-size:11px;color:#9090c0;margin-top:6px">Per-weekday breakdown not available for ${SD.shortLabel}</div>
+      </div>`;
+    } else {
+      container.innerHTML = '';
+    }
+    return;
+  }
   const W=660, ML=42, MR=14;
-  const days=wkdayLbhr.labels, n=days.length;
+  const days=SD.wkdayLbhr.labels, n=days.length;
   const slotW=(W-ML-MR)/n;
   const maxTop=70, maxBot=80;
-  const t1y=22, t1h=155, t2y=207, t2h=150;
+  const t1y=32, t1h=155, t2y=220, t2h=150;
   const t1base=t1y+t1h, t2base=t2y+t2h;
   let out='';
-  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="10" font-weight="700" fill="#9090c0" letter-spacing="1">PROGRAM TOTAL · lb/hr</text>`;
+  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y-8}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="11" font-weight="700" fill="#ccd8ee" letter-spacing=".5">${titleStr||'Avg lb/hr by Weekday · '+SD.label}</text>`;
+  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" font-weight="700" fill="#9090c0" letter-spacing="1">PROGRAM TOTAL · lb/hr</text>`;
   [20,40,60].forEach(v => {
     const y=(t1base-(v/maxTop)*(t1h-14)).toFixed(1);
     out+=`<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
     out+=`<text x="${ML-5}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#8aa4c8" text-anchor="end">${v}</text>`;
   });
   out+=`<line x1="${ML}" y1="${t1base}" x2="${W-MR}" y2="${t1base}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
-  wkdayLbhr.total.forEach((v,i) => {
+  SD.wkdayLbhr.total.forEach((v,i) => {
     const bw=Math.floor(slotW*0.55);
     const cx=(ML+i*slotW+slotW/2).toFixed(1), bx=(ML+i*slotW+(slotW-bw)/2).toFixed(1);
     const bh=((v/maxTop)*(t1h-14)).toFixed(1);
     const by=(t1base-+bh).toFixed(1);
-    out+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="url(#wdgT)" rx="2.5" data-day="${i}" style="cursor:pointer"/>`;
+    out+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="url(#wdgT)" rx="2.5" data-wkd="${i}" style="cursor:pointer"/>`;
     out+=`<text x="${cx}" y="${(+by-4).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="10" font-weight="700" fill="#c0c0f8" text-anchor="middle" pointer-events="none">${v.toFixed(1)}</text>`;
     out+=`<text x="${cx}" y="${t1base+15}" font-family="Barlow Condensed,sans-serif" font-size="12" font-weight="700" fill="#ccd8ee" text-anchor="middle">${days[i]}</text>`;
   });
-  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t2y+8}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="10" font-weight="700" fill="#9090c0" letter-spacing="1">BY DINING HALL · lb/hr</text>`;
+  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t2y+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" font-weight="700" fill="#9090c0" letter-spacing="1">BY DINING HALL · lb/hr</text>`;
   [20,40,60,80].forEach(v => {
     const y=(t2base-(v/maxBot)*(t2h-14)).toFixed(1);
     out+=`<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
@@ -2040,8 +2568,8 @@ function renderVizLbhr() {
   });
   out+=`<line x1="${ML}" y1="${t2base}" x2="${W-MR}" y2="${t2base}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
   const hw=Math.floor(slotW*0.3);
-  wkdayLbhr.mf.forEach((mf,i) => {
-    const bf=wkdayLbhr.bf[i];
+  SD.wkdayLbhr.mf.forEach((mf,i) => {
+    const bf=SD.wkdayLbhr.bf[i];
     const cx=(ML+i*slotW+slotW/2).toFixed(1);
     const mfx=(ML+i*slotW+slotW/2-hw-1).toFixed(1), bfx=(ML+i*slotW+slotW/2+1).toFixed(1);
     const mfh=((mf/maxBot)*(t2h-14)).toFixed(1), bfh=((bf/maxBot)*(t2h-14)).toFixed(1);
@@ -2057,8 +2585,9 @@ function renderVizLbhr() {
   out+=`<rect x="${ML+82}" y="${t2base+30}" width="10" height="10" fill="url(#wdgBF)" rx="2"/>`;
   out+=`<text x="${ML+96}" y="${t2base+39}" font-family="Barlow Condensed,sans-serif" font-size="10" fill="#e87a6a">Butterfield</text>`;
   const Htot=t2base+52;
-  document.getElementById('viz-lbhr-inner').innerHTML=
-    `<svg viewBox="0 0 ${W} ${Htot}" style="width:100%;overflow:visible">
+  container.innerHTML=
+    `<div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08)">
+    <svg viewBox="0 0 ${W} ${Htot}" style="width:100%;overflow:visible">
       <defs>
         <linearGradient id="wdgT" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#9a80cf"/><stop offset="100%" stop-color="#5040a0"/>
@@ -2071,32 +2600,25 @@ function renderVizLbhr() {
         </linearGradient>
       </defs>
       ${out}
-    </svg>`;
-
+    </svg></div>`;
   // Weekday bar tooltips
-  document.querySelectorAll('#viz-lbhr-inner [data-day]').forEach(el => {
-    const i = +el.dataset.day;
+  container.querySelectorAll('[data-wkd]').forEach(el => {
+    const i = +el.dataset.wkd;
     function _wkdayTip(e) {
-      const wks = wkdayMeta.activeWeeks[i], totalLbs = wkdayMeta.totalLbs[i], totalHrs = wkdayMeta.totalHrs[i];
+      const wkm = SD.wkdayMeta || {};
+      const wks = (wkm.activeWeeks||[])[i]||1, totalLbs=(wkm.totalLbs||[])[i]||0, totalHrs=(wkm.totalHrs||[])[i]||0;
       tipShow(e,
-        `<div class="tip-title">${wkdayLbhr.labels[i]}s — Spring 2026</div>` +
-        `<div class="tip-row"><span>Total lbs collected</span><span>${totalLbs.toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Avg lbs per ${wkdayLbhr.labels[i]}</span><span>${Math.round(totalLbs/wks).toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Avg hours worked</span><span>${(totalHrs/wks).toFixed(1)} hrs</span></div>` +
-        `<div class="tip-row"><span>Total hours worked</span><span>${totalHrs.toFixed(1)} hrs</span></div>`
+        `<div class="tip-title">${SD.wkdayLbhr.labels[i]}s — ${SD.label}</div>` +
+        `<div class="tip-row"><span>Total lbs</span><span>${totalLbs.toLocaleString()}</span></div>` +
+        `<div class="tip-row"><span>Avg lbs / ${SD.wkdayLbhr.labels[i]}</span><span>${Math.round(totalLbs/wks).toLocaleString()}</span></div>` +
+        `<div class="tip-row"><span>Avg hrs worked</span><span>${(totalHrs/wks).toFixed(1)} hrs</span></div>` +
+        `<div class="tip-row"><span>Total hrs</span><span>${totalHrs.toFixed(1)} hrs</span></div>`
       );
     }
     el.addEventListener('mousemove', _wkdayTip);
     el.addEventListener('touchstart', _wkdayTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
-    el.addEventListener('click', e => {
-      const wks = wkdayMeta.activeWeeks[i];
-      const totalLbs = wkdayMeta.totalLbs[i];
-      const totalHrs = wkdayMeta.totalHrs[i];
-      const avgLbs = Math.round(totalLbs / wks);
-      const avgHrs = (totalHrs / wks).toFixed(1);
-      _wkdayTip(e);
-    });
+    el.addEventListener('click', _wkdayTip);
   });
 }
 
@@ -2127,13 +2649,15 @@ function renderVizScatter() {
   const semMidMap={S24:'2024-03-28',F24:'2024-10-20',S25:'2025-02-20',F25:'2025-10-20',S26:'2026-02-20'};
   Object.entries(semMidMap).forEach(([s,d]) => {
     const x=dx(d).toFixed(1);
-    g+=`<text x="${x}" y="${MT+10}" font-family="Barlow Condensed,sans-serif" font-size="9.5" font-weight="700" fill="${semColorMap[s]}" text-anchor="middle" opacity="0.85" data-sem="${s}" style="cursor:pointer;user-select:none">${s}</text>`;
+    const isCur=(s===SD.semKey);
+    g+=`<text x="${x}" y="${MT+10}" font-family="Barlow Condensed,sans-serif" font-size="${isCur?11:9.5}" font-weight="700" fill="${isCur?'#6aaee6':semColorMap[s]}" text-anchor="middle" opacity="${isCur?1:0.45}" data-sem="${s}" style="cursor:pointer;user-select:none">${s}</text>`;
   });
 
   allTimeData.forEach((p,idx) => {
     const x=dx(p.d).toFixed(1), y=dy(p.y).toFixed(1);
-    const c=semColorMap[p.s], isS26=(p.s==='S26');
-    g+=`<circle cx="${x}" cy="${y}" r="${isS26?5.5:4.5}" fill="${c}" opacity="${isS26?1:0.72}" stroke="${isS26?'rgba(255,255,255,0.35)':'none'}" stroke-width="${isS26?1.5:0}" data-pt="${idx}" style="cursor:pointer"/>`;
+    const isCurrent=(p.s===SD.semKey);
+    const c=isCurrent?'#6aaee6':semColorMap[p.s];
+    g+=`<circle cx="${x}" cy="${y}" r="${isCurrent?5.5:4.0}" fill="${c}" opacity="${isCurrent?1:0.45}" stroke="${isCurrent?'rgba(255,255,255,0.4)':'none'}" stroke-width="${isCurrent?1.5:0}" data-pt="${idx}" style="cursor:pointer"/>`;
   });
 
   document.getElementById('viz-scatter-inner').innerHTML=
@@ -2206,19 +2730,60 @@ function renderVizScatter() {
   });
 }
 
+// ── Fallback for seasons without weekly amb data ───────────────────────────
+function renderAmbTotalsBars() {
+  const container = document.getElementById('viz-amb-inner');
+  const legend = document.getElementById('amb-legend');
+  if (legend) legend.innerHTML = '';
+  if (!SD.ambTotals || !container) return;
+  const data = Object.entries(SD.ambTotals).sort((a,b)=>b[1]-a[1]);
+  const max = data[0]?.[1] || 1;
+  container.innerHTML = `<div class="bar-chart">${data.map(([name,lbs],i)=>{
+    const t = lbs/max;
+    const grad = `linear-gradient(90deg,${_BAR_A},${_lerpColor(_BAR_A,_BAR_B,t)})`;
+    return `<div class="bar-row"><div class="bar-rank ${i<3?'r'+(i+1):''}">${i+1}</div><div class="bar-name">${name}</div><div class="bar-track"><div class="bar-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}"><span class="bar-val">${lbs.toLocaleString()} lbs</span></div></div></div>`;
+  }).join('')}</div>`;
+}
+
 // ── Viz 6: Ambassador weekly stacked bars ─────────────────────────────────
 function renderVizAmb() {
-  const SPRING_BREAK = 8;
-  const wkIdxs = Array.from({length:15},(_,i)=>i).filter(i => i !== SPRING_BREAK);
+  const ambVizSec = document.getElementById('amb-viz-section');
+  if (!SD.ambWeeklyLbs) {
+    if (ambVizSec) ambVizSec.style.display = 'none';
+    return;
+  }
+  if (ambVizSec) ambVizSec.style.display = '';
+
+  // Show/hide efficiency toggle; detect lb/shift proxy mode (F25)
+  const isLbShiftMode = !!(SD.ambWeeklyEff && !SD.weekAvgEff);
+  const effBtn = document.getElementById('eff-btn');
+  if (effBtn) {
+    const canEff = !!SD.ambWeeklyEff;
+    effBtn.style.display = canEff ? '' : 'none';
+    if (!canEff && effMode) { effMode = false; effBtn.classList.remove('active'); }
+    if (!effMode) effBtn.textContent = isLbShiftMode ? '⚡ Show lb/shift View' : '⚡ Show Efficiency View';
+    else effBtn.textContent = '📊 Show Output View';
+  }
+
+  const weekTotals = SD.weekTotals, weekLabels = SD.weekLabels, weekMeta = SD.weekMeta;
+  const SPRING_BREAK = SD.SPRING_BREAK;
+  const ambWeeklyLbs = SD.ambWeeklyLbs, ambWeeklyHrs = SD.ambWeeklyHrs;
+  const ambWeeklyEff = SD.ambWeeklyEff, ambWeeklyShifts = SD.ambWeeklyShifts;
+  const ambNames = SD.ambNames, ambColors = SD.ambColors;
+
+  const nAll = weekTotals.length;
+  const wkIdxs = (SPRING_BREAK !== null && SPRING_BREAK !== undefined)
+    ? Array.from({length:nAll},(_,i)=>i).filter(i => i !== SPRING_BREAK)
+    : Array.from({length:nAll},(_,i)=>i);
   const nWk = wkIdxs.length;
-  const W=900, ML=22, MR=22, MT=46, MB=52;
+  const W=900, ML=22, MR=22, MT=66, MB=52;
   const pw=W-ML-MR, sw=pw/nWk, bw=Math.floor(sw*0.80);
   const ph=270;
   const H=MT+ph+MB;
   let maxH, g='';
 
   if (!effMode) {
-    maxH = Math.ceil(Math.max(...wkIdxs.map(wi => s26WeekTotals[wi])) / 500) * 500;
+    maxH = Math.ceil(Math.max(...wkIdxs.map(wi => weekTotals[wi])) / 500) * 500;
     [500,1000,1500,2000,2500,3000].forEach(v => {
       if (v > maxH) return;
       const y = (MT+ph-v/maxH*ph).toFixed(1);
@@ -2226,15 +2791,30 @@ function renderVizAmb() {
       g += `<text x="${ML-4}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="7.5" fill="#8aa4c8" text-anchor="end">${v/1000}k</text>`;
     });
   } else {
-    // Efficiency Score axis: 0 to 350 (raw scores × 100), baseline at 100
-    maxH = 350;
-    [50,100,150,200,250,300].forEach(v => {
-      const y = (MT+ph-v/maxH*ph).toFixed(1);
-      const isBase = (v === 100);
-      g += `<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="${isBase ? 'rgba(245,200,66,0.5)' : 'rgba(255,255,255,0.05)'}" stroke-width="${isBase ? 1.5 : 1}" stroke-dasharray="${isBase ? '5,3' : ''}"/>`;
-      g += `<text x="${ML-4}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="7.5" fill="${isBase ? 'rgba(245,200,66,0.85)' : '#8aa4c8'}" text-anchor="end">${v}</text>`;
-    });
-    g += `<text x="${W-MR-2}" y="${(MT+ph-100/maxH*ph-4).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="rgba(245,200,66,0.8)" text-anchor="end">100 = hall avg for shift time</text>`;
+    if (isLbShiftMode) {
+      // lb/shift proxy mode (F25): dynamic axis based on data max
+      const flatEff = SD.ambWeeklyEff.flat().filter(v => v > 0);
+      const dataMax = flatEff.length ? Math.max(...flatEff) : 200;
+      maxH = Math.ceil(dataMax / 50) * 50;
+      const axisVals = [];
+      for (let v = 50; v <= maxH; v += 50) axisVals.push(v);
+      axisVals.forEach(v => {
+        const y = (MT+ph-v/maxH*ph).toFixed(1);
+        g += `<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+        g += `<text x="${ML-4}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="7.5" fill="#8aa4c8" text-anchor="end">${v}</text>`;
+      });
+      g += `<text x="${W/2}" y="${MT-8}" font-family="Barlow Condensed,sans-serif" font-size="9" fill="rgba(109,174,230,0.7)" text-anchor="middle">lb / shift (proxy efficiency)</text>`;
+    } else {
+      // Standard efficiency score axis: 0 to 350 (normalized × 100), baseline at 100
+      maxH = 350;
+      [50,100,150,200,250,300].forEach(v => {
+        const y = (MT+ph-v/maxH*ph).toFixed(1);
+        const isBase = (v === 100);
+        g += `<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="${isBase ? 'rgba(245,200,66,0.5)' : 'rgba(255,255,255,0.05)'}" stroke-width="${isBase ? 1.5 : 1}" stroke-dasharray="${isBase ? '5,3' : ''}"/>`;
+        g += `<text x="${ML-4}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="7.5" fill="${isBase ? 'rgba(245,200,66,0.85)' : '#8aa4c8'}" text-anchor="end">${v}</text>`;
+      });
+      g += `<text x="${W-MR-2}" y="${(MT+ph-100/maxH*ph-4).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="rgba(245,200,66,0.8)" text-anchor="end">100 = hall avg for shift time</text>`;
+    }
   }
   g += `<line x1="${ML}" y1="${MT+ph}" x2="${W-MR}" y2="${MT+ph}" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>`;
 
@@ -2243,7 +2823,7 @@ function renderVizAmb() {
     const bx = (ML+xi*sw+(sw-bw)/2).toFixed(1);
     const isWkSelected = selectedWeek !== null && xi !== selectedWeek;
     const wkLabelColor = (selectedWeek === xi) ? '#ffffff' : (selectedWeek !== null ? '#3a4a5e' : '#8aa4c8');
-    g += `<text x="${cx}" y="${MT+ph+18}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="${wkLabelColor}" text-anchor="middle" data-week-xi="${xi}" style="cursor:pointer">${s26WeekLabels[wi]}</text>`;
+    g += `<text x="${cx}" y="${MT+ph+18}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="${wkLabelColor}" text-anchor="middle" data-week-xi="${xi}" style="cursor:pointer">${weekLabels[wi]}</text>`;
 
     if (!effMode) {
       // Sort ascending by lbs — largest renders last (sits on top of the visual stack)
@@ -2264,22 +2844,25 @@ function renderVizAmb() {
         stackY = by;
       });
 
-      // Crown: ambassador with most lbs this week
+      // Column total label + crown
       const maxEntry = ambNames
         .map((n, ai) => ({ai, lbs: ambWeeklyLbs[ai][wi]}))
         .reduce((best, cur) => cur.lbs > best.lbs ? cur : best, {ai:-1, lbs:0});
       if (maxEntry.ai >= 0 && maxEntry.lbs > 0) {
-        const totalH = s26WeekTotals[wi] / maxH * ph;
+        const totalH = weekTotals[wi] / maxH * ph;
         const crownY = (MT + ph - totalH - 14).toFixed(1);
-        const nameY = (+crownY - 14).toFixed(1);
+        const nameY  = (+crownY - 13).toFixed(1);
+        const totalY = (+nameY - 12).toFixed(1);
         const crownName = ambNames[maxEntry.ai];
         const ambFaded = filteredAmb !== null && crownName !== filteredAmb;
-        const labelOpacity = isWkSelected ? 0.15 : (ambFaded ? 0.2 : 1);
-        g += `<text x="${cx}" y="${crownY}" text-anchor="middle" font-size="12" opacity="${labelOpacity}" pointer-events="none">👑</text>`;
+        const labelOpacity = isWkSelected ? 0.15 : (ambFaded ? 0.3 : 1);
+        const totalLabel = weekTotals[wi] >= 1000 ? (weekTotals[wi]/1000).toFixed(1)+'k' : weekTotals[wi].toString();
+        g += `<text x="${cx}" y="${totalY}" font-family="Barlow Condensed,sans-serif" font-size="9" fill="rgba(255,255,255,0.75)" text-anchor="middle" font-weight="700" opacity="${isWkSelected?0.15:1}" pointer-events="none">${totalLabel}</text>`;
+        g += `<text x="${cx}" y="${crownY}" text-anchor="middle" font-size="11" opacity="${labelOpacity}" pointer-events="none">👑</text>`;
         g += `<text x="${cx}" y="${nameY}" font-family="Barlow Condensed,sans-serif" font-size="9.5" fill="${ambColors[maxEntry.ai]}" text-anchor="middle" font-weight="700" opacity="${labelOpacity}" data-crown="${crownName}" style="cursor:pointer">${crownName.split(' ')[0]}</text>`;
       }
     } else {
-      // Efficiency view: grouped bars using Efficiency Score × 100 (100 = hall avg)
+      // Efficiency view: grouped bars using Efficiency Score × 100 (100 = hall avg) OR lb/shift (F25)
       const active = ambNames
         .map((n, ai) => ({ai, eff: ambWeeklyEff[ai][wi]}))
         .filter(a => a.eff > 0);
@@ -2290,7 +2873,7 @@ function renderVizAmb() {
       let maxEffEntry = {ai: -1, eff: 0, barCx: 0, barTop: MT};
       active.forEach(({ai, eff}) => {
         if (!isFinite(eff) || eff <= 0) { mx += mbw + 1; return; }
-        const effScaled = eff * 100;
+        const effScaled = isLbShiftMode ? eff : eff * 100;
         const bh = Math.min(effScaled / maxH * ph, ph);
         const by = MT + ph - bh;
         const ambFaded = filteredAmb !== null && ambNames[ai] !== filteredAmb;
@@ -2332,7 +2915,7 @@ function renderVizAmb() {
     el.addEventListener('click', () => selectWeekIdx(+el.dataset.weekXi));
     function _weekTip(e) {
       const wi = wkIdxs[+el.dataset.weekXi];
-      tipShow(e, `<div class="tip-title">${s26WeekMeta[wi].range}</div><div class="tip-row"><span>Tap to isolate week</span></div>`);
+      tipShow(e, `<div class="tip-title">${weekMeta?.[wi]?.range||weekLabels[wi]}</div><div class="tip-row"><span>Tap to isolate week</span></div>`);
     }
     el.addEventListener('mousemove', _weekTip);
     el.addEventListener('touchstart', _weekTip, {passive:true});
@@ -2344,15 +2927,21 @@ function renderVizAmb() {
     const ai = +el.dataset.segAi;
     const wi = +el.dataset.segWi;
     function _segTip(e) {
-      const lbs = ambWeeklyLbs[ai][wi], weekTotal = s26WeekTotals[wi];
+      const lbs = ambWeeklyLbs[ai][wi], weekTotal = weekTotals[wi];
       const pct = weekTotal > 0 ? Math.round(lbs / weekTotal * 100) : 0;
+      const shifts = ambWeeklyShifts ? ambWeeklyShifts[ai][wi] : null;
+      const hrs = ambWeeklyHrs ? ambWeeklyHrs[ai][wi] : null;
+      const lbShift = (shifts && shifts > 0) ? (lbs / shifts).toFixed(0) : null;
+      const lbHr    = (hrs && hrs > 0) ? (lbs / hrs).toFixed(1) : null;
       tipShow(e,
         `<div class="tip-title">${ambNames[ai]}</div>` +
-        `<div class="tip-row"><span>Week of</span><span>${s26WeekMeta[wi].range.split(' – ')[0]}</span></div>` +
+        `<div class="tip-row"><span>Week of</span><span>${weekMeta?.[wi]?.range || weekLabels[wi]}</span></div>` +
         `<div class="tip-row"><span>Lbs this week</span><span>${lbs.toLocaleString()}</span></div>` +
         `<div class="tip-row"><span>Week total</span><span>${weekTotal.toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Share</span><span>${pct}%</span></div>` +
-        `<div class="tip-row"><span>Shifts worked</span><span>${ambWeeklyShifts[ai][wi]}</span></div>`
+        `<div class="tip-row"><span>Share of week</span><span>${pct}%</span></div>` +
+        (shifts !== null ? `<div class="tip-row"><span>Shifts</span><span>${shifts}</span></div>` : '') +
+        (lbShift !== null && shifts > 0 ? `<div class="tip-row"><span>lb / shift</span><span>${lbShift}</span></div>` : '') +
+        (lbHr !== null ? `<div class="tip-row"><span>lb / hr</span><span>${lbHr}</span></div>` : '')
       );
     }
     el.addEventListener('mousemove', _segTip);
@@ -2378,16 +2967,22 @@ function renderVizAmb() {
     const wi = +el.dataset.effWi;
     function _effTip(e) {
       const eff = ambWeeklyEff[ai][wi], lbs = ambWeeklyLbs[ai][wi];
-      const hrs = ambWeeklyHrs[ai][wi], shiftCount = ambWeeklyShifts[ai][wi];
-      tipShow(e,
-        `<div class="tip-title">${ambNames[ai]}</div>` +
-        `<div class="tip-row"><span>Week of</span><span>${s26WeekMeta[wi].range.split(' – ')[0]}</span></div>` +
-        `<div class="tip-row"><span>Efficiency score</span><span>${Math.round(eff * 100)}</span></div>` +
-        `<div class="tip-row"><span>Lbs</span><span>${lbs.toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Hours</span><span>${hrs.toFixed(1)}</span></div>` +
-        `<div class="tip-row"><span>Shifts worked</span><span>${shiftCount}</span></div>` +
-        `<div style="font-size:10px;color:var(--muted);margin-top:6px;border-top:1px solid rgba(255,255,255,0.08);padding-top:6px">100 = hall avg for shift time · higher is better</div>`
-      );
+      const shiftCount = ambWeeklyShifts ? ambWeeklyShifts[ai][wi] : null;
+      const weekLabel2 = (weekMeta?.[wi]?.range||weekLabels[wi]).split(' – ')[0];
+      let tipHtml = `<div class="tip-title">${ambNames[ai]}</div>` +
+        `<div class="tip-row"><span>Week of</span><span>${weekLabel2}</span></div>` +
+        `<div class="tip-row"><span>Lbs</span><span>${lbs.toLocaleString()}</span></div>`;
+      if (isLbShiftMode) {
+        tipHtml += `<div class="tip-row"><span>lb / shift</span><span>${eff.toFixed(1)}</span></div>`;
+        if (shiftCount != null) tipHtml += `<div class="tip-row"><span>Shifts</span><span>${shiftCount}</span></div>`;
+      } else {
+        const hrs = ambWeeklyHrs ? ambWeeklyHrs[ai][wi] : null;
+        tipHtml += `<div class="tip-row"><span>Efficiency score</span><span>${Math.round(eff * 100)}</span></div>`;
+        if (hrs != null) tipHtml += `<div class="tip-row"><span>Hours</span><span>${hrs.toFixed(1)}</span></div>`;
+        if (shiftCount != null) tipHtml += `<div class="tip-row"><span>Shifts worked</span><span>${shiftCount}</span></div>`;
+        tipHtml += `<div style="font-size:10px;color:var(--muted);margin-top:6px;border-top:1px solid rgba(255,255,255,0.08);padding-top:6px">100 = hall avg for shift time · higher is better</div>`;
+      }
+      tipShow(e, tipHtml);
     }
     el.addEventListener('mousemove', _effTip);
     el.addEventListener('touchstart', _effTip, {passive:true});
@@ -2396,12 +2991,332 @@ function renderVizAmb() {
   });
 }
 
+// ── Season dropdown ───────────────────────────────────────────────────────
+function toggleSeasonDrop(e) {
+  e.stopPropagation();
+  document.getElementById('season-btn').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.getElementById('season-btn')?.classList.remove('open');
+});
+
+function switchSeason(key) {
+  if (!SEASON_DATA[key]) return;
+  SD = SEASON_DATA[key];
+  currentSeason = key;
+  document.getElementById('season-label').textContent = SD.label + ' ▾';
+  document.getElementById('season-btn').classList.remove('open');
+  document.querySelectorAll('.sdrop-item').forEach((el, i) => {
+    el.classList.toggle('active', Object.keys(SEASON_DATA)[i] === key);
+  });
+  renderSeasonUI();
+  renderLeaderboard(currentLb);
+  renderVizAmb();
+  renderGrowth();
+  if (selectedCard) {
+    const map = {lbs:renderVizLbs, co2:renderVizCO2, hrs:renderVizHrs, lbhr:renderVizLbhr, alltime:renderVizScatter, amb:renderVizAmb};
+    map[selectedCard]?.();
+  }
+  setTimeout(animateBars, 60);
+  updateHash();
+}
+
+function updateHash() {
+  const h = `#${currentSeason}/${currentTab}`;
+  if (window.location.hash !== h) history.replaceState(null, '', h);
+}
+
+function initFromHash() {
+  const parts = (window.location.hash.slice(1) || '').split('/');
+  const s = SEASON_DATA[parts[0]] ? parts[0] : 's26';
+  const tabIds = ['impact','leaderboard','attendance','growth'];
+  const t = tabIds.includes(parts[1]) ? parts[1] : 'impact';
+  SD = SEASON_DATA[s];
+  currentSeason = s;
+  document.getElementById('season-label').textContent = SD.label + ' ▾';
+  document.querySelectorAll('.sdrop-item').forEach((el, i) => {
+    el.classList.toggle('active', Object.keys(SEASON_DATA)[i] === s);
+  });
+  renderSeasonUI();
+  renderLeaderboard('lbs');
+  renderEcoImpact();
+  renderGrowth();
+  renderVizAmb();
+  const btn = document.querySelector(`.tab[onclick*="'${t}'"]`);
+  showPanel(t, btn);
+}
+
+// ── renderSeasonUI — update hero cards + section titles ───────────────────
+function renderSeasonUI() {
+  const s = SD;
+  // Section titles
+  const stEl = document.getElementById('impact-section-title');
+  if (stEl) stEl.textContent = `${s.label} · Highlights`;
+  const lbSt = document.getElementById('lb-section-title');
+  if (lbSt) { lbSt.textContent = `${s.label} · Team`; lbSt.style.display = s.hasWeeklyAmb ? '' : 'none'; }
+  const lbSh = document.getElementById('lb-section-heading');
+  if (lbSh) { lbSh.textContent = `${s.shortLabel} Weekly Team Output`; lbSh.style.display = s.hasWeeklyAmb ? '' : 'none'; }
+  const lbSubEl2 = document.getElementById('lb-section-sub');
+  if (lbSubEl2) { lbSubEl2.textContent = 'Filter by ambassador · toggle output vs. efficiency mode'; lbSubEl2.style.display = s.hasWeeklyAmb ? '' : 'none'; }
+  const ambChartTitle = document.getElementById('amb-chart-title');
+  if (ambChartTitle) ambChartTitle.textContent = s.hasWeeklyAmb
+    ? `Ambassador Weekly Output · ${s.label}`
+    : `Ambassador Season Totals · ${s.label}`;
+  const ambChartNote = document.getElementById('amb-chart-note');
+  if (ambChartNote) ambChartNote.textContent = s.hasWeeklyAmb
+    ? `Stacked by ambassador — 👑 marks each week's top contributor`
+    : `Total lbs diverted per ambassador this semester`;
+  const ambSt = document.getElementById('amb-section-title');
+  if (ambSt) ambSt.textContent = `${s.label} · Ambassadors`;
+  const ecoSt = document.getElementById('eco-section-title');
+  if (ecoSt) ecoSt.textContent = `${s.label} · Environmental`;
+
+  // Hero cards
+  const lbsVal = document.getElementById('hcard-lbs-val');
+  if (lbsVal) lbsVal.innerHTML = `<span>${s.lbs.toLocaleString()}</span>`;
+  const lbsSub = document.getElementById('hcard-lbs-sub');
+  if (lbsSub) lbsSub.textContent = `${s.label} full semester`;
+
+  const miles = Math.round(s.co2 / 0.891);
+  const co2Val = document.getElementById('hcard-co2-val');
+  if (co2Val) co2Val.textContent = s.co2.toLocaleString();
+  const co2Sub = document.getElementById('hcard-co2-sub');
+  if (co2Sub) co2Sub.textContent = `≈ ${miles.toLocaleString()} miles not driven`;
+
+  const hrsVal = document.getElementById('hcard-hrs-val');
+  if (hrsVal) hrsVal.textContent = s.hrs ? Math.round(s.hrs) : 'N/A';
+  const hrsSub = document.getElementById('hcard-hrs-sub');
+  if (hrsSub) hrsSub.textContent = s.hrs ? `Across ${s.shifts} shifts` : 'Hours not tracked this season';
+
+  const lbhrVal = document.getElementById('hcard-lbhr-val');
+  if (lbhrVal) lbhrVal.textContent = s.lbhr ? s.lbhr.toFixed(2) : 'N/A';
+  const lbhrSub = document.getElementById('hcard-lbhr-sub');
+  if (lbhrSub) lbhrSub.textContent = s.lbhr ? (s.lbhrVsPrev || '') : 'Requires shift-hour tracking';
+
+  const cumVal = document.getElementById('hcard-alltime-val');
+  if (cumVal) cumVal.innerHTML = `<span>${s.cum.toLocaleString()}</span>`;
+  const cumSub = document.getElementById('hcard-alltime-sub');
+  if (cumSub) cumSub.textContent = `Since program launch ${s.cumSince || 'S24'}`;
+
+  // Donut chart
+  renderDonut(s);
+
+  // Eco selector cards
+  const ecoMiles = Math.round(s.co2 / 0.891);
+  const compostEst = Math.round(s.lbs * 0.4 / 100) * 100;
+  const eco2Val = document.getElementById('ecard-co2-val');
+  if (eco2Val) eco2Val.innerHTML = `<span>${s.co2.toLocaleString()}</span> lbs`;
+  const eco2Lbl = document.getElementById('ecard-co2-label');
+  if (eco2Lbl) eco2Lbl.textContent = `CO₂e Avoided · ${s.shortLabel}`;
+  const eco2Sub = document.getElementById('ecard-co2-sub');
+  if (eco2Sub) eco2Sub.textContent = `↑ ${s.cumCO2.toLocaleString()} lbs CO₂e all-time`;
+
+  const ecolVal = document.getElementById('ecard-lbs-val');
+  if (ecolVal) ecolVal.innerHTML = `<span>${s.lbs.toLocaleString()}</span> lbs`;
+  const ecolLbl = document.getElementById('ecard-lbs-label');
+  if (ecolLbl) ecolLbl.textContent = `Food Waste Diverted · ${s.shortLabel}`;
+  const ecolSub = document.getElementById('ecard-lbs-sub');
+  if (ecolSub) ecolSub.textContent = `↑ ${s.cum.toLocaleString()} lbs all-time`;
+
+  const ecocVal = document.getElementById('ecard-compost-val');
+  if (ecocVal) ecocVal.innerHTML = `~<span>${compostEst.toLocaleString()}</span> lbs`;
+  const ecocLbl = document.getElementById('ecard-compost-label');
+  if (ecocLbl) ecocLbl.textContent = `Compost Produced · ${s.shortLabel}`;
+
+  // Eco viz content
+  renderEcoViz(s);
+
+  // Viz-lbs chart title
+  const vlbsTitle = document.getElementById('viz-lbs-title');
+  if (vlbsTitle) vlbsTitle.textContent = `Weekly Pounds Diverted · ${s.label}`;
+  const vlbsNote = document.getElementById('viz-lbs-note');
+  if (vlbsNote) vlbsNote.textContent = s.SPRING_BREAK !== null && s.SPRING_BREAK !== undefined
+    ? 'Week-by-week · Spring Break = gap'
+    : `Week-by-week · ${s.weekTotals?.length || 0} weeks`;
+
+  // Leaderboard badge
+  const lbBadge = document.getElementById('lb-chart-badge');
+  if (lbBadge) lbBadge.textContent = s.label;
+  const donutBadge = document.getElementById('donut-badge');
+  if (donutBadge) donutBadge.textContent = s.shortLabel;
+  const donutTitle = document.getElementById('donut-chart-title');
+  if (donutTitle) donutTitle.textContent = `Dining Hall Split · ${s.label}`;
+  const donutNote = document.getElementById('donut-chart-note');
+  if (donutNote && s.hasMFBF) {
+    const mfPct = (s.mf / (s.mf + s.bf) * 100).toFixed(1);
+    const bfPct = (s.bf / (s.mf + s.bf) * 100).toFixed(1);
+    donutNote.textContent = `${mfPct}% Mainfare · ${bfPct}% Butterfield`;
+  }
+
+  // Update stat strip above leaderboard chart panel
+  updateAmbStatStrip();
+
+  // Show/hide leaderboard selector cards based on data availability
+  const effEl = document.getElementById('ltog-eff');
+  if (effEl) effEl.style.display = s.hasEff ? '' : 'none';
+  const bbEl = document.getElementById('ltog-busybee');
+  if (bbEl) bbEl.style.display = (s.ambWeeklyHrs || s.ambWeeklyShifts) ? '' : 'none';
+  // Reset invalid currentLb
+  if (currentLb === 'lbhr' || currentLb === 'lbshift') currentLb = 'lbs';
+  if ((currentLb === 'eff' && !s.hasEff) || (currentLb === 'busybee' && !s.ambWeeklyHrs && !s.ambWeeklyShifts)) {
+    currentLb = 'lbs';
+    document.querySelectorAll('.lb-sel-card').forEach(c => c.classList.remove('active'));
+    const lbsBtn = document.getElementById('ltog-lbs');
+    if (lbsBtn) lbsBtn.classList.add('active');
+  }
+
+  // At a Glance panel
+  function _gset(id, val) { const el = document.getElementById(id); if (!el) return; el.textContent = val; el.className = (val === 'N/A') ? 'glance-val na' : 'glance-val'; }
+  _gset('glance-lbs',    s.lbs.toLocaleString());
+  _gset('glance-co2',    s.co2.toLocaleString());
+  _gset('glance-hrs',    s.hrs ? Math.round(s.hrs).toLocaleString() : 'N/A');
+  _gset('glance-lbhr',   s.lbhr ? s.lbhr.toFixed(1) : 'N/A');
+  _gset('glance-shifts', s.shifts ? s.shifts.toLocaleString() : 'N/A');
+  _gset('glance-ambs',   s.ambs.toString());
+  _gset('glance-lbshift',s.shifts ? (s.lbs / s.shifts).toFixed(1) : 'N/A');
+  _gset('glance-lbamb',  s.ambs ? Math.round(s.lbs / s.ambs).toLocaleString() : 'N/A');
+  const glanceNote = document.getElementById('glance-note');
+  if (glanceNote) glanceNote.textContent = `${s.label} · complete semester overview`;
+  const glanceBadge = document.getElementById('glance-badge');
+  if (glanceBadge) glanceBadge.textContent = s.shortLabel;
+}
+
+// ── renderDonut — dynamic SVG donut for dining hall split ─────────────────
+function renderDonut(s) {
+  const cont = document.getElementById('donut-wrap-container');
+  if (!cont) return;
+  if (!s.hasMFBF) {
+    cont.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:16px 0">Dining hall split data not available for this season.</p>';
+    return;
+  }
+  const total = s.mf + s.bf;
+  const mfPct = (s.mf / total * 100).toFixed(1);
+  const bfPct = (s.bf / total * 100).toFixed(1);
+  const r = 70, cx = 90, cy = 90, strokeW = 28;
+  const circ = 2 * Math.PI * r;
+  const mfDash = s.mf / total * circ;
+  const bfDash = s.bf / total * circ;
+  cont.innerHTML = `
+    <div class="donut-wrap" style="display:flex;align-items:center;gap:32px;flex-wrap:wrap">
+      <svg width="180" height="180" viewBox="0 0 180 180" style="flex-shrink:0">
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="${strokeW}"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#6aaee6" stroke-width="${strokeW}"
+          stroke-dasharray="${mfDash.toFixed(2)} ${circ.toFixed(2)}"
+          stroke-dashoffset="${(circ/4).toFixed(2)}" stroke-linecap="butt"/>
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f5c842" stroke-width="${strokeW}"
+          stroke-dasharray="${bfDash.toFixed(2)} ${circ.toFixed(2)}"
+          stroke-dashoffset="${(circ/4 - mfDash).toFixed(2)}" stroke-linecap="butt"/>
+        <text x="${cx}" y="${cy - 8}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="22" font-weight="800" fill="#ffffff">${total.toLocaleString()}</text>
+        <text x="${cx}" y="${cy + 12}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="11" fill="#8aa4c8" letter-spacing="0.05em">TOTAL LBS</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="width:12px;height:12px;border-radius:2px;background:#6aaee6;flex-shrink:0"></div>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#8aa4c8">Mainfare</span>
+          </div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:#ffffff;line-height:1">${s.mf.toLocaleString()} <span style="font-size:14px;color:#6aaee6">${mfPct}%</span></div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <div style="width:12px;height:12px;border-radius:2px;background:#f5c842;flex-shrink:0"></div>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#8aa4c8">Butterfield</span>
+          </div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;color:#ffffff;line-height:1">${s.bf.toLocaleString()} <span style="font-size:14px;color:#f5c842">${bfPct}%</span></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── renderEcoViz — dynamic CO2 equivalents + food weight + compost facts ──
+function renderEcoViz(s) {
+  const co2 = s.co2, lbs = s.lbs;
+  const miles = Math.round(co2 / 0.891);
+  const earthPct = (miles / 24901 * 100).toFixed(1);
+  const trees = Math.round(co2 / 48);
+  const hhDays = Math.round(co2 / 41);
+  const iPhones = Math.round(co2 / 143);
+
+  // CO2 viz
+  const co2El = document.getElementById('eco-co2-inner');
+  if (co2El) co2El.innerHTML = `
+    <div class="eco-stat-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px">
+      <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;margin-bottom:4px">🚗</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#fff">${miles.toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">miles not driven</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">${earthPct}% of Earth's circumference</div>
+      </div>
+      <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;margin-bottom:4px">🌳</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#3abf7e">${trees.toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">trees absorbing for 1 year</div>
+      </div>
+      <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;margin-bottom:4px">🏠</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#f5c842">${hhDays.toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">household days of energy</div>
+      </div>
+      <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+        <div style="font-size:28px;margin-bottom:4px">📱</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#6aaee6">${iPhones.toLocaleString()}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">iPhones charged</div>
+      </div>
+    </div>
+    <div id="eco-co2-chart"></div>`;
+
+  // Lbs viz
+  const lbsEl = document.getElementById('eco-lbs-inner');
+  if (lbsEl) {
+    const elephants = (lbs / 13000).toFixed(1);
+    const cars = (lbs / 4000).toFixed(1);
+    const persons = Math.round(lbs / 130);
+    lbsEl.innerHTML = `
+      <div class="eco-stat-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px">
+        <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:28px;margin-bottom:4px">🐘</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#fff">${elephants}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">African elephants</div>
+        </div>
+        <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:28px;margin-bottom:4px">🚗</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#6aaee6">${cars}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">average cars</div>
+        </div>
+        <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:28px;margin-bottom:4px">👤</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#3abf7e">${persons.toLocaleString()}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">people weigh this much</div>
+        </div>
+      </div>`;
+  }
+
+  // Compost viz
+  const compostEl = document.getElementById('eco-compost-inner');
+  if (compostEl) {
+    const compostLbs = Math.round(lbs * 0.4);
+    const bags = Math.round(compostLbs / 40);
+    compostEl.innerHTML = `
+      <div class="eco-stat-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px">
+        <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:28px;margin-bottom:4px">🌱</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#3abf7e">${compostLbs.toLocaleString()}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">lbs compost estimated (40%)</div>
+        </div>
+        <div class="eco-stat-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:16px;text-align:center">
+          <div style="font-size:28px;margin-bottom:4px">🪣</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:#f5c842">${bags.toLocaleString()}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">40-lb bags of compost</div>
+        </div>
+      </div>
+      <div id="eco-compost-chart"></div>`;
+  }
+  // Both chart containers now exist — render once
+  renderEcoImpact();
+}
+
 // Init
-renderLeaderboard('lbs');
-renderEcoImpact();
-renderGrowth();
-renderVizAmb();
-setTimeout(animateBars, 120);
+initFromHash();
 </script>
 <div id="tip"></div>
 </body>
