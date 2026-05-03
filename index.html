@@ -28,12 +28,13 @@ header::after { content:''; position:absolute; right:-80px; top:-80px; width:400
 .logo-wrap img { height:80px; filter:drop-shadow(0 4px 16px rgba(109,174,230,0.4)); }
 .header-text h1 { font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:clamp(28px,4vw,48px); letter-spacing:0.04em; text-transform:uppercase; line-height:1; }
 .header-text h1 span { color:var(--light); }
-.header-text p { font-size:13px; color:var(--muted); font-weight:500; letter-spacing:0.12em; text-transform:uppercase; margin-top:6px; }
+.header-text p, .logo-wrap p { font-size:13px; color:var(--muted); font-weight:500; letter-spacing:0.12em; text-transform:uppercase; margin-top:6px; white-space:nowrap; }
 .header-badge { margin-left:auto; background:rgba(245,200,66,0.15); border:1px solid rgba(245,200,66,0.4); border-radius:6px; padding:8px 16px; text-align:center; flex-shrink:0; }
 .header-badge .badge-label { font-size:10px; color:var(--gold); letter-spacing:0.15em; text-transform:uppercase; }
 .header-badge .badge-val { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:800; color:var(--gold); }
 .season-select { position:relative; cursor:pointer; user-select:none; }
-.season-drop { display:none; position:absolute; top:calc(100% + 6px); right:0; background:#0c1e3d; border:1px solid rgba(109,174,230,0.35); border-radius:8px; overflow:hidden; z-index:500; min-width:160px; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
+#season-btn { position:fixed; top:28px; right:48px; z-index:600; margin-left:0; }
+.season-drop { display:none; position:absolute; top:calc(100% + 6px); right:0; background:#0c1e3d; border:1px solid rgba(109,174,230,0.35); border-radius:8px; overflow:hidden; z-index:601; min-width:160px; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
 .season-select.open .season-drop { display:block; }
 .sdrop-item { padding:10px 16px; font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); cursor:pointer; transition:background 0.12s,color 0.12s; }
 .sdrop-item:hover { background:rgba(109,174,230,0.12); color:var(--white); }
@@ -63,6 +64,7 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 
 .hero-grid { display:flex; flex-direction:row; gap:16px; margin-bottom:40px; flex-wrap:wrap; }
 .hero-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px 20px; position:relative; overflow:hidden; transition:transform 0.2s,border-color 0.2s; flex:0 0 200px; min-width:200px; }
+#panel-impact .hero-grid .hero-card, #panel-summary .hero-grid .hero-card { flex:1 1 auto; min-width:160px; }
 .hero-card:hover { transform:translateY(-3px); border-color:var(--light); }
 .hero-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--blue),var(--light)); }
 .hero-card .hc-icon { font-size:28px; margin-bottom:12px; }
@@ -81,7 +83,9 @@ main { padding:40px 48px; position:relative; z-index:1; max-width:1400px; margin
 .badge-mid { background:rgba(245,200,66,0.15); color:var(--gold); border:1px solid rgba(245,200,66,0.3); }
 .badge-all { background:rgba(58,191,126,0.15); color:var(--green); border:1px solid rgba(58,191,126,0.3); }
 
-.bar-chart { width:100%; }
+.bar-chart { width:100%; container-type: inline-size; }
+@container (max-width: 420px) { .bar-name { display:none; } }
+@container (max-width: 260px) { .bar-val { font-size:0; } .bar-val::after { content:attr(data-abbrev); font-size:11px; font-weight:700; font-family:'Barlow Condensed',sans-serif; color:var(--white); opacity:0.9; white-space:nowrap; } }
 .bar-row { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
 .bar-rank { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:800; color:var(--muted); width:24px; text-align:right; flex-shrink:0; }
 .bar-rank.r1 { color:var(--gold); }
@@ -929,12 +933,15 @@ function _lbBarHTML(data, fmt) {
       _tipStore[k] = d.tip;
       tipAttrs = ` data-tipk="${k}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk])" onmousemove="moveTip(event)" onmouseleave="hideTip()" ontouchstart="tipShow(event,_tipStore[+this.dataset.tipk])"`;
     }
+    const nk = ++_tipIdx;
+    _tipStore[nk] = `<div class="tip-title">${d.name}</div>`;
+    const rankTip = ` data-tipk="${nk}" onmouseenter="tipShow(event,_tipStore[+this.dataset.tipk]);event.stopPropagation()" onmousemove="moveTip(event)" onmouseleave="hideTip()"`;
     return `<div class="bar-row"${tipAttrs}>
-      <div class="bar-rank ${ranks[i]||''}">${i+1}</div>
+      <div class="bar-rank ${ranks[i]||''}"${rankTip}>${i+1}</div>
       <div class="bar-name">${d.name}</div>
       <div class="bar-track">
         <div class="bar-fill" style="background:${grad}" data-pct="${(t*100).toFixed(1)}">
-          <span class="bar-val" data-orig="${fmt(d.val)}">${fmt(d.val)}</span>
+          <span class="bar-val" data-orig="${d.display||fmt(d.val)}" data-abbrev="*">${d.display||fmt(d.val)}</span>
         </div>
       </div>
       <div class="bar-extra">${d.extra||''}</div>
@@ -953,20 +960,9 @@ function _section(title, data, fmt) {
 }
 
 function updateAmbStatStrip() {
+  // Stats now shown inside selector cards — hide the strip
   const el = document.getElementById('amb-stat-strip');
-  if (!el) return;
-  const avgLbs = Math.round(SD.lbs / SD.ambs).toLocaleString() + ' lbs avg';
-  let avgLbhr = null;
-  if (SD.ambTotalsLbhr) {
-    const vals = Object.values(SD.ambTotalsLbhr);
-    avgLbhr = (vals.reduce((s,v)=>s+v,0) / vals.length).toFixed(1) + ' lb/hr avg';
-  } else if (SD.lbhr) {
-    avgLbhr = SD.lbhr.toFixed(1) + ' lb/hr avg';
-  }
-  const divider = avgLbhr ? `<div style="width:1px;background:rgba(255,255,255,0.12);align-self:stretch;margin:0 2px"></div>` : '';
-  el.innerHTML = `<div><div class="lst-label">Semester Total</div><div class="lst-val">${avgLbs}</div></div>
-    ${divider}
-    ${avgLbhr ? `<div><div class="lst-label">Avg Rate</div><div class="lst-val">${avgLbhr}</div></div>` : ''}`;
+  if (el) el.style.display = 'none';
 }
 
 function renderLeaderboard(type) {
@@ -974,19 +970,25 @@ function renderLeaderboard(type) {
   const _wl = SD.ambWeeklyLbs, _wh = SD.ambWeeklyHrs, _we = SD.ambWeeklyEff, _ws = SD.ambWeeklyShifts;
   const _wm = SD.weekMeta, _wt = SD.weekTotals;
 
-  // Update leaderboard selector card semester total text
+  // Update leaderboard selector card text
   const lbSubEl = document.querySelector('#ltog-lbs .hc-sub');
-  if (lbSubEl) lbSubEl.textContent = `${SD.lbs.toLocaleString()} lbs · ${SD.shortLabel}`;
+  if (lbSubEl) lbSubEl.textContent = `${SD.lbs.toLocaleString()} lbs · ${Math.round(SD.lbs/SD.ambs).toLocaleString()} avg`;
+  const avgLbhrVal = SD.ambTotalsLbhr
+    ? (Object.values(SD.ambTotalsLbhr).reduce((s,v)=>s+v,0)/Object.values(SD.ambTotalsLbhr).length).toFixed(1)
+    : (SD.lbhr ? SD.lbhr.toFixed(1) : null);
+  const avgSubEl = document.querySelector('#ltog-avglbs .hc-sub');
+  if (avgSubEl) avgSubEl.textContent = Math.round(SD.lbs/SD.ambs).toLocaleString() + ' lbs avg'
+    + (avgLbhrVal ? ` · ${avgLbhrVal} lb/hr` : '');
 
   // Show/hide detail selectors based on available data
   const _effEl = document.getElementById('ltog-eff');
   if (_effEl) _effEl.style.display = SD.hasEff ? '' : 'none';
   const _bbEl = document.getElementById('ltog-busybee');
-  if (_bbEl) _bbEl.style.display = (SD.ambWeeklyHrs || SD.ambWeeklyShifts) ? '' : 'none';
+  if (_bbEl) _bbEl.style.display = (SD.ambWeeklyHrs || SD.ambWeeklyShifts || SD.ambShiftCounts) ? '' : 'none';
   // avglbs always visible (content adapts); eff hidden when no eff data
   const _typeNeedsEff = (type === 'eff');
   const _typeNeedsBB  = (type === 'busybee');
-  if ((_typeNeedsEff && !SD.hasEff) || (_typeNeedsBB && !SD.ambWeeklyHrs && !SD.ambWeeklyShifts)) {
+  if ((_typeNeedsEff && !SD.hasEff) || (_typeNeedsBB && !SD.ambWeeklyHrs && !SD.ambWeeklyShifts && !SD.ambShiftCounts)) {
     type = 'lbs';
     currentLb = 'lbs';
     document.querySelectorAll('.lb-sel-card').forEach(t => t.classList.remove('active'));
@@ -1094,39 +1096,135 @@ function renderLeaderboard(type) {
     return _tip(a.name, rows);
   }
 
-  // ── Pre-hour seasons: no tab system, render flat ────────────────────────
+  // ── Pre-hour seasons: selector cards (hide Eff, show 1 section at a time) ─
   const selGrid = document.querySelector('#panel-leaderboard .sel-grid');
+  const ambVizSecLB = document.getElementById('amb-viz-section');
   if (!_wl) {
-    if (selGrid) selGrid.style.display = 'none';
-    title = `${SD.shortLabel} · Top Ambassadors`;
-    note  = 'Total lbs · lb/shift · lb/day · lb/week';
-    const t5Lbs = top5(tots,'totalLbs').map(a => ({name:a.name, val:a.totalLbs, tip:semTip(a)}));
-    const t5Shift = SD.shifts ? top5(tots,'totalLbs').map(a => ({
-      name: a.name, val: +(a.totalLbs / SD.shifts).toFixed(1),
-      extra: SD.shifts + ' team shifts', tip: semTip(a)
-    })) : null;
-    const t5Day = SD.collDays ? top5(tots,'totalLbs').map(a => ({
+    if (selGrid) selGrid.style.display = '';   // show selector cards
+    if (ambVizSecLB) ambVizSecLB.style.display = 'none';
+    // Efficiency always hidden for pre-hour; Busy Bee shown only if shift data exists
+    document.getElementById('ltog-eff')?.style.setProperty('display','none');
+    // (ltog-busybee visibility already set above via _bbEl check)
+    const _badge = document.getElementById('lb-chart-badge');
+    if (_badge) _badge.textContent = SD.label;
+
+    // ── Section 1: Total Lbs ──────────────────────────────────────────────
+    const t5TotalLbs = top5(tots,'totalLbs').map(a => ({name:a.name, val:a.totalLbs, tip:semTip(a)}));
+    const maxShiftPH = SD.ambMaxShiftLbs;
+    const t5ShiftPH = (maxShiftPH && Object.keys(maxShiftPH).length)
+      ? Object.entries(maxShiftPH).map(([n,v]) => {
+          const a = tots.find(t => t.name === n);
+          return {name: n, val: v, extra: SD.ambMaxShiftDate?.[n] || '',
+            tip: _tip(n + ' · Best shift', [
+              ['Best lbs/shift', v.toLocaleString() + ' lbs'],
+              ['—','—'],
+              ['Total lbs', a ? a.totalLbs.toLocaleString() + ' lbs' : '—'],
+              ['Most freq period', a?.period || '—'],
+            ])};
+        }).sort((a,b) => b.val-a.val).slice(0,5)
+      : null;
+    const bestDayPH = SD.ambBestDay_lbs;
+    const t5DayPH = (bestDayPH && Object.keys(bestDayPH).length)
+      ? Object.entries(bestDayPH).map(([n,d]) => {
+          const a = tots.find(t => t.name === n);
+          return {name: n, val: Math.round(d.val), extra: d.label,
+            tip: _tip(n + ' · ' + d.label, [
+              ['Total lbs that day', Math.round(d.val).toLocaleString() + ' lbs'],
+              ['—','—'],
+              ['Total lbs', a ? a.totalLbs.toLocaleString() + ' lbs' : '—'],
+              ['Most freq period', a?.period || '—'],
+            ])};
+        }).sort((a,b) => b.val-a.val).slice(0,5)
+      : null;
+    const bestWkPH = SD.ambBestWeek_lbs;
+    const t5BestWkPH = (bestWkPH && Object.keys(bestWkPH).length)
+      ? Object.entries(bestWkPH).map(([n,w]) => {
+          const a = tots.find(t => t.name === n);
+          return {name: n, val: Math.round(w.val), extra: w.label,
+            tip: _tip(n + ' · ' + w.label, [
+              ['Total lbs that week', Math.round(w.val).toLocaleString() + ' lbs'],
+              ['—','—'],
+              ['Total lbs', a ? a.totalLbs.toLocaleString() + ' lbs' : '—'],
+              ['Most freq period', a?.period || '—'],
+            ])};
+        }).sort((a,b) => b.val-a.val).slice(0,5)
+      : null;
+    const sec1Html =
+      _pair(_chart('Top 5 · Total Lbs', t5TotalLbs, v => v.toLocaleString() + ' lbs'),
+            t5BestWkPH ? _chart('Top 5 · Best Single Week', t5BestWkPH, v => v.toLocaleString() + ' lbs') : '') +
+      (t5ShiftPH || t5DayPH
+        ? _pair(t5ShiftPH ? _chart('Top 5 · Best Single Shift', t5ShiftPH, v => v.toLocaleString() + ' lbs') : '',
+                t5DayPH  ? _chart('Top 5 · Best Single Day',   t5DayPH,  v => v.toLocaleString() + ' lbs') : '')
+        : '');
+
+    // ── Section 2: Avg Lbs ────────────────────────────────────────────────
+    const ambShiftCounts = SD.ambShiftCounts;
+    let t5AvgShiftPH = null;
+    if (ambShiftCounts) {
+      const avgs = Object.entries(ambShiftCounts)
+        .map(([n,sc]) => {
+          const a = tots.find(t => t.name === n);
+          const val = a && sc > 0 ? +(a.totalLbs / sc).toFixed(1) : 0;
+          return {name: n, val, extra: sc + ' shifts',
+            tip: _tip(n, [
+              ['Avg lb/shift', val.toFixed(1) + ' lb/sh'],
+              ['Total lbs', a ? a.totalLbs.toLocaleString() + ' lbs' : '—'],
+              ['Total shifts', sc],
+              ['Most freq period', a?.period || '—'],
+            ])};
+        }).filter(d => d.val > 0).sort((a,b) => b.val-a.val).slice(0,5);
+      if (avgs.length) t5AvgShiftPH = avgs;
+    }
+    const t5AvgDayPH = SD.collDays ? top5(tots,'totalLbs').map(a => ({
       name: a.name, val: +(a.totalLbs / SD.collDays).toFixed(1),
-      extra: SD.collDays + ' coll. days', tip: semTip(a)
+      extra: SD.collDays + ' days', tip: semTip(a)
     })) : null;
-    const t5Week = SD.semWeeks ? top5(tots,'totalLbs').map(a => ({
+    const t5AvgWeekPH = SD.semWeeks ? top5(tots,'totalLbs').map(a => ({
       name: a.name, val: +(a.totalLbs / SD.semWeeks).toFixed(1),
       extra: SD.semWeeks + ' weeks', tip: semTip(a)
     })) : null;
-    html = `<div class="bar-chart">${_lbBarHTML(t5Lbs, v => v.toLocaleString() + ' lbs')}</div>`;
-    if (t5Shift && t5Day) html += _pair(
-      _chart('Top 5 · lb / shift', t5Shift, v => v.toFixed(1) + ' lb/sh'),
-      _chart('Top 5 · lb / day',   t5Day,   v => v.toFixed(1) + ' lb/day')
-    );
-    if (t5Week) html += _chart('Top 5 · lb / week', t5Week, v => v.toFixed(1) + ' lb/wk');
-    document.getElementById('lb-chart-title').textContent = title;
-    document.getElementById('lb-chart-note').textContent  = note;
-    const _badge = document.getElementById('lb-chart-badge');
-    if (_badge) _badge.textContent = SD.label;
-    el.innerHTML = html;
+    let sec2Inner = '';
+    if (t5AvgShiftPH) sec2Inner += _chart('Top 5 · Avg lb / shift', t5AvgShiftPH, v => v.toFixed(1) + ' lb/sh');
+    if (t5AvgDayPH && t5AvgWeekPH) sec2Inner += _pair(_chart('Top 5 · Avg lb / day', t5AvgDayPH, v => v.toFixed(1) + ' lb/day'), _chart('Top 5 · Avg lb / week', t5AvgWeekPH, v => v.toFixed(1) + ' lb/wk'));
+    else if (t5AvgDayPH) sec2Inner += _chart('Top 5 · Avg lb / day', t5AvgDayPH, v => v.toFixed(1) + ' lb/day');
+    else if (t5AvgWeekPH) sec2Inner += _chart('Top 5 · Avg lb / week', t5AvgWeekPH, v => v.toFixed(1) + ' lb/wk');
+    const sec2Html = sec2Inner;
+
+    // ── Section 3: Busy Bee ───────────────────────────────────────────────
+    let sec3Inner = '';
+    if (ambShiftCounts) {
+      const busyData = Object.entries(ambShiftCounts)
+        .map(([n,sc]) => {
+          const a = tots.find(t => t.name === n);
+          return {name: n, val: sc,
+            tip: _tip(n, [
+              ['Shifts worked', sc],
+              ['Total lbs', a ? a.totalLbs.toLocaleString() + ' lbs' : '—'],
+              ['Most freq period', a?.period || '—'],
+            ])};
+        }).filter(d => d.val > 0).sort((a,b) => b.val-a.val).slice(0,5);
+      if (busyData.length) sec3Inner = _chart('Top 5 · Most Shifts Worked', busyData, v => v + ' shifts');
+    }
+    const sec3Html = sec3Inner;
+
+    // Render only the selected section (matches selector card)
+    if (type === 'avglbs') {
+      document.getElementById('lb-chart-title').textContent = 'Avg Lbs';
+      document.getElementById('lb-chart-note').textContent  = 'Per-shift, per-day, and per-week averages';
+      el.innerHTML = sec2Html || `<p style="color:var(--muted);padding:20px 0">No avg rate data available for ${SD.label}.</p>`;
+    } else if (type === 'busybee') {
+      document.getElementById('lb-chart-title').textContent = 'Busy Bee 🐝';
+      document.getElementById('lb-chart-note').textContent  = 'Most shifts worked this season';
+      el.innerHTML = sec3Html || `<p style="color:var(--muted);padding:20px 0">Shift counts not available for ${SD.label}.</p>`;
+    } else {
+      document.getElementById('lb-chart-title').textContent = 'Total Lbs';
+      document.getElementById('lb-chart-note').textContent  = 'Best total output & single-session peaks';
+      el.innerHTML = sec1Html;
+    }
     return;
   }
   if (selGrid) selGrid.style.display = '';
+  if (ambVizSecLB) ambVizSecLB.style.display = '';
 
   // ── Aggregate season stat strip (above chart panel) ──────────────────────
   updateAmbStatStrip();
@@ -1176,7 +1274,7 @@ function renderLeaderboard(type) {
       .map(([n, v]) => {
         const a = tots.find(t => t.name === n);
         return {name: n, val: v,
-          extra: a ? a.totalLbs.toLocaleString() + ' total' : '',
+          extra: SD.ambMaxShiftDate?.[n] || '',
           tip: _tip(n + ' · Best shift', [
             ['Best lbs/shift', v.toLocaleString() + ' lbs'],
             ['Eff that shift', SD.ambMaxShiftEff?.[n] ? (SD.ambMaxShiftEff[n]*100).toFixed(0)+' pts' : '—'],
@@ -1694,11 +1792,11 @@ const S26_META_IDX = {
 };
 
 const semStats = {
-  S24:{name:'Spring 2024',lbs:7111,weeks:6,lbhr:null},
-  F24:{name:'Fall 2024',lbs:26386,weeks:14,lbhr:null},
-  S25:{name:'Spring 2025',lbs:31073,weeks:12,lbhr:null},
-  F25:{name:'Fall 2025',lbs:36594,weeks:14,lbhr:46.68},
-  S26:{name:'Spring 2026',lbs:34009,weeks:14,lbhr:49.65},
+  S24:{name:'Spring 2024',lbs:7111,weeks:6,shifts:85,  lbhr:null},
+  F24:{name:'Fall 2024',  lbs:26386,weeks:14,shifts:277,lbhr:null},
+  S25:{name:'Spring 2025',lbs:31073,weeks:12,shifts:262,lbhr:null},
+  F25:{name:'Fall 2025',  lbs:36594,weeks:14,shifts:279,lbhr:46.68},
+  S26:{name:'Spring 2026',lbs:34009,weeks:14,shifts:280,lbhr:49.65},
 };
 
 const allTimeData = [
@@ -1994,6 +2092,141 @@ const f25wkdayMeta = {
   totalLbs:    [9322, 6971, 6486, 6154, 4504],
   totalHrs:    [161.52, 128.45, 96.97, 113.25, 58.38],
 };
+
+// ── Weekday lbs meta for pre-hour seasons (from YoY Bulk Data) ─────────────
+const s25WkdayMeta = { totalLbs:[7018,6490,6621,6211,4733], activeWeeks:[12,13,13,13,13] };
+const f24WkdayMeta = { totalLbs:[4361,4250,6644,6234,4897], activeWeeks:[12,13,13,13,13] };
+const s24WkdayMeta = { totalLbs:[2059,2516,1134,1132,270],  activeWeeks:[7,6,6,6,6] };
+
+// ── Per-ambassador shift counts (names consolidated to yoyRosters) ──────────
+const s25AmbShiftCounts = {
+  'Leisly Aceituno':31,'Kaya Pernini':29,'Kaitlyn Deierlein':26,'Marley Ahlijanian':23,
+  'Maureen Surgot':22,'Lizzle Welch':22,'Tyson Enes':22,'Brynn Hornig':21,'Kate Stanwood':21,
+  'Skyler Bobinski':21,'Sarah Wilme':13,'Bitanya Hailu':7,'Anna Cunha':3,
+};
+const f24AmbShiftCounts = {
+  'Kaya Pernini':57,'Lizzie Welch':56,'Westin Palumbo':32,'Skyler Bobinski':31,
+  'Cassidy Haskell':22,'astou dieng':20,'Tyson Enes':19,"Kayleigh O'mealia":19,
+  'Lucas Meier':9,'Bitanya Hailu':15,
+};
+const s24AmbShiftCounts = {
+  'Kayleigh Omealia':22,'Bitanya Hailu':17,'Westin Palumbo':14,
+  'Skyler Bobinski':12,'Katie Field':10,'Rushil Nepal':2,
+};
+
+// ── Per-ambassador best single shift lbs + dates (pre-hour seasons) ─────────
+const s25AmbMaxShiftLbs = {
+  'Maureen Surgot':456,'Bitanya Hailu':346,'Anna Cunha':313,'Kaya Pernini':306,
+  'Sarah Wilme':225,'Tyson Enes':216,'Kate Stanwood':194,'Leisly Aceituno':189,
+  'Lizzle Welch':179,'Marley Ahlijanian':153,'Brynn Hornig':143,'Kaitlyn Deierlein':131,'Skyler Bobinski':99,
+};
+const s25AmbMaxShiftDate = {
+  'Maureen Surgot':'Feb 19','Bitanya Hailu':'Feb 21','Anna Cunha':'Feb 11','Kaya Pernini':'Apr 14',
+  'Sarah Wilme':'Apr 24','Tyson Enes':'Apr 7','Kate Stanwood':'Feb 27','Leisly Aceituno':'Apr 25',
+  'Lizzle Welch':'Apr 24','Marley Ahlijanian':'Feb 25','Brynn Hornig':'Feb 3',
+  'Kaitlyn Deierlein':'Feb 24','Skyler Bobinski':'Feb 27',
+};
+const f24AmbMaxShiftLbs = {
+  'Kaya Pernini':273,'Lizzie Welch':258,'Bitanya Hailu':237,"Kayleigh O'mealia":185,
+  'astou dieng':177,'Westin Palumbo':155,'Cassidy Haskell':138,'Skyler Bobinski':84,
+  'Lucas Meier':75,'Tyson Enes':71,
+};
+const f24AmbMaxShiftDate = {
+  'Kaya Pernini':'Dec 4','Lizzie Welch':'Oct 17','Bitanya Hailu':'Oct 1',
+  "Kayleigh O'mealia":'Nov 6','astou dieng':'Nov 1','Westin Palumbo':'Nov 8',
+  'Cassidy Haskell':'Nov 7','Skyler Bobinski':'Nov 13','Lucas Meier':'Sep 23','Tyson Enes':'Oct 10',
+};
+const s24AmbMaxShiftLbs = {
+  'Bitanya Hailu':335,'Rushil Nepal':167,'Skyler Bobinski':134,'Katie Field':129,
+  'Kayleigh Omealia':95,'Westin Palumbo':79,
+};
+const s24AmbMaxShiftDate = {
+  'Bitanya Hailu':'Apr 23','Rushil Nepal':'Mar 25','Skyler Bobinski':'Mar 25',
+  'Katie Field':'Apr 16','Kayleigh Omealia':'Apr 9','Westin Palumbo':'Apr 29',
+};
+
+// ── Per-ambassador best single day and best single week (pre-hour seasons) ───
+const s25AmbBestDay_lbs = {
+  'Anna Cunha':        {val:313, label:'Feb 11'},
+  'Bitanya Hailu':     {val:346, label:'Feb 21'},
+  'Brynn Hornig':      {val:143, label:'Feb 3'},
+  'Kaitlyn Deierlein': {val:131, label:'Feb 24'},
+  'Kate Stanwood':     {val:194, label:'Feb 27'},
+  'Kaya Pernini':      {val:306, label:'Apr 14'},
+  'Leisly Aceituno':   {val:270, label:'Feb 7'},
+  'Lizzle Welch':      {val:179, label:'Apr 24'},
+  'Marley Ahlijanian': {val:327, label:'Apr 15'},
+  'Maureen Surgot':    {val:456, label:'Feb 19'},
+  'Sarah Wilme':       {val:225, label:'Apr 24'},
+  'Skyler Bobinski':   {val:99,  label:'Feb 27'},
+  'Tyson Enes':        {val:430, label:'Feb 12'},
+};
+const s25AmbBestWeek_lbs = {
+  'Anna Cunha':        {val:313, label:'Feb 10 – Feb 14', date:'Feb 10'},
+  'Bitanya Hailu':     {val:346, label:'Feb 17 – Feb 21', date:'Feb 17'},
+  'Brynn Hornig':      {val:221, label:'Feb 24 – Feb 28', date:'Feb 24'},
+  'Kaitlyn Deierlein': {val:225, label:'Feb 24 – Feb 28', date:'Feb 24'},
+  'Kate Stanwood':     {val:364, label:'Jan 27 – Jan 31', date:'Jan 27'},
+  'Kaya Pernini':      {val:749, label:'Apr 14 – Apr 18', date:'Apr 14'},
+  'Leisly Aceituno':   {val:359, label:'Mar 3 – Mar 7',   date:'Mar 3'},
+  'Lizzle Welch':      {val:289, label:'Feb 24 – Feb 28', date:'Feb 24'},
+  'Marley Ahlijanian': {val:327, label:'Apr 14 – Apr 18', date:'Apr 14'},
+  'Maureen Surgot':    {val:456, label:'Feb 17 – Feb 21', date:'Feb 17'},
+  'Sarah Wilme':       {val:323, label:'Apr 21 – Apr 25', date:'Apr 21'},
+  'Skyler Bobinski':   {val:170, label:'Feb 24 – Feb 28', date:'Feb 24'},
+  'Tyson Enes':        {val:430, label:'Feb 10 – Feb 14', date:'Feb 10'},
+};
+const f24AmbBestDay_lbs = {
+  'Bitanya Hailu':     {val:293, label:'Nov 14'},
+  'Cassidy Haskell':   {val:138, label:'Nov 7'},
+  'Kaya Pernini':      {val:723, label:'Dec 4'},
+  "Kayleigh O'mealia": {val:185, label:'Nov 6'},
+  'Lizzie Welch':      {val:415, label:'Nov 7'},
+  'Lucas Meier':       {val:75,  label:'Sep 23'},
+  'Skyler Bobinski':   {val:84,  label:'Nov 13'},
+  'Tyson Enes':        {val:71,  label:'Oct 10'},
+  'Westin Palumbo':    {val:155, label:'Nov 8'},
+  'astou dieng':       {val:177, label:'Nov 1'},
+};
+const f24AmbBestWeek_lbs = {
+  'Bitanya Hailu':     {val:320,  label:'Sep 30 – Oct 4',  date:'Sep 30'},
+  'Cassidy Haskell':   {val:251,  label:'Oct 21 – Oct 25', date:'Oct 21'},
+  'Kaya Pernini':      {val:1063, label:'Dec 2 – Dec 6',   date:'Dec 2'},
+  "Kayleigh O'mealia": {val:233,  label:'Dec 2 – Dec 6',   date:'Dec 2'},
+  'Lizzie Welch':      {val:907,  label:'Sep 30 – Oct 4',  date:'Sep 30'},
+  'Lucas Meier':       {val:155,  label:'Sep 23 – Sep 27', date:'Sep 23'},
+  'Skyler Bobinski':   {val:219,  label:'Sep 30 – Oct 4',  date:'Sep 30'},
+  'Tyson Enes':        {val:137,  label:'Oct 7 – Oct 11',  date:'Oct 7'},
+  'Westin Palumbo':    {val:166,  label:'Nov 4 – Nov 8',   date:'Nov 4'},
+  'astou dieng':       {val:248,  label:'Oct 28 – Nov 1',  date:'Oct 28'},
+};
+const s24AmbBestDay_lbs = {
+  'Bitanya Hailu':   {val:335,   label:'Apr 23'},
+  'Katie Field':     {val:129,   label:'Apr 16'},
+  'Kayleigh Omealia':{val:95,    label:'Apr 9'},
+  'Rushil Nepal':    {val:232,   label:'Mar 25'},
+  'Skyler Bobinski': {val:134,   label:'Mar 25'},
+  'Westin Palumbo':  {val:153,   label:'Apr 29'},
+};
+const s24AmbBestWeek_lbs = {
+  'Bitanya Hailu':   {val:601,   label:'Apr 15 – Apr 19', date:'Apr 15'},
+  'Katie Field':     {val:238,   label:'Apr 8 – Apr 12',  date:'Apr 8'},
+  'Kayleigh Omealia':{val:213,   label:'Apr 8 – Apr 12',  date:'Apr 8'},
+  'Rushil Nepal':    {val:232,   label:'Mar 25 – Mar 29', date:'Mar 25'},
+  'Skyler Bobinski': {val:306,   label:'Apr 15 – Apr 19', date:'Apr 15'},
+  'Westin Palumbo':  {val:153,   label:'Apr 29 – May 3',  date:'Apr 29'},
+};
+
+// ── Per-hall per-weekday lbs & hrs (S26, F25) ────────────────────────────────
+const s26WkdayHallMeta = {
+  mf:{ totalLbs:[3078,3724,3013,2536,3948], totalHrs:[52.12,54.43,62.57,46.12,64.85], avgLbs:[307.8,310.3,231.8,181.1,303.7], avgHrs:[5.21,4.54,4.81,3.29,4.99] },
+  bf:{ totalLbs:[2133,3407,3590,4447,1469], totalHrs:[56.42,69.58,82.58,101.08,42.83], avgLbs:[213.3,309.7,299.2,370.6,113.0], avgHrs:[5.64,6.33,6.88,8.42,3.29] },
+};
+const f25WkdayHallMeta = {
+  mf:{ totalLbs:[4627,2557,3718,2744,3803], totalHrs:[80.88,35.72,51.45,50.45,48.43], avgLbs:[330.5,196.7,309.8,211.1,316.9], avgHrs:[5.78,2.75,4.29,3.88,4.04] },
+  bf:{ totalLbs:[4695,4414,2768,3410,701],  totalHrs:[80.63,92.73,45.52,62.8,9.95],   avgLbs:[361.2,315.3,251.6,262.3,87.6],  avgHrs:[6.2,6.62,4.14,4.83,1.24] },
+};
+
 const f25AmbMaxShiftLbs = {
   'Orpheus Wilson':159,'Greta Traynor':90,'Emma Korsu':194,'Emmett Khan':209,
   'Sarah Wilme':199,'Maureen Surgot':197,'Brynn Hornig':151,'Leisly Aceituno':225,
@@ -2037,6 +2270,26 @@ const f25AmbBestDayLbs = {
   'Laila Maisuria':{val:97,label:'Nov 17'},
   'Kyra Turner':{val:149,label:'Dec 2'},
 };
+// Real per-shift efficiency scores extracted from F2025 Data Analysis.xlsx col N
+// Values = normalized ratio; ×100 = pts (1.0 ≈ hall avg for that shift time)
+// Weeks 0–2 = null (no hours recorded those weeks)
+const f25AmbWeeklyEff = [
+  /* Orpheus Wilson */          [null,null,null,1.048576,1.49651, 1.09718, 1.455757,1.595831,1.08504, 1.653338,1.411795,1.162896,1.462816,null    ],
+  /* Greta Traynor */           [null,null,null,0.763788,0.838656,1.35616, 1.040263,1.183304,1.083852,1.141294,1.184036,0.802087,1.167315,0.64275 ],
+  /* Emma Korsu */              [null,null,null,1.328201,1.126384,1.309113,1.385625,1.123731,null,    null,    null,    null,    null,    null    ],
+  /* Emmett Khan */             [null,null,null,1.249262,0.843694,1.218731,1.052668,1.032118,1.255697,1.410287,1.118831,0.500502,1.01146, 0.622544],
+  /* Sarah Wilme */             [null,null,null,0.517355,0.685161,0.437361,1.000719,0.86613, 1.118083,0.92672, 1.19814, null,    null,    null    ],
+  /* Maureen Surgot */          [null,null,null,0.761488,0.764365,0.960375,0.685181,0.7506,  1.074811,0.854437,1.034362,0.543858,0.904845,1.006913],
+  /* Brynn Hornig */            [null,null,null,0.621926,0.789123,0.835316,0.754064,1.177363,0.564286,0.863729,0.818971,null,    1.150457,0.788322],
+  /* Leisly Aceituno */         [null,null,null,1.497579,0.367044,null,    null,    null,    null,    null,    null,    null,    null,    null    ],
+  /* Kaylie Forgue */           [null,null,null,0.983072,1.533609,0.945145,1.112876,0.913244,0.940962,0.788189,0.982568,0.887615,1.199866,0.803619],
+  /* Evan Morgan */             [null,null,null,1.016428,null,    null,    1.177569,1.207008,0.65696, 0.690427,1.211703,null,    1.065583,0.661374],
+  /* Elliott Haber */           [null,null,null,null,    null,    0.849504,null,    0.803963,1.02251, 0.758599,1.103234,null,    null,    null    ],
+  /* Oluwatimilehin Shodipe */  [null,null,null,null,    null,    null,    0.840283,null,    1.099501,1.118731,0.994891,null,    1.215849,0.539388],
+  /* Laila Maisuria */          [null,null,null,null,    null,    null,    0.726269,0.524541,0.086812,null,    0.495593,0.457933,0.728753,0.78473 ],
+  /* Kyra Turner */             [null,null,null,null,    null,    null,    null,    1.015599,0.784529,null,    0.649799,0.202283,0.732071,0.742647],
+];
+const f25WeekAvgEff = [null,null,null,0.973591,0.984619,1.036075,1.032769,1.066032,0.97366,1.027398,1.06287,0.680598,1.079735,0.75703];
 
 // Helper: extract weekly totals/labels/meta from allTimeData for a given semester
 function _semWeekData(sem) {
@@ -2049,6 +2302,23 @@ function _semWeekData(sem) {
     weekMeta:   rows.map(x => ({range: fmtD(x.d), date: fmtD(x.d), lbs: x.y})),
   };
 }
+
+// ── Per-ambassador most frequent meal period (pre-hour seasons) ───────────
+const s25AmbMostFreqPeriod = {
+  'Kaitlyn Deierlein':'Breakfast','Lizzle Welch':'Lunch','Kaya Pernini':'Dinner',
+  'Maureen Surgot':'Dinner','Kate Stanwood':'Lunch','Anna Cunha':'Dinner',
+  'Marley Ahlijanian':'Breakfast & Lunch','Bitanya Hailu':'Dinner','Leisly Aceituno':'Lunch',
+  'Sarah Wilme':'Dinner','Tyson Enes':'Lunch','Brynn Hornig':'Lunch','Skyler Bobinski':'Breakfast',
+};
+const f24AmbMostFreqPeriod = {
+  'Skyler Bobinski':'Breakfast','Bitanya Hailu':'Dinner','astou dieng':'Dinner',
+  'Lucas Meier':'Lunch','Tyson Enes':'Breakfast','Westin Palumbo':'Lunch',
+  'Cassidy Haskell':'Lunch','Lizzie Welch':'Dinner','Kaya Pernini':'Lunch',"Kayleigh O'mealia":'Lunch',
+};
+const s24AmbMostFreqPeriod = {
+  'Westin Palumbo':'Lunch','Bitanya Hailu':'Lunch','Skyler Bobinski':'Dinner',
+  'Kayleigh Omealia':'Breakfast','Rushil Nepal':'Dinner','Katie Field':'Lunch',
+};
 
 // ── SEASON_DATA: one object per season ────────────────────────────────────
 const SEASON_DATA = (() => {
@@ -2088,7 +2358,7 @@ const SEASON_DATA = (() => {
       ambMaxShiftLbs:ambMaxShiftLbs, ambMaxShiftLbhr:ambMaxShiftLbhr,
       ambMaxShiftEff:ambMaxShiftEff, ambMostFreqPeriod:ambMostFreqPeriod,
       ambTotals:yoyAmbLbs['S26'],
-      wkdayLbhr:wkdayLbhr, wkdayMeta:wkdayMeta, wkdayAvgLbhr:wkdayAvgLbhr, wkdayAvgEff:wkdayAvgEff,
+      wkdayLbhr:wkdayLbhr, wkdayMeta:wkdayMeta, wkdayAvgLbhr:wkdayAvgLbhr, wkdayAvgEff:wkdayAvgEff, wkdayHallMeta:s26WkdayHallMeta,
       topDateBy_lbhr, topDateBy_eff, topDateBy_lbs,
       allDayStats:null, ambBestDay_lbhr, ambBestDay_eff, ambBestDay_lbs,
       worstDay_lbhr:{label:'Feb 26',lbs:144,hrs:5.25,lbhr:27.43},
@@ -2113,18 +2383,46 @@ const SEASON_DATA = (() => {
       lbhrVsPrev:'First semester with hour tracking',
       cumSince:'S24',
       weekTotals:f25WeekTotals, weekLabels:f25WeekLabels, weekMeta:f25WeekMeta,
-      weekAvgEff:null, SPRING_BREAK:null,
+      weekAvgEff:f25WeekAvgEff, SPRING_BREAK:null,
       ambNames:f25AmbNames, ambColors:f25AmbColors,
       ambWeeklyLbs:f25AmbWeeklyLbs, ambWeeklyHrs:null,
-      ambWeeklyEff:f25AmbWeeklyLbShift, ambWeeklyShifts:f25AmbWeeklyShifts,
-      ambMaxShiftLbs:f25AmbMaxShiftLbs, ambMaxShiftLbhr:null, ambMaxShiftEff:null, ambMostFreqPeriod:f25AmbMostFreqPeriod,
+      ambWeeklyEff:f25AmbWeeklyEff, ambWeeklyShifts:f25AmbWeeklyShifts,
+      ambMaxShiftLbs:f25AmbMaxShiftLbs,
+      ambMaxShiftLbhr:{
+        'Orpheus Wilson':150.00,'Greta Traynor':60.88,'Emma Korsu':77.61,'Emmett Khan':109.25,
+        'Sarah Wilme':51.72,'Maureen Surgot':58.00,'Brynn Hornig':88.80,'Leisly Aceituno':76.00,
+        'Kaylie Forgue':98.13,'Evan Morgan':28.67,'Elliott Haber':111.00,'Oluwatimilehin Shodipe':66.07,
+        'Laila Maisuria':57.65,'Kyra Turner':51.82,
+      },
+      ambMaxShiftEff:{
+        'Orpheus Wilson':1.95,'Greta Traynor':1.51,'Emma Korsu':1.79,'Emmett Khan':1.84,
+        'Sarah Wilme':1.37,'Maureen Surgot':1.21,'Brynn Hornig':1.71,'Leisly Aceituno':1.58,
+        'Kaylie Forgue':2.36,'Evan Morgan':1.21,'Elliott Haber':1.20,'Oluwatimilehin Shodipe':1.28,
+        'Laila Maisuria':0.95,'Kyra Turner':1.04,
+      },
+      ambMaxShiftDate:{
+        'Orpheus Wilson':'Oct 27','Greta Traynor':'Oct 27','Emma Korsu':'Sep 11','Emmett Khan':'Sep 19',
+        'Sarah Wilme':'Sep 24','Maureen Surgot':'Dec 9','Brynn Hornig':'Sep 23','Leisly Aceituno':'Sep 9',
+        'Kaylie Forgue':'Nov 17','Evan Morgan':'Nov 20','Elliott Haber':'Nov 20','Oluwatimilehin Shodipe':'Dec 1',
+        'Laila Maisuria':'Oct 20','Kyra Turner':'Oct 28',
+      },
+      ambMostFreqPeriod:f25AmbMostFreqPeriod,
       ambTotals:yoyAmbLbs['F25'], ambTotalsHrs:f25AmbTotalsHrs, ambTotalsLbhr:f25AmbTotalsLbhr,
-      wkdayLbhr:f25wkdayLbhr, wkdayMeta:f25wkdayMeta, wkdayAvgLbhr:f25WkdayAvgLbhr, wkdayAvgEff:null,
-      topDateBy_lbhr:f25TopDateByLbhr, topDateBy_eff:null, topDateBy_lbs:f25TopDateByLbs,
+      wkdayLbhr:f25wkdayLbhr, wkdayMeta:f25wkdayMeta, wkdayAvgLbhr:f25WkdayAvgLbhr, wkdayAvgEff:f25WeekAvgEff, wkdayHallMeta:f25WkdayHallMeta,
+      topDateBy_lbhr:f25TopDateByLbhr, topDateBy_eff:null, topDateBy_lbs:[{lbs:864,label:'Oct 27'}],
       allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:f25AmbBestDayLbs,
-      worstDay_lbhr:f25WorstDateByLbhr, worstDay_lbs:f25WorstDateByLbs, worstShiftLbs:null, periodHallLbhr:null,
+      worstDay_lbhr:f25WorstDateByLbhr, worstDay_lbs:{label:'Nov 11',lbs:12},
+      worstShiftLbs:6,
+      periodHallLbhr:{
+        mf_l:{lbs:7087,hrs:145.4, lbhr:48.74},
+        mf_d:{lbs:3363,hrs:63.43, lbhr:53.02},
+        bf_b:{lbs:1283,hrs:52.05, lbhr:24.65},
+        bf_l:{lbs:3808,hrs:93.62, lbhr:40.68},
+        bf_d:{lbs:3666,hrs:78.22, lbhr:46.87},
+        mf_b:null,
+      },
       collDays:70, semWeeks:14,
-      hasWeeklyAmb:true, hasHours:true, hasEff:false,
+      hasWeeklyAmb:true, hasHours:true, hasEff:true,
     },
     s25: {
       key:'s25', label:'Spring 2025', shortLabel:'S25', semKey:'S25',
@@ -2135,11 +2433,13 @@ const SEASON_DATA = (() => {
       ...s25wd, weekAvgEff:null, SPRING_BREAK:null,
       ambNames:yoyRosters['S25'], ambColors:yoyRosters['S25'].map((_,i)=>`hsl(${Math.round(i*360/13)},62%,62%)`),
       ambWeeklyLbs:null, ambWeeklyHrs:null, ambWeeklyEff:null, ambWeeklyShifts:null,
-      ambMaxShiftLbs:null, ambMaxShiftLbhr:null, ambMaxShiftEff:null, ambMostFreqPeriod:null,
+      ambMaxShiftLbs:s25AmbMaxShiftLbs, ambMaxShiftDate:s25AmbMaxShiftDate, ambMaxShiftLbhr:null, ambMaxShiftEff:null,
+      ambMostFreqPeriod:s25AmbMostFreqPeriod, ambShiftCounts:s25AmbShiftCounts,
       ambTotals:yoyAmbLbs['S25'],
-      wkdayLbhr:null, wkdayMeta:null, wkdayAvgLbhr:null, wkdayAvgEff:null,
-      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:null,
-      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:null,
+      wkdayLbhr:null, wkdayMeta:s25WkdayMeta, wkdayAvgLbhr:null, wkdayAvgEff:null,
+      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:[{lbs:789,label:'Apr 28'}],
+      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:s25AmbBestDay_lbs, ambBestWeek_lbs:s25AmbBestWeek_lbs,
+      worstDay_lbs:{label:'May 2',lbs:142}, worstShiftLbs:7, worstDay_lbhr:null, periodHallLbhr:null,
       collDays:65, semWeeks:14,
       hasWeeklyAmb:false, hasHours:false, hasEff:false,
     },
@@ -2152,11 +2452,13 @@ const SEASON_DATA = (() => {
       ...f24wd, weekAvgEff:null, SPRING_BREAK:null,
       ambNames:yoyRosters['F24'], ambColors:yoyRosters['F24'].map((_,i)=>`hsl(${Math.round(i*360/10)},62%,62%)`),
       ambWeeklyLbs:null, ambWeeklyHrs:null, ambWeeklyEff:null, ambWeeklyShifts:null,
-      ambMaxShiftLbs:null, ambMaxShiftLbhr:null, ambMaxShiftEff:null, ambMostFreqPeriod:null,
+      ambMaxShiftLbs:f24AmbMaxShiftLbs, ambMaxShiftDate:f24AmbMaxShiftDate, ambMaxShiftLbhr:null, ambMaxShiftEff:null,
+      ambMostFreqPeriod:f24AmbMostFreqPeriod, ambShiftCounts:f24AmbShiftCounts,
       ambTotals:yoyAmbLbs['F24'],
-      wkdayLbhr:null, wkdayMeta:null, wkdayAvgLbhr:null, wkdayAvgEff:null,
-      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:null,
-      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:null,
+      wkdayLbhr:null, wkdayMeta:f24WkdayMeta, wkdayAvgLbhr:null, wkdayAvgEff:null,
+      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:[{lbs:956,label:'Dec 4'}],
+      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:f24AmbBestDay_lbs, ambBestWeek_lbs:f24AmbBestWeek_lbs,
+      worstDay_lbs:{label:'Nov 26',lbs:71}, worstShiftLbs:1, worstDay_lbhr:null, periodHallLbhr:null,
       collDays:65, semWeeks:15,
       hasWeeklyAmb:false, hasHours:false, hasEff:false,
     },
@@ -2169,11 +2471,13 @@ const SEASON_DATA = (() => {
       ...s24wd, weekAvgEff:null, SPRING_BREAK:null,
       ambNames:yoyRosters['S24'].filter(Boolean), ambColors:yoyRosters['S24'].filter(Boolean).map((_,i)=>`hsl(${Math.round(i*360/7)},62%,62%)`),
       ambWeeklyLbs:null, ambWeeklyHrs:null, ambWeeklyEff:null, ambWeeklyShifts:null,
-      ambMaxShiftLbs:null, ambMaxShiftLbhr:null, ambMaxShiftEff:null, ambMostFreqPeriod:null,
+      ambMaxShiftLbs:s24AmbMaxShiftLbs, ambMaxShiftDate:s24AmbMaxShiftDate, ambMaxShiftLbhr:null, ambMaxShiftEff:null,
+      ambMostFreqPeriod:s24AmbMostFreqPeriod, ambShiftCounts:s24AmbShiftCounts,
       ambTotals:yoyAmbLbs['S24'],
-      wkdayLbhr:null, wkdayMeta:null, wkdayAvgLbhr:null, wkdayAvgEff:null,
-      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:null,
-      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:null,
+      wkdayLbhr:null, wkdayMeta:s24WkdayMeta, wkdayAvgLbhr:null, wkdayAvgEff:null,
+      topDateBy_lbhr:null, topDateBy_eff:null, topDateBy_lbs:[{lbs:662,label:'Mar 25'}],
+      allDayStats:null, ambBestDay_lbhr:null, ambBestDay_eff:null, ambBestDay_lbs:s24AmbBestDay_lbs, ambBestWeek_lbs:s24AmbBestWeek_lbs,
+      worstDay_lbs:{label:'Apr 24',lbs:30}, worstShiftLbs:8, worstDay_lbhr:null, periodHallLbhr:null,
       collDays:42, semWeeks:14,
       hasWeeklyAmb:false, hasHours:false, hasEff:false,
     },
@@ -2244,6 +2548,20 @@ function showBarTip(e, wi) {
 }
 
 // ── Card selection + toggle ───────────────────────────────────────────────
+// On mobile (≤640px), move the viz-container to appear right below the clicked hero-card
+let _vcOrigParent = null, _vcOrigNext = null;
+function _positionVizMobile(id) {
+  const vc = document.querySelector('#panel-summary .viz-container');
+  if (!vc) return;
+  if (window.innerWidth <= 640) {
+    if (!_vcOrigParent) { _vcOrigParent = vc.parentNode; _vcOrigNext = vc.nextSibling; }
+    const card = document.getElementById('hcard-' + id);
+    if (card) card.after(vc);
+  } else if (_vcOrigParent) {
+    _vcOrigNext ? _vcOrigParent.insertBefore(vc, _vcOrigNext) : _vcOrigParent.appendChild(vc);
+  }
+}
+
 function selectCard(id) {
   const wasSelected = (selectedCard === id);
   document.querySelectorAll('.hero-card').forEach(c => c.classList.remove('selected'));
@@ -2258,6 +2576,7 @@ function selectCard(id) {
   else if (id === 'lbhr') renderVizLbhr();
   else if (id === 'alltime') renderVizScatter();
   else if (id === 'amb') renderVizAmb();
+  _positionVizMobile(id);
 }
 
 function toggleEff() {
@@ -2395,12 +2714,20 @@ function renderVizHrs() {
   const partial = totalFilms - full;
   const TW=28, TH=42, GAP=2;
   const imgPath = 'data%20files/kun%20fu%20panda%202.jpg';
-  let html = `<div style="display:flex;flex-wrap:wrap;gap:${GAP}px;">`;
+  let html = `<div style="position:relative;border-radius:8px;overflow:hidden;">` +
+    `<div style="display:flex;flex-wrap:wrap;gap:${GAP}px;">`;
   for (let i = 0; i <= full; i++) {
     const op = (i === full) ? partial.toFixed(2) : 1;
     html += `<div style="width:${TW}px;height:${TH}px;background:url('${imgPath}') center/cover no-repeat;border-radius:2px;flex-shrink:0;opacity:${op}"></div>`;
   }
-  html += `</div><div style="margin-top:12px;font-size:11px;color:var(--muted)"><span style="color:var(--green);font-weight:600">${totalFilms.toFixed(2)} screenings</span> of Kung Fu Panda 2</div>`;
+  html += `</div>` +
+    `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;background:rgba(10,31,68,0.82);border:2px solid var(--light);border-radius:12px;padding:16px 28px;pointer-events:none;box-shadow:0 0 32px rgba(109,174,230,0.4)">` +
+    `<div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(56px,8vw,100px);font-weight:900;line-height:1;color:var(--white)">${full}</div>` +
+    `<div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(14px,2vw,22px);font-weight:700;letter-spacing:.05em;color:var(--light);margin-top:4px">Showings of</div>` +
+    `<div style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(14px,2vw,22px);font-weight:700;letter-spacing:.05em;color:var(--light)">Kung Fu Panda 2</div>` +
+    `</div>` +
+    `</div>` +
+    `<div style="margin-top:12px;font-size:11px;color:var(--muted)"><span style="color:var(--green);font-weight:600">${totalFilms.toFixed(2)} screenings</span> of Kung Fu Panda 2</div>`;
   if (kfpGrid) kfpGrid.innerHTML = html;
   if (titleEl) titleEl.textContent = `Hours Worked · In Movie Terms`;
   const noteEl = document.querySelector('#viz-hrs .chart-note');
@@ -2412,12 +2739,9 @@ function renderVizLbhr() {
   const innerEl = document.getElementById('viz-lbhr-inner');
   const titleEl = document.getElementById('viz-lbhr-title');
   const noteEl  = document.getElementById('viz-lbhr-note');
-  if (!SD.lbhr) {
-    if (innerEl) innerEl.innerHTML = `<p style="color:var(--muted);padding:20px 0">Rate breakdown not available for ${SD.label}.</p>`;
-    return;
-  }
   if (titleEl) titleEl.textContent = `Rate Breakdown · ${SD.label}`;
-  if (noteEl)  noteEl.textContent  = 'Semester averages vs. single-session extremes · lb/hr · lb/shift · lb/day · lb/week';
+  if (noteEl)  noteEl.textContent  = 'Semester averages vs. single-session extremes'
+    + (SD.lbhr ? ' · lb/hr' : '') + ' · lb/shift · lb/day · lb/week';
 
   // ── helper: render one comparison row ─────────────────────────────────
   function _rateRow(label, avgVal, avgFmt, bestObj, worstObj, valKey, fmtFn) {
@@ -2525,59 +2849,193 @@ function renderVizLbhr() {
 function _renderWkdayChart(container, titleStr) {
   if (!container) return;
   if (!SD.wkdayLbhr) {
-    if (SD.lbhr) {
+    if (SD.wkdayMeta) {
+      // Pre-hour seasons: render lbs-only weekday chart (no hall split, no lb/hr)
+      const W=660, ML=42, MR=14;
+      const phDays=['Mon','Tue','Wed','Thu','Fri'], phN=phDays.length;
+      const phSlotW=(W-ML-MR)/phN;
+      const phLbs=SD.wkdayMeta.totalLbs;
+      const phMaxRaw=Math.max(...phLbs,1);
+      const phStep=phMaxRaw>6000?2000:phMaxRaw>3000?1000:500;
+      const phMax=Math.ceil(phMaxRaw/phStep)*phStep;
+      const phGridVals=[]; for(let gv=phStep;gv<=phMax;gv+=phStep) phGridVals.push(gv);
+      const t1y=32,t1h=155,t1base=t1y+t1h;
+      let phOut='';
+      phOut+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y-8}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="11" font-weight="700" fill="#ccd8ee" letter-spacing=".5">${titleStr||'Lbs Diverted by Weekday · '+SD.label}</text>`;
+      phOut+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" font-weight="700" fill="#9090c0" letter-spacing="1">PROGRAM TOTAL · lbs</text>`;
+      phGridVals.forEach(v => {
+        const y=(t1base-(v/phMax)*(t1h-14)).toFixed(1);
+        phOut+=`<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+        phOut+=`<text x="${ML-5}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#8aa4c8" text-anchor="end">${v>=1000?(v/1000)+'k':v}</text>`;
+      });
+      phOut+=`<line x1="${ML}" y1="${t1base}" x2="${W-MR}" y2="${t1base}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
+      phLbs.forEach((lbs,i) => {
+        const bw=Math.floor(phSlotW*0.55);
+        const cx=(ML+i*phSlotW+phSlotW/2).toFixed(1), bx=(ML+i*phSlotW+(phSlotW-bw)/2).toFixed(1);
+        const bh=((lbs/phMax)*(t1h-14)).toFixed(1);
+        const by=(t1base-+bh).toFixed(1);
+        phOut+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="url(#wdgT)" rx="2.5" data-wkd="${i}" style="cursor:pointer"/>`;
+        phOut+=`<text x="${cx}" y="${(+by-4).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="10" font-weight="700" fill="#c0c0f8" text-anchor="middle" pointer-events="none">${lbs.toLocaleString()}</text>`;
+        phOut+=`<text x="${cx}" y="${t1base+15}" font-family="Barlow Condensed,sans-serif" font-size="12" font-weight="700" fill="#ccd8ee" text-anchor="middle">${phDays[i]}</text>`;
+      });
+      // Hall section (S25/F24 only — approximate split using season mf/bf ratio)
+      let phHallOut='', phHallExtraH=0;
+      if (SD.hasMFBF && SD.mf && SD.bf) {
+        const mfR=SD.mf/(SD.mf+SD.bf);
+        const phMfLbs=phLbs.map(l=>Math.round(l*mfR));
+        const phBfLbs=phLbs.map(l=>Math.round(l*(1-mfR)));
+        const phBotRaw=Math.max(...phMfLbs,...phBfLbs,1);
+        const phBotStep=phBotRaw>4000?2000:phBotRaw>2000?1000:phBotRaw>1000?500:250;
+        const phBotMax=Math.ceil(phBotRaw/phBotStep)*phBotStep;
+        const t2y=t1base+30, t2h=120, t2base=t2y+t2h;
+        phHallExtraH=t2base+52-(t1base+32);
+        phHallOut+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t2y+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" font-weight="700" fill="#9090c0" letter-spacing="1">BY DINING HALL · lbs (approx)</text>`;
+        const phBGVals=[]; for(let gv=phBotStep;gv<=phBotMax;gv+=phBotStep) phBGVals.push(gv);
+        phBGVals.forEach(v=>{
+          const y=(t2base-(v/phBotMax)*(t2h-14)).toFixed(1);
+          phHallOut+=`<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+          phHallOut+=`<text x="${ML-5}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#8aa4c8" text-anchor="end">${v>=1000?(v/1000).toFixed(1)+'k':v}</text>`;
+        });
+        phHallOut+=`<line x1="${ML}" y1="${t2base}" x2="${W-MR}" y2="${t2base}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
+        const phHw=Math.floor(phSlotW*0.3);
+        const fmtPH=v=>v>=1000?(v/1000).toFixed(1)+'k':v;
+        phMfLbs.forEach((mfL,i)=>{
+          const bfL=phBfLbs[i];
+          const cx=(ML+i*phSlotW+phSlotW/2).toFixed(1);
+          const mfx=(ML+i*phSlotW+phSlotW/2-phHw-1).toFixed(1), bfx=(ML+i*phSlotW+phSlotW/2+1).toFixed(1);
+          const mfh=((mfL/phBotMax)*(t2h-14)).toFixed(1), bfh=((bfL/phBotMax)*(t2h-14)).toFixed(1);
+          const mfy=(t2base-+mfh).toFixed(1), bfy=(t2base-+bfh).toFixed(1);
+          phHallOut+=`<rect x="${mfx}" y="${mfy}" width="${phHw}" height="${mfh}" fill="url(#wdgMF)" rx="2" data-ph-hall="${i}-mf" style="cursor:pointer"/>`;
+          phHallOut+=`<rect x="${bfx}" y="${bfy}" width="${phHw}" height="${bfh}" fill="url(#wdgBF)" rx="2" data-ph-hall="${i}-bf" style="cursor:pointer"/>`;
+          phHallOut+=`<text x="${(+mfx+phHw/2).toFixed(1)}" y="${(+mfy-3).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#9ac8ee" text-anchor="middle">${fmtPH(mfL)}</text>`;
+          phHallOut+=`<text x="${(+bfx+phHw/2).toFixed(1)}" y="${(+bfy-3).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#e87a6a" text-anchor="middle">${fmtPH(bfL)}</text>`;
+          phHallOut+=`<text x="${cx}" y="${t2base+15}" font-family="Barlow Condensed,sans-serif" font-size="12" font-weight="700" fill="#ccd8ee" text-anchor="middle">${phDays[i]}</text>`;
+        });
+        phHallOut+=`<rect x="${ML}" y="${t2base+30}" width="10" height="10" fill="url(#wdgMF)" rx="2"/>`;
+        phHallOut+=`<text x="${ML+14}" y="${t2base+39}" font-family="Barlow Condensed,sans-serif" font-size="10" fill="#9ac8ee">Mainfare</text>`;
+        phHallOut+=`<rect x="${ML+82}" y="${t2base+30}" width="10" height="10" fill="url(#wdgBF)" rx="2"/>`;
+        phHallOut+=`<text x="${ML+96}" y="${t2base+39}" font-family="Barlow Condensed,sans-serif" font-size="10" fill="#e87a6a">Butterfield</text>`;
+      }
+      const Htot=t1base+32+phHallExtraH;
+      container.innerHTML=`<div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08)">
+        <svg viewBox="0 0 ${W} ${Htot}" style="width:100%;overflow:visible">
+          <defs>
+            <linearGradient id="wdgT" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9a80cf"/><stop offset="100%" stop-color="#5040a0"/></linearGradient>
+            <linearGradient id="wdgMF" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6aaee6"/><stop offset="100%" stop-color="#1d5090"/></linearGradient>
+            <linearGradient id="wdgBF" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e07b5c"/><stop offset="100%" stop-color="#a03020"/></linearGradient>
+          </defs>
+          ${phOut}${phHallOut}
+        </svg></div>`;
+      container.querySelectorAll('[data-wkd]').forEach(el => {
+        const i=+el.dataset.wkd;
+        function _phTip(e) {
+          const wkm=SD.wkdayMeta||{};
+          const wks=(wkm.activeWeeks||[])[i]||1, totalLbs=(wkm.totalLbs||[])[i]||0;
+          const day=phDays[i];
+          tipShow(e,`<div class="tip-title">${day}s — ${SD.label}</div>`+
+            `<div class="tip-row"><span>Total lbs</span><span>${totalLbs.toLocaleString()}</span></div>`+
+            `<div class="tip-row"><span>Avg lbs / ${day}</span><span>${Math.round(totalLbs/wks).toLocaleString()}</span></div>`+
+            `<div class="tip-row"><span>Active weeks</span><span>${wks}</span></div>`);
+        }
+        el.addEventListener('mousemove',_phTip);
+        el.addEventListener('touchstart',_phTip,{passive:true});
+        el.addEventListener('mouseleave',hideTip);
+        el.addEventListener('click',_phTip);
+      });
+      container.querySelectorAll('[data-ph-hall]').forEach(el => {
+        function _phHallTip(e) {
+          const [iStr,hall]=el.dataset.phHall.split('-');
+          const i=+iStr;
+          const isMF=hall==='mf';
+          const hallName=isMF?'Mainfare':'Butterfield';
+          const mfR=SD.mf/(SD.mf+SD.bf);
+          const ratio=isMF?mfR:1-mfR;
+          const approxLbs=Math.round(phLbs[i]*ratio);
+          const wks=(SD.wkdayMeta.activeWeeks||[])[i]||1;
+          tipShow(e,
+            `<div class="tip-title">${hallName} · ${phDays[i]}s</div>`+
+            `<div class="tip-row"><span>Approx total lbs</span><span>${approxLbs.toLocaleString()} lbs</span></div>`+
+            `<div class="tip-row"><span>Approx avg / ${phDays[i]}</span><span>${Math.round(approxLbs/wks).toLocaleString()} lbs</span></div>`+
+            `<div class="tip-row"><span>Season split</span><span>${(ratio*100).toFixed(0)}% ${hallName}</span></div>`
+          );
+        }
+        el.addEventListener('mousemove',_phHallTip);
+        el.addEventListener('touchstart',_phHallTip,{passive:true});
+        el.addEventListener('mouseleave',hideTip);
+        el.addEventListener('click',_phHallTip);
+      });
+    } else if (SD.lbhr) {
       container.innerHTML = `<div style="margin-top:16px;padding:14px 20px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:#ccd8ee;margin-bottom:4px">PROGRAM TOTAL · lb/hr</div>
         <div style="font-size:24px;font-weight:700;color:var(--light)">${SD.lbhr.toFixed(1)} <span style="font-size:13px;font-weight:400;color:#9090c0">lb/hr program avg</span></div>
         <div style="font-size:11px;color:#9090c0;margin-top:6px">Per-weekday breakdown not available for ${SD.shortLabel}</div>
       </div>`;
     } else {
-      container.innerHTML = '';
+      container.innerHTML = `<div style="margin-top:16px;padding:14px 20px;background:rgba(255,255,255,0.04);border-radius:8px;border:1px solid rgba(255,255,255,0.08)">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:#ccd8ee;margin-bottom:4px">PROGRAM TOTAL · ${SD.shortLabel}</div>
+        <div style="font-size:24px;font-weight:700;color:var(--light)">${SD.lbs.toLocaleString()} <span style="font-size:13px;font-weight:400;color:#9090c0">lbs total</span></div>
+        <div style="font-size:11px;color:#9090c0;margin-top:6px">Hourly rate not tracked for ${SD.shortLabel}</div>
+      </div>`;
     }
     return;
   }
   const W=660, ML=42, MR=14;
   const days=SD.wkdayLbhr.labels, n=days.length;
   const slotW=(W-ML-MR)/n;
-  const maxTop=70, maxBot=80;
+  const hallMeta = SD.wkdayHallMeta;
+  const _mfLbsArr = hallMeta ? hallMeta.mf.totalLbs : null;
+  const _bfLbsArr = hallMeta ? hallMeta.bf.totalLbs : null;
+  const maxBotRaw = _mfLbsArr ? Math.max(..._mfLbsArr, ..._bfLbsArr, 1) : 1;
+  const botStep = maxBotRaw > 4000 ? 2000 : maxBotRaw > 2000 ? 1000 : maxBotRaw > 1000 ? 500 : 250;
+  const maxBot = Math.ceil(maxBotRaw / botStep) * botStep;
   const t1y=32, t1h=155, t2y=220, t2h=150;
   const t1base=t1y+t1h, t2base=t2y+t2h;
+  // Top section: use total lbs per weekday (lb/hr moves to tooltip)
+  const wkdayLbs = (SD.wkdayMeta && SD.wkdayMeta.totalLbs) ? SD.wkdayMeta.totalLbs : SD.wkdayLbhr.total.map(()=>0);
+  const maxLbsRaw = Math.max(...wkdayLbs, 1);
+  const gridStep = maxLbsRaw > 6000 ? 2000 : maxLbsRaw > 3000 ? 1000 : 500;
+  const maxTop = Math.ceil(maxLbsRaw / gridStep) * gridStep;
+  const gridVals = [];
+  for (let gv=gridStep; gv<=maxTop; gv+=gridStep) gridVals.push(gv);
   let out='';
-  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y-8}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="11" font-weight="700" fill="#ccd8ee" letter-spacing=".5">${titleStr||'Avg lb/hr by Weekday · '+SD.label}</text>`;
-  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" font-weight="700" fill="#9090c0" letter-spacing="1">PROGRAM TOTAL · lb/hr</text>`;
-  [20,40,60].forEach(v => {
+  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y-8}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="11" font-weight="700" fill="#ccd8ee" letter-spacing=".5">${titleStr||'Lbs Diverted by Weekday · '+SD.label}</text>`;
+  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t1y+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" font-weight="700" fill="#9090c0" letter-spacing="1">PROGRAM TOTAL · lbs</text>`;
+  gridVals.forEach(v => {
     const y=(t1base-(v/maxTop)*(t1h-14)).toFixed(1);
     out+=`<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
-    out+=`<text x="${ML-5}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#8aa4c8" text-anchor="end">${v}</text>`;
+    out+=`<text x="${ML-5}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#8aa4c8" text-anchor="end">${v>=1000?(v/1000)+'k':v}</text>`;
   });
   out+=`<line x1="${ML}" y1="${t1base}" x2="${W-MR}" y2="${t1base}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
-  SD.wkdayLbhr.total.forEach((v,i) => {
+  wkdayLbs.forEach((lbs,i) => {
     const bw=Math.floor(slotW*0.55);
     const cx=(ML+i*slotW+slotW/2).toFixed(1), bx=(ML+i*slotW+(slotW-bw)/2).toFixed(1);
-    const bh=((v/maxTop)*(t1h-14)).toFixed(1);
+    const bh=((lbs/maxTop)*(t1h-14)).toFixed(1);
     const by=(t1base-+bh).toFixed(1);
     out+=`<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" fill="url(#wdgT)" rx="2.5" data-wkd="${i}" style="cursor:pointer"/>`;
-    out+=`<text x="${cx}" y="${(+by-4).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="10" font-weight="700" fill="#c0c0f8" text-anchor="middle" pointer-events="none">${v.toFixed(1)}</text>`;
+    out+=`<text x="${cx}" y="${(+by-4).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="10" font-weight="700" fill="#c0c0f8" text-anchor="middle" pointer-events="none">${lbs.toLocaleString()}</text>`;
     out+=`<text x="${cx}" y="${t1base+15}" font-family="Barlow Condensed,sans-serif" font-size="12" font-weight="700" fill="#ccd8ee" text-anchor="middle">${days[i]}</text>`;
   });
-  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t2y+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" font-weight="700" fill="#9090c0" letter-spacing="1">BY DINING HALL · lb/hr</text>`;
-  [20,40,60,80].forEach(v => {
+  out+=`<text x="${(ML+(W-ML-MR)/2).toFixed(1)}" y="${t2y+4}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-size="9" font-weight="700" fill="#9090c0" letter-spacing="1">BY DINING HALL · lbs</text>`;
+  const botGridVals=[]; for(let gv=botStep;gv<=maxBot;gv+=botStep) botGridVals.push(gv);
+  botGridVals.forEach(v => {
     const y=(t2base-(v/maxBot)*(t2h-14)).toFixed(1);
     out+=`<line x1="${ML}" y1="${y}" x2="${W-MR}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
-    out+=`<text x="${ML-5}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#8aa4c8" text-anchor="end">${v}</text>`;
+    out+=`<text x="${ML-5}" y="${(+y+3.5).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#8aa4c8" text-anchor="end">${v>=1000?(v/1000).toFixed(1)+'k':v}</text>`;
   });
   out+=`<line x1="${ML}" y1="${t2base}" x2="${W-MR}" y2="${t2base}" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
   const hw=Math.floor(slotW*0.3);
-  SD.wkdayLbhr.mf.forEach((mf,i) => {
-    const bf=SD.wkdayLbhr.bf[i];
+  (_mfLbsArr || SD.wkdayLbhr.mf).forEach((mfVal,i) => {
+    const mfLbs = _mfLbsArr ? _mfLbsArr[i] : mfVal;
+    const bfLbs = _bfLbsArr ? _bfLbsArr[i] : SD.wkdayLbhr.bf[i];
     const cx=(ML+i*slotW+slotW/2).toFixed(1);
     const mfx=(ML+i*slotW+slotW/2-hw-1).toFixed(1), bfx=(ML+i*slotW+slotW/2+1).toFixed(1);
-    const mfh=((mf/maxBot)*(t2h-14)).toFixed(1), bfh=((bf/maxBot)*(t2h-14)).toFixed(1);
+    const mfh=((mfLbs/maxBot)*(t2h-14)).toFixed(1), bfh=((bfLbs/maxBot)*(t2h-14)).toFixed(1);
     const mfy=(t2base-+mfh).toFixed(1), bfy=(t2base-+bfh).toFixed(1);
-    out+=`<rect x="${mfx}" y="${mfy}" width="${hw}" height="${mfh}" fill="url(#wdgMF)" rx="2"/>`;
-    out+=`<rect x="${bfx}" y="${bfy}" width="${hw}" height="${bfh}" fill="url(#wdgBF)" rx="2"/>`;
-    out+=`<text x="${(+mfx+hw/2).toFixed(1)}" y="${(+mfy-3).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#9ac8ee" text-anchor="middle">${mf.toFixed(0)}</text>`;
-    out+=`<text x="${(+bfx+hw/2).toFixed(1)}" y="${(+bfy-3).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#e87a6a" text-anchor="middle">${bf.toFixed(0)}</text>`;
+    const fmtLbs=v=>v>=1000?(v/1000).toFixed(1)+'k':v;
+    out+=`<rect x="${mfx}" y="${mfy}" width="${hw}" height="${mfh}" fill="url(#wdgMF)" rx="2" data-wkd-hall="${i}-mf" style="cursor:pointer"/>`;
+    out+=`<rect x="${bfx}" y="${bfy}" width="${hw}" height="${bfh}" fill="url(#wdgBF)" rx="2" data-wkd-hall="${i}-bf" style="cursor:pointer"/>`;
+    out+=`<text x="${(+mfx+hw/2).toFixed(1)}" y="${(+mfy-3).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#9ac8ee" text-anchor="middle">${fmtLbs(mfLbs)}</text>`;
+    out+=`<text x="${(+bfx+hw/2).toFixed(1)}" y="${(+bfy-3).toFixed(1)}" font-family="Barlow Condensed,sans-serif" font-size="8.5" fill="#e87a6a" text-anchor="middle">${fmtLbs(bfLbs)}</text>`;
     out+=`<text x="${cx}" y="${t2base+15}" font-family="Barlow Condensed,sans-serif" font-size="12" font-weight="700" fill="#ccd8ee" text-anchor="middle">${days[i]}</text>`;
   });
   out+=`<rect x="${ML}" y="${t2base+30}" width="10" height="10" fill="url(#wdgMF)" rx="2"/>`;
@@ -2601,24 +3059,63 @@ function _renderWkdayChart(container, titleStr) {
       </defs>
       ${out}
     </svg></div>`;
-  // Weekday bar tooltips
+  // Weekday bar tooltips — program total bars
   container.querySelectorAll('[data-wkd]').forEach(el => {
     const i = +el.dataset.wkd;
     function _wkdayTip(e) {
       const wkm = SD.wkdayMeta || {};
       const wks = (wkm.activeWeeks||[])[i]||1, totalLbs=(wkm.totalLbs||[])[i]||0, totalHrs=(wkm.totalHrs||[])[i]||0;
-      tipShow(e,
-        `<div class="tip-title">${SD.wkdayLbhr.labels[i]}s — ${SD.label}</div>` +
+      const lbhr = SD.wkdayLbhr?.total?.[i];
+      const mfLbhr = SD.wkdayLbhr?.mf?.[i], bfLbhr = SD.wkdayLbhr?.bf?.[i];
+      const day = SD.wkdayLbhr.labels[i];
+      let html = `<div class="tip-title">${day}s — ${SD.label}</div>` +
         `<div class="tip-row"><span>Total lbs</span><span>${totalLbs.toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Avg lbs / ${SD.wkdayLbhr.labels[i]}</span><span>${Math.round(totalLbs/wks).toLocaleString()}</span></div>` +
-        `<div class="tip-row"><span>Avg hrs worked</span><span>${(totalHrs/wks).toFixed(1)} hrs</span></div>` +
-        `<div class="tip-row"><span>Total hrs</span><span>${totalHrs.toFixed(1)} hrs</span></div>`
-      );
+        `<div class="tip-row"><span>Avg lbs / ${day}</span><span>${Math.round(totalLbs/wks).toLocaleString()}</span></div>`;
+      if (lbhr != null) html += `<div class="tip-row"><span>Avg lb/hr</span><span>${lbhr.toFixed(1)} lb/hr</span></div>`;
+      html += `<div class="tip-row"><span>Avg hrs worked</span><span>${(totalHrs/wks).toFixed(1)} hrs</span></div>` +
+        `<div class="tip-row"><span>Total hrs</span><span>${totalHrs.toFixed(1)} hrs</span></div>`;
+      if (mfLbhr != null && bfLbhr != null)
+        html += `<div class="tip-divider"></div>` +
+          `<div class="tip-row"><span>Mainfare lb/hr</span><span>${mfLbhr.toFixed(1)}</span></div>` +
+          `<div class="tip-row"><span>Butterfield lb/hr</span><span>${bfLbhr.toFixed(1)}</span></div>`;
+      tipShow(e, html);
     }
     el.addEventListener('mousemove', _wkdayTip);
     el.addEventListener('touchstart', _wkdayTip, {passive:true});
     el.addEventListener('mouseleave', hideTip);
     el.addEventListener('click', _wkdayTip);
+  });
+  // Dining hall bar tooltips
+  container.querySelectorAll('[data-wkd-hall]').forEach(el => {
+    function _hallTip(e) {
+      const [iStr, hall] = el.dataset.wkdHall.split('-');
+      const i = +iStr;
+      const day = SD.wkdayLbhr.labels[i];
+      const isMF = hall === 'mf';
+      const hallName = isMF ? 'Mainfare' : 'Butterfield';
+      const lbhr = isMF ? SD.wkdayLbhr.mf[i] : SD.wkdayLbhr.bf[i];
+      const otherLbhr = isMF ? SD.wkdayLbhr.bf[i] : SD.wkdayLbhr.mf[i];
+      const combined = lbhr + otherLbhr;
+      const pct = combined > 0 ? (lbhr / combined * 100).toFixed(0) : '—';
+      const hm = SD.wkdayHallMeta?.[hall];
+      const totalLbs = hm ? hm.totalLbs[i] : null;
+      const totalHrs = hm ? hm.totalHrs[i] : null;
+      const avgLbs   = hm ? hm.avgLbs[i]   : null;
+      const avgHrs   = hm ? hm.avgHrs[i]   : null;
+      tipShow(e,
+        `<div class="tip-title">${hallName} · ${day}s</div>` +
+        `<div class="tip-row"><span>Avg lb/hr</span><span>${lbhr.toFixed(1)} lb/hr</span></div>` +
+        `<div class="tip-row"><span>Share of combined lb/hr</span><span>${pct}%</span></div>` +
+        `<div class="tip-row"><span>Total lbs</span><span>${totalLbs!=null ? totalLbs.toLocaleString()+' lbs' : '—'}</span></div>` +
+        `<div class="tip-row"><span>Avg lbs / ${day}</span><span>${avgLbs!=null ? Math.round(avgLbs).toLocaleString()+' lbs' : '—'}</span></div>` +
+        `<div class="tip-row"><span>Total hrs</span><span>${totalHrs!=null ? totalHrs.toFixed(1)+' hrs' : '—'}</span></div>` +
+        `<div class="tip-row"><span>Avg hrs</span><span>${avgHrs!=null ? avgHrs.toFixed(1)+' hrs' : '—'}</span></div>`
+      );
+    }
+    el.addEventListener('mousemove', _hallTip);
+    el.addEventListener('touchstart', _hallTip, {passive:true});
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('click', _hallTip);
   });
 }
 
@@ -2707,7 +3204,8 @@ function renderVizScatter() {
         return;
       }
       const avgWk = Math.round(st.lbs / st.weeks);
-      const lbhrStr = st.lbhr != null ? st.lbhr.toFixed(2) + ' lb/hr' : 'N/A';
+      const lbhrStr = st.lbhr != null ? st.lbhr.toFixed(2) + ' lb/hr' : (st.shifts ? (st.lbs/st.shifts).toFixed(1) + ' lb/sh' : '—');
+      const lbhrLbl = st.lbhr != null ? 'Avg lb / hr' : 'Avg lb / shift';
       panel.style.display = 'block';
       panel.dataset.open = s;
       panel.innerHTML =
@@ -2717,7 +3215,7 @@ function renderVizScatter() {
         `<div style="display:flex;gap:28px;flex-wrap:wrap">` +
         `<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--white);line-height:1">${st.lbs.toLocaleString()}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Total lbs</div></div>` +
         `<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--white);line-height:1">${avgWk.toLocaleString()}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Avg lbs / week</div></div>` +
-        `<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--white);line-height:1">${lbhrStr}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">Avg lb / hr</div></div>` +
+        `<div><div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;color:var(--white);line-height:1">${lbhrStr}</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:3px">${lbhrLbl}</div></div>` +
         `</div>`;
     });
     function _semTip(e) {
@@ -2749,7 +3247,14 @@ function renderAmbTotalsBars() {
 function renderVizAmb() {
   const ambVizSec = document.getElementById('amb-viz-section');
   if (!SD.ambWeeklyLbs) {
+    // Pre-hour season: renderLeaderboard handles the 3-section layout
     if (ambVizSec) ambVizSec.style.display = 'none';
+    const effBtn2 = document.getElementById('eff-btn');
+    if (effBtn2) effBtn2.style.display = 'none';
+    const inner2 = document.getElementById('viz-amb-inner');
+    if (inner2) inner2.innerHTML = '';
+    const legend2 = document.getElementById('amb-legend');
+    if (legend2) legend2.innerHTML = '';
     return;
   }
   if (ambVizSec) ambVizSec.style.display = '';
@@ -3091,9 +3596,9 @@ function renderSeasonUI() {
   if (hrsSub) hrsSub.textContent = s.hrs ? `Across ${s.shifts} shifts` : 'Hours not tracked this season';
 
   const lbhrVal = document.getElementById('hcard-lbhr-val');
-  if (lbhrVal) lbhrVal.textContent = s.lbhr ? s.lbhr.toFixed(2) : 'N/A';
+  if (lbhrVal) lbhrVal.textContent = s.lbhr ? s.lbhr.toFixed(2) : (s.shifts ? (s.lbs/s.shifts).toFixed(1) : '—');
   const lbhrSub = document.getElementById('hcard-lbhr-sub');
-  if (lbhrSub) lbhrSub.textContent = s.lbhr ? (s.lbhrVsPrev || '') : 'Requires shift-hour tracking';
+  if (lbhrSub) lbhrSub.textContent = s.lbhr ? (s.lbhrVsPrev || '') : (s.shifts ? 'avg lb/shift · hours not tracked' : 'Rate data unavailable');
 
   const cumVal = document.getElementById('hcard-alltime-val');
   if (cumVal) cumVal.innerHTML = `<span>${s.cum.toLocaleString()}</span>`;

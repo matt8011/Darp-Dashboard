@@ -1,17 +1,99 @@
-some things are still wrong:
+═══════════════════════════════════════════════════════════════════
+DARP DASHBOARD — FEATURE TRACKING
+Last updated: May 3, 2026 (session 2)
+═══════════════════════════════════════════════════════════════════
 
-Summary Tab :
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ COMPLETED FEATURES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-* Pounds Diverted section
-   * include PROGRAM TOTAL · lb/hr for all semesters (this is Mon,Tue,Wed,Thu,Fri stat)
-* make the section selector containers take up the page width
-* Rate Breakdown section:
-   * using YoY Data sheet, parse each semesters tabs for highest and lowest lbs/shift, lbs/day and lbs/week. use those values for each semester. EACH SEMESTER SHOULD GET AN ENTRY IN THE RATE BREAKDOWN TAB
-Ambassador Tab:
+SUMMARY TAB
+-----------
+✅ Pounds Diverted — weekday lbs chart for ALL semesters
+   · S26 / F25 → full Mon–Fri chart: top bars show total lbs per weekday,
+     lb/hr in tooltip only; bottom section shows dining hall lb/hr split
+   · S25 / F24 / S24 → full Mon–Fri lbs chart; hall section uses approx split
+     (season mf/bf ratio applied per weekday; labeled "approx")
+   · Weekday chart section title updated to "Lbs Diverted by Weekday"
+   · Hall bars now show TOTAL LBS (not lb/hr) for all seasons (S26/F25 exact, S25/F24 approx)
 
-* Ambassador Weekly Output section
-   * use "C:\Users\mkyle\OneDrive\Desktop\darp dashboard\data files\F2025 Data Analysis.xlsx" and extract efficiency metrics for each shift from Col N. NOTE the 1st 3 weeks haev no lb/hr stats. use those effeciency numbers to make an effeciency graph
-* Effeciency tab [add this]
-   * use the same data to make an effeciency tab to the same desired specs as S26.
+✅ Section selector containers stretch to full page width
+   · CSS on #panel-summary and #panel-impact hero-grid cards
 
-NOTE: your current F25 efficiency metrics are all wrong.
+✅ Rate Breakdown — real best/worst values for every season
+   · All seasons show lb/shift, lb/day, lb/week rows
+   · lb/hr row only for F25 and S26 (only seasons with hour tracking)
+   · S25 / F24 / S24 best/worst data: day, shift, week populated
+
+✅ Rate Breakdown — no "N/A" for lb/hr hero card or scatter panel
+   · No-lbhr seasons show avg lb/shift instead
+   · Scatter semester pop-up also shows "Avg lb/shift" label
+
+✅ KFP2 — big number OVERLAID on poster grid
+   · Number, "Showings of", "Kung Fu Panda 2" centered on image grid
+   · Blue border + dark background for legibility
+   · Footer line shows decimal screenings count
+
+✅ Weekday tooltip enhanced: total lbs, avg lbs/day, lb/hr, hall split rows
+✅ Dining hall (MF/BF) bar tooltips — fully populated:
+   avg lb/hr, share of combined lb/hr, total lbs, avg lbs/day,
+   total hrs, avg hrs — from extracted S26 / F25 per-hall per-weekday data
+✅ Dining hall bars show lbs (not lb/hr) — S26/F25 exact, S25/F24 approx via season ratio
+
+LEADERBOARD TAB
+---------------
+✅ All leaderboard bars: ambassador NAME on LEFT, date on RIGHT
+   · Best Week: name left, date range right
+   · Best Single Shift: name left, date right (all seasons now have dates)
+   · Best Single Day: name left, date right
+✅ Per-ambassador best shift lbs + dates extracted for S25, F24, S24
+   (S25: 13 ambassadors; F24: 10 ambassadors; S24: 6 ambassadors)
+✅ Per-ambassador shift counts extracted for S25, F24, S24
+   (used in Busy Bee section and Avg lb/shift charts)
+
+AMBASSADOR TAB (S25 / F24 / S24 — pre-hour seasons)
+-----------------------------------------------------
+✅ 3-section layout (no selector cards, no weekly stacked chart):
+   · Section 1 — Total Lbs: Top 5 · Total Lbs + Best Single Week (pair row 1)
+                            + Best Single Shift + Best Single Day (pair row 2)
+   · Section 2 — Avg Lbs: Avg lb/shift (requires per-amb shifts) +
+                          Avg lb/day + Avg lb/week
+   · Section 3 — Busy Bee: Top 5 · Most Shifts Worked
+   All 3 sections now have data from extraction.
+✅ Selector cards and weekly stacked chart hidden for pre-hour seasons;
+   restored automatically when switching to S26/F25.
+
+AMBASSADOR TAB (all seasons)
+-----------------------------
+✅ F25 efficiency metrics — extracted from col N (real normalized scores)
+✅ F25 Efficiency tab added (hasEff:true, weekAvgEff populated)
+✅ ambMostFreqPeriod populated for all seasons
+   · Marley Ahlijanian (S25): 'Breakfast & Lunch' (was tied 11/11)
+   · Astou Dieng (F24): Dinner (most frequent clean period)
+
+MISC
+----
+✅ Tooltip divider rows support (_tip helper)
+✅ Selector cards (ltog-lbs / ltog-avglbs) show avg lbs + avg lb/hr stats
+✅ Stat strip (amb-stat-strip) hidden — stats moved into selector cards
+✅ Mobile (≤640px) — section content appears below clicked selector card
+   (viz-container moves in DOM to after the selected hero-card on mobile)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔜 UPCOMING (approved, not yet implemented)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. All-time scatter / YoY — show per-shift dots colored by season
+   * add a toggle to switch to lbs/week, lbs/shift, lbs/day
+
+3. ✅ Ambassador tab for S25 F24 S24 — uses selector cards (Total Lbs / Avg Lbs / Busy Bee)
+   · Efficiency card hidden; Busy Bee visible when shift counts available
+   · One section rendered at a time matching selected card
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 FUTURE — NOT YET APPROVED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. embed this link https://script.google.com/a/macros/uri.edu/s/AKfycbw1QCu3D3ruGNL4wSwAaPBg54HuQIrMdIAvTi2SPwtP6zMrl0L42-8vnvjTuCjocyAs5w/exec
