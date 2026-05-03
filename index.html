@@ -356,17 +356,17 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 </header>
 
 <nav>
-  <button class="tab active" onclick="showPanel('impact',this)">🌱 Season Summary</button>
+  <button class="tab active" onclick="showPanel('summary',this)">🌱 Season Summary</button>
   <button class="tab" onclick="showPanel('leaderboard',this)">🏆 Ambassadors</button>
-  <button class="tab" onclick="showPanel('attendance',this)">🌍 Eco Impact</button>
+  <button class="tab" onclick="showPanel('impact',this)">🌍 Eco Impact</button>
   <button class="tab" onclick="showPanel('growth',this)">📊 All-Time</button>
 </nav>
 
 <main>
 
-<!-- IMPACT -->
-<div id="panel-impact" class="panel active">
-  <div class="section-title" id="impact-section-title">Spring 2026 · Highlights</div>
+<!-- Summary -->
+<div id="panel-summary" class="panel active">
+  <div class="section-title" id="summary-section-title">Spring 2026 · Highlights</div>
   <h2 class="section-heading">Season Highlights</h2>
   <p class="section-sub">Complete Spring 2026 data — tap any card to explore the story behind the numbers</p>
 
@@ -574,7 +574,7 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 </div>
 
 <!-- ECO IMPACT -->
-<div id="panel-attendance" class="panel">
+<div id="panel-impact" class="panel">
   <div class="section-title" id="eco-section-title">Spring 2026 · Environmental</div>
   <h2 class="section-heading">Eco Impact</h2>
   <p class="section-sub">Every pound diverted keeps methane out of landfills — processed by Remix Organics into compost and renewable energy · tap a card to explore</p>
@@ -627,7 +627,7 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
     <div class="gc-card"><div class="gc-val">129,352</div><div class="gc-label">All-time lbs diverted</div></div>
     <div class="gc-card"><div class="gc-val">82,207</div><div class="gc-label">All-time lbs CO₂e avoided</div></div>
   </div>
-  <div class="yoy-grid">
+  <div class="growth-grid">
     <div class="chart-section">
       <div class="chart-header">
         <div><div class="chart-title">Lbs Diverted Per Semester</div><div class="chart-note">All semesters · S26 = current</div></div>
