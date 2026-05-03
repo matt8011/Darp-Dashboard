@@ -3032,7 +3032,7 @@ function initFromHash() {
   const s = SEASON_DATA[parts[0]] ? parts[0] : 's26';
   const tabIds = ['summary','leaderboard','impact','growth'];
   //tab to load on reload
-  const t = tabIds.includes(parts[1]) ? parts[1] : 'summary';
+  const t = tabIds.includes(parts[1]) ? parts[1] : 'leaderboard';
   SD = SEASON_DATA[s];
   currentSeason = s;
   document.getElementById('season-label').textContent = SD.label + ' ▾';
