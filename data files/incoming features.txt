@@ -1,0 +1,17 @@
+some things are still wrong:
+
+Summary Tab :
+
+* Pounds Diverted section
+   * include PROGRAM TOTAL · lb/hr for all semesters (this is Mon,Tue,Wed,Thu,Fri stat)
+* make the section selector containers take up the page width
+* Rate Breakdown section:
+   * using YoY Data sheet, parse each semesters tabs for highest and lowest lbs/shift, lbs/day and lbs/week. use those values for each semester. EACH SEMESTER SHOULD GET AN ENTRY IN THE RATE BREAKDOWN TAB
+Ambassador Tab:
+
+* Ambassador Weekly Output section
+   * use "C:\Users\mkyle\OneDrive\Desktop\darp dashboard\data files\F2025 Data Analysis.xlsx" and extract efficiency metrics for each shift from Col N. NOTE the 1st 3 weeks haev no lb/hr stats. use those effeciency numbers to make an effeciency graph
+* Effeciency tab [add this]
+   * use the same data to make an effeciency tab to the same desired specs as S26.
+
+NOTE: your current F25 efficiency metrics are all wrong.

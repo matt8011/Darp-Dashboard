@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>DaRP · Spring 2026 · Ambassador Impact Dashboard</title>
+<title>DaRP · All Semesters · Program Impact Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -338,9 +338,9 @@ footer { text-align:center; padding:32px 48px; color:var(--muted); font-size:11p
 <body>
 
 <header>
-  <div class="logo-wrap"><img src="data%20files/Rhode_Island_Rams_logo.svg.png">
-    <h1>DaRP <span>Spring 2026</span></h1>
-    <p>Diversion &amp; Recovery Program · Ambassador Impact Dashboard</p>
+  <div class="logo-wrap"><img src="data%20files/DaRP_Logo.png">
+    <h1>DaRP <span>Semester Data</span></h1>
+    <p>Diversion &amp; Recovery Program · Program Impact Tool</p>
   </div>
   <div class="header-badge season-select" id="season-btn" onclick="toggleSeasonDrop(event)">
     <div class="badge-label">Season Status</div>
@@ -2182,7 +2182,7 @@ const SEASON_DATA = (() => {
 
 let SD = SEASON_DATA.s26;
 let currentSeason = 's26';
-let currentTab = 'impact';
+let currentTab = 'summary';
 
 const PROG_AVG_LBHR = 49.65;
 let selectedCard = null;
@@ -3028,9 +3028,11 @@ function updateHash() {
 
 function initFromHash() {
   const parts = (window.location.hash.slice(1) || '').split('/');
+  //semester to load on reload
   const s = SEASON_DATA[parts[0]] ? parts[0] : 's26';
-  const tabIds = ['impact','leaderboard','attendance','growth'];
-  const t = tabIds.includes(parts[1]) ? parts[1] : 'impact';
+  const tabIds = ['summary','leaderboard','impact','growth'];
+  //tab to load on reload
+  const t = tabIds.includes(parts[1]) ? parts[1] : 'summary';
   SD = SEASON_DATA[s];
   currentSeason = s;
   document.getElementById('season-label').textContent = SD.label + ' ▾';
